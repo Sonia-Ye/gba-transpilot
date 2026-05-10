@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA TransPilot - 完整预览</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .nav-tabs .nav-link {
+            color: #666;
+            border-radius: 12px 12px 0 0;
+        }
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .glossary-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .history-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .lang-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+        .flex-1 { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="container py-6">
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-white border-0 py-4">
+                        <h1 class="text-center text-primary">GBA TransPilot</h1>
+                        <p class="text-center text-muted small">面向大湾区场景的智能翻译、跨境政务工具展示版</p>
+                        
+                        <ul class="nav nav-tabs mt-4" id="mainTabs" role="tablist" style="display: flex; justify-content: space-around; width: 100%;">
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link active w-full px-4 py-2" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab">
+                                    <i class="fas fa-file-text me-1"></i> 文本翻译
+                                </button>
+                            </li>
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="av-tab" data-bs-toggle="tab" data-bs-target="#av" type="button" role="tab">
+                                    <i class="fas fa-video me-1"></i> 音视频翻译
+                                </button>
+                            </li>
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="rewrite-tab" data-bs-toggle="tab" data-bs-target="#rewrite" type="button" role="tab">
+                                    <i class="fas fa-edit me-1"></i> AI改写
+                                </button>
+                            </li>
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="polish-tab" data-bs-toggle="tab" data-bs-target="#polish" type="button" role="tab">
+                                    <i class="fas fa-sparkles me-1"></i> AI润色
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-body p-6">
+                        <div class="tab-content" id="mainTabContent">
+                            <div class="tab-pane fade show active" id="text" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">翻译工作台</h5>
+                                            <p class="text-gray-500 text-sm mb-4">支持翻译、查输入内容，核心操作保持简洁清爽</p>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-5">
+                                                    <select id="sourceLang" class="form-select">
+                                                        <option value="auto">自动检测</option>
+                                                        <option value="zh">中文</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">粤语</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2 text-center">
+                                                    <button id="swapLang" class="btn btn-outline-primary" style="border-radius: 50%; width: 36px; height: 36px;">
+                                                        <i class="fas fa-exchange-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <select id="targetLang" class="form-select">
+                                                        <option value="zh">中文</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">粤语</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="sourceText" class="form-control" rows="8" maxlength="5000">香港是一个国际化大都市，拥有繁荣的金融市场和丰富的文化遗产。
+
+Art Basel是世界著名的艺术博览会。
+
+大湾区建设正在稳步推进。</textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="charCount">69/5000</div>
+                                                </div>
+                                                
+                                                <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
+                                                    <button id="translateBtn" class="btn btn-primary" style="border-radius: 50%; width: 56px; height: 56px; font-size: 20px;">
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">翻译结果</label>
+                                                    <textarea id="targetText" class="form-control" rows="8" readonly>Hong Kong is an international metropolis with a thriving financial market and rich cultural heritage.
+
+Art Basel is a world-renowned art fair.
+
+The development of the Greater Bay Area is progressing steadily.</textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mt-4">
+                                                <div class="col-md-5">
+                                                    <button id="cleanTextBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-align-left"></i> 整理文本</button>
+                                                    <button id="speakSourceBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copySourceBtn" class="btn btn-outline-secondary"><i class="fas fa-copy"></i></button>
+                                                </div>
+                                                <div class="col-md-5 offset-md-2">
+                                                    <button id="alignBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-list"></i> 逐句对照</button>
+                                                    <button id="speakTargetBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copyTargetBtn" class="btn btn-outline-secondary"><i class="fas fa-copy"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-4">
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">OCR/PDF翻译</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">支持上传图片或PDF进行文字提取和翻译</p>
+                                                    <input type="file" id="ocrFile" class="form-control mb-3" accept=".pdf,.jpg,.jpeg,.png,.bmp">
+                                                    <button id="ocrBtn" class="btn btn-primary w-full"><i class="fas fa-file-image"></i> 上传并识别</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">回译验证</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">将译文再译回原文，验证翻译准确性</p>
+                                                    <button id="backTranslateBtn" class="btn btn-primary w-full mb-3"><i class="fas fa-sync"></i> 双向回译</button>
+                                                    <textarea id="backTranslateResult" class="form-control" rows="4" readonly></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-4">
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">OneLook词典</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">查询单词的详细释义和用法</p>
+                                                    <input type="text" id="dictInput" class="form-control mb-3" placeholder="输入要查询的单词（如：metropolis）">
+                                                    <button id="dictBtn" class="btn btn-primary w-full"><i class="fas fa-book"></i> 查询</button>
+                                                    <div id="dictResult" class="mt-3"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">术语表查询</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">从政府网站爬取的最新术语库</p>
+                                                    <input type="text" id="glossaryQuery" class="form-control mb-2" placeholder="输入要查询的术语（如：Art Basel）">
+                                                    <select id="glossaryTargetLang" class="form-select mb-3">
+                                                        <option value="zh">→ 中文</option>
+                                                        <option value="en">→ English</option>
+                                                        <option value="zh-HK">→ 粤语</option>
+                                                    </select>
+                                                    <button id="glossaryBtn" class="btn btn-primary w-full"><i class="fas fa-search"></i> 查询</button>
+                                                    <div id="glossaryResult" class="mt-3"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-4">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">词库与历史记录</h5>
+                                                <div>
+                                                    <button id="addTermBtn" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#addTermModal">
+                                                        <i class="fas fa-plus"></i> 添加术语
+                                                    </button>
+                                                    <button id="updateGlossaryBtn" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-sync-alt"></i> 更新词库
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded inline-block mb-3">2026-05-01</p>
+                                            <p class="text-gray-500 text-sm mb-3">从以下官方政府网站实时提取最新术语（支持中英粤三语）</p>
+                                            
+                                            <div class="glossary-item">
+                                                <i class="fas fa-globe me-2 text-danger"></i>
+                                                <a href="https://www.gov.cn/" target="_blank" class="text-decoration-none">gov.cn 中央政府</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-building me-2 text-primary"></i>
+                                                <a href="https://www.state.gov.cn/" target="_blank" class="text-decoration-none">state.gov.cn 国务院</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-gavel me-2 text-info"></i>
+                                                <a href="https://www.court.gov.cn/" target="_blank" class="text-decoration-none">court.gov.cn 最高人民法院</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-users me-2 text-success"></i>
+                                                <a href="https://www.npc.gov.cn/" target="_blank" class="text-decoration-none">npc.gov.cn 全国人大</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-landmark me-2 text-warning"></i>
+                                                <a href="https://www.gov.hk/" target="_blank" class="text-decoration-none">GovHK 香港政府一站通</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-balance-scale me-2 text-secondary"></i>
+                                                <a href="https://www.doj.gov.hk/" target="_blank" class="text-decoration-none">doj.gov.hk 律政司</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-file-alt me-2 text-primary"></i>
+                                                <a href="https://www.elegislation.gov.hk/" target="_blank" class="text-decoration-none">e-legislation 香港电子法例</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-chart-line me-2 text-info"></i>
+                                                <a href="https://www.hkex.com.hk/" target="_blank" class="text-decoration-none">HKEX 香港交易所</a>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-3">历史记录</h5>
+                                                <button id="clearHistoryBtn" class="btn btn-xs btn-outline-danger float-end">清空</button>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mb-3">翻译历史一键，可回溯到翻译工作台</p>
+                                            <div id="historyList">
+                                                <div class="history-item">
+                                                    <p class="text-sm text-gray-600 mb-1">香港是一个国际化大都市...</p>
+                                                    <p class="text-sm text-primary mb-1">Hong Kong is an international...</p>
+                                                    <span class="lang-tag">zh → en</span>
+                                                    <span class="lang-tag">2026-04-30 10:00:00</span>
+                                                </div>
+                                                <div class="history-item">
+                                                    <p class="text-sm text-gray-600 mb-1">Art Basel是世界著名的艺术博览会...</p>
+                                                    <p class="text-sm text-primary mb-1">Art Basel is a world-renowned art fair...</p>
+                                                    <span class="lang-tag">zh → en</span>
+                                                    <span class="lang-tag">2026-04-30 10:30:00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane fade" id="av" role="tabpanel">
+                                <ul class="nav nav-pills mb-4" id="avModeTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="transcribe-mode-tab" data-bs-toggle="tab" data-bs-target="#transcribe-mode" type="button" role="tab">
+                                            <i class="fas fa-file-audio me-2"></i>文件转录
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="realtime-mode-tab" data-bs-toggle="tab" data-bs-target="#realtime-mode" type="button" role="tab">
+                                            <i class="fas fa-microphone me-2"></i>实时对话
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content" id="avModeTabContent">
+                                    <!-- File Transcription Mode -->
+                                    <div class="tab-pane fade show active" id="transcribe-mode" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">音/视频上传与转录</h5>
+                                                    <p class="text-gray-500 text-sm mb-4">上传音/视频文件进行自动转录，生成字幕和翻译</p>
+                                                    
+                                                    <div class="mb-4">
+                                                        <input type="file" id="avFile" class="form-control" accept=".mp3,.wav,.mp4,.avi,.mov">
+                                                    </div>
+                                                    
+                                                    <div class="row mb-4">
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">转录语言</label>
+                                                            <select id="avSourceLang" class="form-select">
+                                                                <option value="auto">自动检测</option>
+                                                                <option value="zh">中文</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">翻译目标语言</label>
+                                                            <select id="avTargetLang" class="form-select">
+                                                                <option value="zh">中文</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <button id="avTranscribeBtn" class="btn btn-primary w-full mb-4"><i class="fas fa-microphone"></i> 开始转录</button>
+                                                    
+                                                    <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                        <h5 class="text-gray-700 mb-3">转录结果</h5>
+                                                        <button id="translateTranscriptBtn" class="btn btn-primary mb-3" style="width: 100%;">
+                                                            <i class="fas fa-arrow-down"></i> 翻译下方转录内容
+                                                        </button>
+                                                        <textarea id="avResult" class="form-control" rows="10" readonly>[00:00:01] 欢迎收听今天的节目
+[00:00:05] 我们将讨论大湾区的最新发展
+[00:00:10] Art Basel是非常重要的艺术活动</textarea>
+                                                        <div class="mt-3">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="downloadFormatDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="fas fa-download"></i> 下载转录内容
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="downloadFormatDropdown">
+                                                                    <li><a class="dropdown-item" href="#" onclick="downloadTranscript('txt')">📄 下载为 TXT</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="downloadTranscript('doc')">📝 下载为 DOC</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="downloadTranscript('pdf')">📕 下载为 PDF</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-4">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">转录翻译结果</h5>
+                                                    <textarea id="avTranslation" class="form-control" rows="10" readonly>[00:00:01] Welcome to today's program
+[00:00:05] We will discuss the latest developments in the Greater Bay Area
+[00:00:10] Art Basel is a very important art event</textarea>
+                                                    <button id="copyAVTranslation" class="btn btn-outline-secondary mt-3"><i class="fas fa-copy"></i> 复制翻译</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Real-time Conversation Mode -->
+                                    <div class="tab-pane fade" id="realtime-mode" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3"><i class="fas fa-comments me-2"></i>实时语音对话</h5>
+                                                    <p class="text-gray-500 text-sm mb-4">旅游时与外国人实时对话，自动翻译双方语言</p>
+                                                    
+                                                    <div class="row mb-4">
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">您的语言</label>
+                                                            <select id="myLang" class="form-select">
+                                                                <option value="zh">中文</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">对方语言</label>
+                                                            <select id="theirLang" class="form-select">
+                                                                <option value="en">English</option>
+                                                                <option value="zh">中文</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="text-center mb-4">
+                                                        <button id="startConversationBtn" class="btn btn-success btn-lg px-5">
+                                                            <i class="fas fa-microphone me-2"></i>开始对话
+                                                        </button>
+                                                        <button id="stopConversationBtn" class="btn btn-danger btn-lg px-5" style="display: none;">
+                                                            <i class="fas fa-stop me-2"></i>结束对话
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div id="conversationStatus" class="alert alert-info text-center" style="display: none;">
+                                                        <i class="fas fa-headphones me-2"></i>
+                                                        <span id="statusText">正在聆听...</span>
+                                                    </div>
+                                                    
+                                                    <div class="bg-white rounded p-3" style="border-radius: 8px; min-height: 200px; max-height: 400px; overflow-y: auto;" id="conversationHistory">
+                                                        <p class="text-muted text-center">对话历史将显示在这里</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-4">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">使用说明</h5>
+                                                    <ol class="text-sm text-gray-600">
+                                                        <li class="mb-2">选择您的语言和对方语言</li>
+                                                        <li class="mb-2">点击"开始对话"按钮开始</li>
+                                                        <li class="mb-2">您说话后，系统会自动翻译并播放给对方</li>
+                                                        <li class="mb-2">对方说话后，系统会自动翻译并播放给您</li>
+                                                        <li class="mb-2">点击"结束对话"按钮停止</li>
+                                                    </ol>
+                                                    <div class="alert alert-warning mt-3">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <small>需要麦克风权限，请在浏览器中允许使用麦克风</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane fade" id="rewrite" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">AI改写工作台</h5>
+                                            <p class="text-gray-500 text-sm mb-4">支持意译和预编辑两种模式，帮助优化文本</p>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">改写模式</label>
+                                                    <select id="rewriteMode" class="form-select">
+                                                        <option value="paraphrase">意译 - 重新组织语言表达</option>
+                                                        <option value="pre-edit">预编辑 - 优化文本便于翻译</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">风格选择</label>
+                                                    <select id="rewriteStyle" class="form-select">
+                                                        <option value="standard">标准</option>
+                                                        <option value="formal">正式</option>
+                                                        <option value="casual">口语化</option>
+                                                        <option value="academic">学术</option>
+                                                        <option value="business">商务</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="rewriteInput" class="form-control" rows="6">这个项目非常好，我们应该大力推广它。</textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button id="rewriteBtn" class="btn btn-primary mb-3"><i class="fas fa-magic"></i> 开始改写</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h6 class="text-gray-600 mb-2">改写结果</h6>
+                                                <textarea id="rewriteOutput" class="form-control" rows="4" readonly>这个项目表现出色，值得我们全力支持并广泛推广。</textarea>
+                                                <button id="copyRewriteBtn" class="btn btn-outline-secondary mt-2"><i class="fas fa-copy"></i> 复制</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-lg-12">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">改写历史</h5>
+                                                <button id="clearRewriteHistoryBtn" class="btn btn-xs btn-outline-danger">清空</button>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mb-3">多次改写结果对比，可选择使用</p>
+                                            <div id="rewriteHistoryList">
+                                                <div class="history-item">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="flex-grow-1">
+                                                            <p class="text-sm text-gray-600 mb-1"><strong>原文:</strong> 这个项目非常好，我们应该大力推广它。</p>
+                                                            <p class="text-sm text-primary mb-1"><strong>改写:</strong> 这个项目表现出色，值得我们全力支持并广泛推广。</p>
+                                                            <span class="lang-tag">paraphrase - formal</span>
+                                                            <span class="lang-tag">2026-04-30 10:30:00</span>
+                                                        </div>
+                                                        <button class="btn btn-xs btn-outline-primary use-rewrite-btn" data-index="0">使用</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane fade" id="polish" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">AI润色工作台</h5>
+                                            <p class="text-gray-500 text-sm mb-4">后编辑润色，提升文本质量和表达效果</p>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label class="text-sm text-gray-600 mb-2">润色风格</label>
+                                                    <select id="polishStyle" class="form-select">
+                                                        <option value="standard">标准</option>
+                                                        <option value="formal">正式</option>
+                                                        <option value="casual">口语化</option>
+                                                        <option value="academic">学术</option>
+                                                        <option value="business">商务</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="polishInput" class="form-control" rows="6">这份报告写得不错，可以再改进一下。</textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button id="polishBtn" class="btn btn-success mb-3"><i class="fas fa-sparkles"></i> 开始润色</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h6 class="text-gray-600 mb-2">润色结果</h6>
+                                                <textarea id="polishOutput" class="form-control" rows="4" readonly>这份报告质量较高，建议进一步优化完善。</textarea>
+                                                <button id="copyPolishBtn" class="btn btn-outline-secondary mt-2"><i class="fas fa-copy"></i> 复制</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-lg-12">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">润色历史</h5>
+                                                <button id="clearPolishHistoryBtn" class="btn btn-xs btn-outline-danger">清空</button>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mb-3">多次润色结果对比，可选择使用</p>
+                                            <div id="polishHistoryList">
+                                                <div class="history-item">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="flex-grow-1">
+                                                            <p class="text-sm text-gray-600 mb-1"><strong>原文:</strong> 这份报告写得不错，可以再改进一下。</p>
+                                                            <p class="text-sm text-primary mb-1"><strong>润色:</strong> 这份报告质量较高，建议进一步优化完善。</p>
+                                                            <span class="lang-tag">polish - standard</span>
+                                                            <span class="lang-tag">2026-04-30 10:35:00</span>
+                                                        </div>
+                                                        <button class="btn btn-xs btn-outline-primary use-polish-btn" data-index="0">使用</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal fade" id="alignModal" tabindex="-1" aria-labelledby="alignModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="alignModalLabel"><i class="fas fa-list me-2"></i>逐句对照</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                                    <div id="alignContent"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                                    <button type="button" class="btn btn-primary" onclick="copyAlignResult()"><i class="fas fa-copy me-1"></i>复制结果</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal fade" id="addTermModal" tabindex="-1" aria-labelledby="addTermModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addTermModalLabel">添加术语</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- 单个添加 -->
+                                    <div class="mb-4">
+                                        <h6 class="text-gray-600 mb-2">📝 单个添加</h6>
+                                        <div class="mb-3">
+                                            <label for="termInput" class="form-label">术语</label>
+                                            <input type="text" class="form-control" id="termInput" placeholder="输入术语（如：Art Basel）">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="translationInput" class="form-label">翻译</label>
+                                            <input type="text" class="form-control" id="translationInput" placeholder="输入翻译（如：巴塞尔艺术展）">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sourceInput" class="form-label">来源（可选）</label>
+                                            <input type="text" class="form-control" id="sourceInput" placeholder="如：政府网站">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 分隔线 -->
+                                    <hr class="my-4">
+                                    
+                                    <!-- 批量上传 -->
+                                    <div class="mb-4">
+                                        <h6 class="text-gray-600 mb-2">📁 批量上传</h6>
+                                        <div class="mb-3">
+                                            <label for="termFileInput" class="form-label">上传术语文件</label>
+                                            <input type="file" class="form-control" id="termFileInput" accept=".json,.csv,.txt">
+                                            <small class="text-muted">支持 JSON、CSV、TXT 格式</small>
+                                        </div>
+                                        <div class="bg-light p-3 rounded">
+                                            <p class="text-sm text-gray-600 mb-1">文件格式示例：</p>
+                                            <code class="text-xs">
+                                                {"Art Basel": "巴塞尔艺术展", "HKEX": "香港交易所"}
+                                            </code>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary" id="saveTermBtn">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-center gap-4">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-lock"></i> 隐私管理</button>
+                            <button class="btn btn-primary btn-sm"><i class="fas fa-comment"></i> 意见反馈</button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-user"></i> 联络作者</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let alignResultText = '';
+        
+        document.getElementById('sourceText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length + '/5000';
+        });
+
+        document.getElementById('swapLang').addEventListener('click', function() {
+            const source = document.getElementById('sourceLang').value;
+            const target = document.getElementById('targetLang').value;
+            document.getElementById('sourceLang').value = target;
+            document.getElementById('targetLang').value = source;
+        });
+
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const text = document.getElementById('sourceText').value;
+            if (!text.trim()) return;
+            this.disabled = true;
+            document.getElementById('targetText').value = '翻译中...';
+            
+            setTimeout(() => {
+                const translations = {
+                    'en': 'Hong Kong is an international metropolis with a thriving financial market and rich cultural heritage.\n\nArt Basel is a world-renowned art fair.\n\nThe development of the Greater Bay Area is progressing steadily.',
+                    'zh': '香港是一个国际化大都市，拥有繁荣的金融市场和丰富的文化遗产。\n\n巴塞尔艺术展是世界著名的艺术博览会。\n\n大湾区建设正在稳步推进。',
+                    'zh-HK': '香港係一個國際化大都市，擁有繁榮嘅金融市場同豐富嘅文化遺產。\n\n巴塞爾藝術展係世界著名嘅藝術博覽會。\n\n大灣區建設正在穩步推進。'
+                };
+                document.getElementById('targetText').value = translations[document.getElementById('targetLang').value] || translations['en'];
+                this.disabled = false;
+            }, 1000);
+        });
+
+        document.getElementById('cleanTextBtn').addEventListener('click', function() {
+            const text = document.getElementById('sourceText').value;
+            if (!text.trim()) return;
+            
+            function cleanText(text) {
+                // 规范化各种换行符
+                text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                
+                // 首先尝试识别自然段落（双换行或空行分隔）
+                const paragraphDelimiters = /\n\s*\n|\n{2,}/;
+                const paragraphs = text.split(paragraphDelimiters);
+                
+                const cleanedParagraphs = paragraphs.map(para => {
+                    para = para.trim();
+                    if (!para) return '';
+                    
+                    // 对每个段落，检查是否包含"断行"
+                    const lines = para.split('\n');
+                    
+                    if (lines.length === 1) {
+                        // 段落只有一行，直接去除多余空格
+                        return para.replace(/\s+/g, ' ').trim();
+                    }
+                    
+                    // 处理多行段落
+                    const processedLines = [];
+                    for (let i = 0; i < lines.length; i++) {
+                        let line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        if (i < lines.length - 1) {
+                            // 检查是否是断行（不是句子结束）
+                            const nextLine = lines[i + 1]?.trim() || '';
+                            
+                            // 判断规则：
+                            // 1. 当前行不以常见句子结束符结尾
+                            // 2. 下一行以小写字母开头（或者很短，像是单词被折行）
+                            // 3. 或者当前行以连字符结尾
+                            const endsWithSentenceEnd = /[。！？.!?…\-–—)）]$/.test(line);
+                            const nextStartsWithLower = /^[a-z]/.test(nextLine);
+                            const lineEndsWithHyphen = /[\-–—]$/.test(line);
+                            
+                            if ((!endsWithSentenceEnd && nextStartsWithLower) || lineEndsWithHyphen) {
+                                // 这是断行，需要连接，但要去除当前行末尾的连字符
+                                line = line.replace(/[\-–—]$/, '');
+                                processedLines.push(line);
+                            } else {
+                                // 这是有意换行或者是句子边界
+                                processedLines.push(line);
+                            }
+                        } else {
+                            // 最后一行
+                            processedLines.push(line);
+                        }
+                    }
+                    
+                    // 合并处理后的行（直接连接，不额外添加空格）
+                    let result = processedLines.join('');
+                    
+                    // 最后一次清理多余空格
+                    result = result.replace(/[ \t]+/g, ' ').trim();
+                    
+                    return result;
+                }).filter(para => para);
+                
+                return cleanedParagraphs.join('\n\n');
+            }
+            
+            document.getElementById('sourceText').value = cleanText(text);
+            document.getElementById('charCount').textContent = document.getElementById('sourceText').value.length + '/5000';
+        });
+
+        document.getElementById('copySourceBtn').addEventListener('click', function() {
+            document.getElementById('sourceText').select();
+            document.execCommand('copy');
+            alert('已复制原文');
+        });
+
+        document.getElementById('copyTargetBtn').addEventListener('click', function() {
+            document.getElementById('targetText').select();
+            document.execCommand('copy');
+            alert('已复制译文');
+        });
+
+        document.getElementById('alignBtn').addEventListener('click', function() {
+            const sourceText = document.getElementById('sourceText').value.trim();
+            const targetText = document.getElementById('targetText').value.trim();
+            
+            if (!sourceText || !targetText) {
+                alert('请先输入原文和译文');
+                return;
+            }
+            
+            const sourceSentences = sourceText.split(/(?<=[。！？.!?])\s*/).filter(s => s.trim());
+            const targetSentences = targetText.split(/(?<=[。！？.!?])\s*/).filter(s => s.trim());
+            
+            let html = '<div class="align-container">';
+            alignResultText = '';
+            
+            const maxLen = Math.max(sourceSentences.length, targetSentences.length);
+            for (let i = 0; i < maxLen; i++) {
+                const src = sourceSentences[i] || '';
+                const tgt = targetSentences[i] || '';
+                
+                if (src || tgt) {
+                    html += `
+                    <div class="align-item mb-4 p-3 bg-light rounded">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <span class="badge bg-primary me-2">${i + 1}</span>
+                                <span class="text-muted small">原文</span>
+                                <p class="mt-2 mb-0 fs-6">${src}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="badge bg-success me-2">${i + 1}</span>
+                                <span class="text-muted small">译文</span>
+                                <p class="mt-2 mb-0 fs-6">${tgt}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                    
+                    alignResultText += `[${i + 1}] 原文: ${src}\n[${i + 1}] 译文: ${tgt}\n\n`;
+                }
+            }
+            
+            html += '</div>';
+            document.getElementById('alignContent').innerHTML = html;
+            
+            const modal = new bootstrap.Modal(document.getElementById('alignModal'));
+            modal.show();
+        });
+
+        function copyAlignResult() {
+            navigator.clipboard.writeText(alignResultText).then(() => alert('已复制到剪贴板'));
+        }
+
+        document.getElementById('ocrBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('ocrFile');
+            if (!fileInput.files[0]) {
+                alert('请先选择文件');
+                return;
+            }
+            document.getElementById('sourceText').value = 'OCR提取的文本内容示例...\n\nSample text extracted from image/PDF...';
+        });
+
+        document.getElementById('backTranslateBtn').addEventListener('click', function() {
+            document.getElementById('backTranslateResult').value = 'English: Hong Kong is an international metropolis\n中文回译: 香港是一个国际化大都市\n粤语回译: 香港係一個國際化大都市';
+        });
+
+        document.getElementById('dictBtn').addEventListener('click', function() {
+            const word = document.getElementById('dictInput').value || 'metropolis';
+            document.getElementById('dictResult').innerHTML = `<pre class="bg-white p-3 rounded">${word}
+
+词性：名词 (Noun)
+定义：A large and important city.
+中文：大都市，大城市
+例句：Hong Kong is a major metropolis in Asia.
+同义词：city, urban center, megacity</pre>`;
+        });
+
+        document.getElementById('glossaryBtn').addEventListener('click', function() {
+            const query = document.getElementById('glossaryQuery').value || 'Art Basel';
+            const lang = document.getElementById('glossaryTargetLang').value;
+            const results = {
+                'en': { 'Art Basel': '巴塞尔艺术展', '大湾区': 'Greater Bay Area', '香港': 'Hong Kong' },
+                'zh': { 'GBA': '大湾区', 'Hong Kong': '香港', 'Art Basel': '巴塞尔艺术展' },
+                'zh-HK': { '大湾区': '大灣區', '香港': '香港', 'Art Basel': '巴塞爾藝術展' }
+            };
+            let html = '';
+            Object.keys(results[lang]).forEach(term => {
+                html += `<div class="glossary-item"><strong>${term}</strong><br>${results[lang][term]}</div>`;
+            });
+            document.getElementById('glossaryResult').innerHTML = html;
+        });
+
+        document.getElementById('saveTermBtn').addEventListener('click', function() {
+            const term = document.getElementById('termInput').value.trim();
+            const translation = document.getElementById('translationInput').value.trim();
+            const fileInput = document.getElementById('termFileInput');
+            const source = document.getElementById('sourceInput').value.trim();
+            
+            if (fileInput.files.length > 0) {
+                // 处理文件上传
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        let terms = {};
+                        const content = e.target.result;
+                        
+                        // 尝试解析为JSON
+                        try {
+                            terms = JSON.parse(content);
+                        } catch {
+                            // 如果不是JSON，尝试解析为CSV/TXT
+                            const lines = content.split('\n');
+                            lines.forEach(line => {
+                                const parts = line.split(/[,=:]/);
+                                if (parts.length >= 2) {
+                                    terms[parts[0].trim()] = parts.slice(1).join('').trim();
+                                }
+                            });
+                        }
+                        
+                        alert(`成功导入 ${Object.keys(terms).length} 个术语！`);
+                        bootstrap.Modal.getInstance(document.getElementById('addTermModal')).hide();
+                        fileInput.value = '';
+                    } catch (error) {
+                        alert('文件格式错误，请检查文件内容');
+                    }
+                };
+                
+                reader.readAsText(file);
+            } else if (term && translation) {
+                // 单个添加
+                alert('术语已添加！');
+                bootstrap.Modal.getInstance(document.getElementById('addTermModal')).hide();
+                document.getElementById('termInput').value = '';
+                document.getElementById('translationInput').value = '';
+                document.getElementById('sourceInput').value = '';
+            } else {
+                alert('请输入术语和翻译，或上传文件');
+            }
+        });
+
+        document.getElementById('avTranscribeBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('avFile');
+            if (!fileInput.files[0]) {
+                alert('请先选择文件');
+                return;
+            }
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 转录中...';
+            
+            setTimeout(() => {
+                document.getElementById('avResult').value = '[00:00:01] 欢迎收听今天的节目\n[00:00:05] 我们将讨论大湾区的最新发展\n[00:00:10] Art Basel是非常重要的艺术活动';
+                document.getElementById('avTranslation').value = '[00:00:01] Welcome to today\'s program\n[00:00:05] We will discuss the latest developments in the Greater Bay Area\n[00:00:10] Art Basel is a very important art event';
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-microphone"></i> 开始转录';
+            }, 2000);
+        });
+
+        document.getElementById('translateTranscriptBtn').addEventListener('click', function() {
+            document.getElementById('avTranslation').value = '[00:00:01] Welcome to today\'s program\n[00:00:05] We will discuss the latest developments in the Greater Bay Area\n[00:00:10] Art Basel is a very important art event';
+        });
+
+        document.getElementById('copyAVTranslation').addEventListener('click', function() {
+            document.getElementById('avTranslation').select();
+            document.execCommand('copy');
+            alert('已复制');
+        });
+
+        function downloadTranscript(format) {
+            const text = document.getElementById('avResult').value;
+            const blob = new Blob([text], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transcript.' + format;
+            a.click();
+        }
+
+        document.getElementById('rewriteBtn').addEventListener('click', function() {
+            const mode = document.getElementById('rewriteMode').value;
+            const style = document.getElementById('rewriteStyle').value;
+            
+            const results = {
+                'paraphrase': {
+                    'standard': '这个项目很不错，我们应该积极推广它。',
+                    'formal': '该项目具有显著优势，应当予以大力推广。',
+                    'casual': '这项目挺不错的，咱们多推广推广。',
+                    'academic': '本研究项目展现出卓越特质，值得广泛推广。',
+                    'business': '该项目表现优异，值得投入资源进行推广。'
+                },
+                'pre-edit': {
+                    'standard': '该项目质量优良，建议进行推广。',
+                    'formal': '鉴于该项目质量优良，建议予以推广。',
+                    'casual': '这项目挺好的，可以推广一下。',
+                    'academic': '该项目质量优良，建议进行推广。',
+                    'business': '该项目质量优良，建议进行推广。'
+                }
+            };
+            
+            document.getElementById('rewriteOutput').value = results[mode][style] || results['paraphrase']['formal'];
+        });
+
+        document.getElementById('copyRewriteBtn').addEventListener('click', function() {
+            document.getElementById('rewriteOutput').select();
+            document.execCommand('copy');
+            alert('已复制');
+        });
+
+        document.getElementById('polishBtn').addEventListener('click', function() {
+            const style = document.getElementById('polishStyle').value;
+            
+            const results = {
+                'standard': '这份报告质量较高，建议进一步优化完善。',
+                'formal': '该报告质量较高，建议进一步优化完善。',
+                'casual': '这份报告写得挺好的，可以再改改。',
+                'academic': '该报告质量较高，建议进一步修改完善。',
+                'business': '该报告质量较高，建议进一步优化完善。'
+            };
+            
+            document.getElementById('polishOutput').value = results[style] || results['standard'];
+        });
+
+        document.getElementById('copyPolishBtn').addEventListener('click', function() {
+            document.getElementById('polishOutput').select();
+            document.execCommand('copy');
+            alert('已复制');
+        });
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+            if (confirm('确定要清空历史记录吗？')) {
+                document.getElementById('historyList').innerHTML = '<p class="text-muted text-center">暂无历史记录</p>';
+            }
+        });
+
+        document.getElementById('clearRewriteHistoryBtn').addEventListener('click', function() {
+            if (confirm('确定要清空改写历史吗？')) {
+                document.getElementById('rewriteHistoryList').innerHTML = '<p class="text-muted text-center">暂无历史记录</p>';
+            }
+        });
+
+        document.getElementById('clearPolishHistoryBtn').addEventListener('click', function() {
+            if (confirm('确定要清空润色历史吗？')) {
+                document.getElementById('polishHistoryList').innerHTML = '<p class="text-muted text-center">暂无历史记录</p>';
+            }
+        });
+
+        // Real-time Voice Conversation
+        let conversationActive = false;
+        let recognition = null;
+        let currentSpeakingLang = 'zh';
+        let conversationMode = 'waiting'; // 'waiting', 'my-turn', 'their-turn'
+
+        const langMap = {
+            'zh': 'zh-CN',
+            'en': 'en-US',
+            'zh-HK': 'zh-HK'
+        };
+
+        const langNames = {
+            'zh': '中文',
+            'en': 'English',
+            'zh-HK': '粤语'
+        };
+
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else {
+                alert('您的浏览器不支持语音识别功能，请使用 Chrome 或 Safari 浏览器');
+                return null;
+            }
+
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                handleRecognizedSpeech(text);
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                    document.getElementById('statusText').textContent = '识别错误: ' + event.error;
+                }
+                if (conversationActive) {
+                    setTimeout(startListening, 1000);
+                }
+            };
+
+            recognition.onend = function() {
+                if (conversationActive) {
+                    setTimeout(startListening, 500);
+                }
+            };
+
+            return recognition;
+        }
+
+        function startListening() {
+            if (!recognition || !conversationActive) return;
+
+            const lang = conversationMode === 'my-turn' ? 
+                langMap[document.getElementById('myLang').value] : 
+                langMap[document.getElementById('theirLang').value];
+
+            recognition.lang = lang;
+            recognition.start();
+
+            document.getElementById('statusText').textContent = 
+                conversationMode === 'my-turn' ? '正在聆听您说话...' : '正在聆听对方说话...';
+        }
+
+        function handleRecognizedSpeech(text) {
+            const myLang = document.getElementById('myLang').value;
+            const theirLang = document.getElementById('theirLang').value;
+
+            if (conversationMode === 'my-turn') {
+                // User spoke in their language, translate to other's language
+                addToConversationHistory(
+                    langNames[myLang],
+                    text,
+                    langNames[theirLang],
+                    text, // Demo: in real app, this would be translated
+                    'me'
+                );
+
+                // Demo translation
+                const translatedText = translateTextDemo(text, myLang, theirLang);
+                speakText(translatedText, theirLang);
+                addToConversationHistory(
+                    langNames[theirLang],
+                    translatedText,
+                    langNames[myLang],
+                    text,
+                    'translated-me'
+                );
+
+                // Switch to their turn
+                conversationMode = 'their-turn';
+                document.getElementById('statusText').textContent = '请对方说话...';
+
+            } else {
+                // Other person spoke, translate to user's language
+                addToConversationHistory(
+                    langNames[theirLang],
+                    text,
+                    langNames[myLang],
+                    text, // Demo: in real app, this would be translated
+                    'them'
+                );
+
+                // Demo translation
+                const translatedText = translateTextDemo(text, theirLang, myLang);
+                speakText(translatedText, myLang);
+                addToConversationHistory(
+                    langNames[myLang],
+                    translatedText,
+                    langNames[theirLang],
+                    text,
+                    'translated-them'
+                );
+
+                // Switch back to user's turn
+                conversationMode = 'my-turn';
+                document.getElementById('statusText').textContent = '请开始说话...';
+            }
+        }
+
+        function translateTextDemo(text, fromLang, toLang) {
+            // Demo translations for testing
+            const translations = {
+                'zh-en': {
+                    '你好': 'Hello',
+                    '今天天气怎么样': "How's the weather today",
+                    '请问在哪里': 'Where is it please',
+                    '谢谢': 'Thank you'
+                },
+                'en-zh': {
+                    'Hello': '你好',
+                    "How's the weather today": '今天天气怎么样',
+                    'Where is it please': '请问在哪里',
+                    'Thank you': '谢谢'
+                }
+            };
+
+            const key = fromLang + '-' + toLang;
+            return translations[key]?.[text] || `[${langNames[toLang]}] ${text}`;
+        }
+
+        function speakText(text, lang) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = langMap[lang];
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+
+                const voices = speechSynthesis.getVoices();
+                const voice = voices.find(v => v.lang.startsWith(lang));
+                if (voice) {
+                    utterance.voice = voice;
+                }
+
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function addToConversationHistory(speaker, original, translator, translated, type) {
+            const historyDiv = document.getElementById('conversationHistory');
+            
+            if (historyDiv.querySelector('.text-muted')) {
+                historyDiv.innerHTML = '';
+            }
+
+            const isMe = type === 'me' || type === 'translated-me';
+            const isTranslated = type.includes('translated');
+
+            const html = `
+                <div class="mb-3 p-2 rounded ${isMe ? 'bg-primary bg-opacity-10' : 'bg-success bg-opacity-10'}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <span class="badge ${isMe ? 'bg-primary' : 'bg-success'} me-2">${speaker}</span>
+                            <p class="mb-1 fw-bold">${original}</p>
+                            ${isTranslated ? `
+                                <small class="text-muted">
+                                    <i class="fas fa-arrow-right me-1"></i>
+                                    <span class="badge bg-secondary me-2">${translator}</span>
+                                    ${translated}
+                                </small>
+                            ` : ''}
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="speakText('${original}', '${isMe ? document.getElementById('myLang').value : document.getElementById('theirLang').value}')">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            historyDiv.insertAdjacentHTML('beforeend', html);
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+        }
+
+        document.getElementById('startConversationBtn').addEventListener('click', function() {
+            conversationActive = true;
+            conversationMode = 'my-turn';
+
+            this.style.display = 'none';
+            document.getElementById('stopConversationBtn').style.display = 'inline-block';
+            document.getElementById('conversationStatus').style.display = 'block';
+            document.getElementById('statusText').textContent = '请开始说话...';
+
+            initSpeechRecognition();
+            if (recognition) {
+                startListening();
+            }
+        });
+
+        document.getElementById('stopConversationBtn').addEventListener('click', function() {
+            conversationActive = false;
+
+            if (recognition) {
+                recognition.stop();
+            }
+
+            this.style.display = 'none';
+            document.getElementById('startConversationBtn').style.display = 'inline-block';
+            document.getElementById('conversationStatus').style.display = 'none';
+        });
+
+        // Load voices when available
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = function() {
+                console.log('Voices loaded:', speechSynthesis.getVoices().length);
+            };
+        }
+    </script>
+</body>
+</html>

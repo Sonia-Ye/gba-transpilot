@@ -1,0 +1,1499 @@
+﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA TransPilot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .nav-tabs .nav-link {
+            color: #666;
+            border-radius: 12px 12px 0 0;
+        }
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        .glossary-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .history-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .lang-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+        .flex-1 { flex: 1; }
+        
+        /* 复制按钮样式 - 新设计 */
+        .copy-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .copy-btn .copy-icon,
+        .copy-btn .check-icon {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            position: absolute;
+        }
+        .copy-btn .check-icon {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        .copy-btn.copied .copy-icon {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        .copy-btn.copied .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .copy-btn.copied {
+            color: #28a745;
+            border-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-6">
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-white border-0 py-4">
+                        <h1 class="text-center text-primary">GBA TransPilot</h1>
+                        <p class="text-center text-muted small">闈㈠悜澶ф咕鍖哄満鏅殑鏅鸿兘缈昏瘧銆佽法澧冩斂鍔″伐鍏峰睍绀虹増</p>
+                        
+                        <!-- Tab Navigation -->
+                        <ul class="nav nav-tabs mt-4" id="mainTabs" role="tablist" style="display: flex; justify-content: space-around; width: 100%;">
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link active w-full px-4 py-2" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab">
+                                    <i class="fas fa-file-text me-1"></i> 鏂囨湰缈昏瘧
+                                </button>
+                            </li>
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="av-tab" data-bs-toggle="tab" data-bs-target="#av" type="button" role="tab">
+                                    <i class="fas fa-video me-1"></i> 闊宠棰戠炕璇?                                </button>
+                            </li>
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="rewrite-tab" data-bs-toggle="tab" data-bs-target="#rewrite" type="button" role="tab">
+                                    <i class="fas fa-edit me-1"></i> AI鏀瑰啓
+                                </button>
+                            </li>
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="polish-tab" data-bs-toggle="tab" data-bs-target="#polish" type="button" role="tab">
+                                    <i class="fas fa-sparkles me-1"></i> AI娑﹁壊
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-body p-6">
+                        <div class="tab-content" id="mainTabContent">
+                            <!-- Text Translation Tab -->
+                            <div class="tab-pane fade show active" id="text" role="tabpanel">
+                                <div class="row">
+                                    <!-- Left Column -->
+                                    <div class="col-lg-8">
+                                        <!-- Translation Workspace -->
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">缈昏瘧宸ヤ綔鍙?/h5>
+                                            <p class="text-gray-500 text-sm mb-4">鏀寔缈昏瘧銆佹煡杈撳叆鍐呭锛屾牳蹇冩搷浣滀繚鎸佺畝娲佹竻鐖?/p>
+                                            
+                                            <!-- Language Selection -->
+                                            <div class="row mb-4">
+                                                <div class="col-md-5">
+                                                    <select id="sourceLang" class="form-select">
+                                                        <option value="auto">鑷姩妫€娴?/option>
+                                                        <option value="zh">涓枃</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">绮よ</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2 text-center">
+                                                    <button id="swapLang" class="btn btn-outline-primary" style="border-radius: 50%; width: 36px; height: 36px;">
+                                                        <i class="fas fa-exchange-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <select id="targetLang" class="form-select">
+                                                        <option value="zh">涓枃</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">绮よ</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Input and Output -->
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">鍘熸枃杈撳叆</label>
+                                                    <textarea id="sourceText" class="form-control" rows="8" maxlength="5000">棣欐腐鏄竴涓浗闄呭寲澶ч兘甯傦紝鎷ユ湁绻佽崳鐨勯噾铻嶅競鍦哄拰涓板瘜鐨勬枃鍖栭仐浜с€?
+Art Basel鏄笘鐣岃憲鍚嶇殑鑹烘湳鍗氳浼氥€?
+澶ф咕鍖哄缓璁炬鍦ㄧǔ姝ユ帹杩涖€?/textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="charCount">69/5000</div>
+                                                </div>
+                                                
+                                                <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
+                                                    <button id="translateBtn" class="btn btn-primary" style="border-radius: 50%; width: 56px; height: 56px; font-size: 20px;">
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">缈昏瘧缁撴灉</label>
+                                                    <textarea id="targetText" class="form-control" rows="8" readonly></textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Toolbar -->
+                                            <div class="row mt-4">
+                                                <div class="col-md-5">
+                                                    <button id="cleanTextBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-align-left"></i> 鏁寸悊鏂囨湰</button>
+                                                    <button id="speakSourceBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copySourceBtn" class="btn btn-outline-secondary copy-btn" data-copy-target="sourceText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                </div>
+                                                <div class="col-md-5 offset-md-2">
+                                                    <button id="alignBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-list"></i> 閫愬彞瀵圭収</button>
+                                                    <button id="speakTargetBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copyTargetBtn" class="btn btn-outline-secondary copy-btn" data-copy-target="targetText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- OCR and Back-Translate -->
+                                        <div class="row mb-4">
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">OCR/PDF缈昏瘧</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">鏀寔涓婁紶鍥剧墖鎴朠DF杩涜鏂囧瓧鎻愬彇鍜岀炕璇?/p>
+                                                    <input type="file" id="ocrFile" class="form-control mb-3" accept=".pdf,.jpg,.jpeg,.png,.bmp">
+                                                    <button id="ocrBtn" class="btn btn-primary w-full"><i class="fas fa-file-image"></i> 涓婁紶骞惰瘑鍒?/button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">鍥炶瘧楠岃瘉</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">灏嗚瘧鏂囧啀璇戝洖鍘熸枃锛岄獙璇佺炕璇戝噯纭€?/p>
+                                                    <button id="backTranslateBtn" class="btn btn-primary w-full mb-3"><i class="fas fa-sync"></i> 鍙屽悜鍥炶瘧</button>
+                                                    <textarea id="backTranslateResult" class="form-control" rows="4" readonly></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Dictionary and Glossary -->
+                                        <div class="row mb-4">
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">OneLook璇嶅吀</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">鏌ヨ鍗曡瘝鐨勮缁嗛噴涔夊拰鐢ㄦ硶</p>
+                                                    <input type="text" id="dictInput" class="form-control mb-3" placeholder="杈撳叆瑕佹煡璇㈢殑鍗曡瘝锛堝锛歮etropolis锛?>
+                                                    <button id="dictBtn" class="btn btn-primary w-full"><i class="fas fa-book"></i> 鏌ヨ</button>
+                                                    <div id="dictResult" class="mt-3"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">鏈琛ㄦ煡璇?/h5>
+                                                    <p class="text-gray-500 text-sm mb-3">浠庢斂搴滅綉绔欑埇鍙栫殑鏈€鏂版湳璇簱</p>
+                                                    <input type="text" id="glossaryQuery" class="form-control mb-2" placeholder="杈撳叆瑕佹煡璇㈢殑鏈锛堝锛欰rt Basel锛?>
+                                                    <select id="glossaryTargetLang" class="form-select mb-3">
+                                                        <option value="zh">鈫?涓枃</option>
+                                                        <option value="en">鈫?English</option>
+                                                        <option value="zh-HK">鈫?绮よ</option>
+                                                    </select>
+                                                    <button id="glossaryBtn" class="btn btn-primary w-full"><i class="fas fa-search"></i> 鏌ヨ</button>
+                                                    <div id="glossaryResult" class="mt-3"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Right Column -->
+                                    <div class="col-lg-4">
+                                        <!-- Glossary and Sources -->
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">璇嶅簱涓庡巻鍙茶褰?/h5>
+                                                <div>
+                                                    <button id="addTermBtn" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#addTermModal">
+                                                        <i class="fas fa-plus"></i> 娣诲姞鏈
+                                                    </button>
+                                                    <button id="updateGlossaryBtn" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-sync-alt"></i> 鏇存柊璇嶅簱
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded inline-block mb-3">2026-05-01</p>
+                                            <p class="text-gray-500 text-sm mb-3">浠庝互涓嬪畼鏂规斂搴滅綉绔欏疄鏃舵彁鍙栨渶鏂版湳璇紙鏀寔涓嫳绮や笁璇級</p>
+                                            
+                                            <div class="glossary-item">
+                                                <i class="fas fa-globe me-2 text-danger"></i>
+                                                <a href="https://www.gov.cn/" target="_blank" class="text-decoration-none">gov.cn 涓ぎ鏀垮簻</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-building me-2 text-primary"></i>
+                                                <a href="https://www.state.gov.cn/" target="_blank" class="text-decoration-none">state.gov.cn 鍥藉姟闄?/a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-gavel me-2 text-info"></i>
+                                                <a href="https://www.court.gov.cn/" target="_blank" class="text-decoration-none">court.gov.cn 鏈€楂樹汉姘戞硶闄?/a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-users me-2 text-success"></i>
+                                                <a href="https://www.npc.gov.cn/" target="_blank" class="text-decoration-none">npc.gov.cn 鍏ㄥ浗浜哄ぇ</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-landmark me-2 text-warning"></i>
+                                                <a href="https://www.gov.hk/" target="_blank" class="text-decoration-none">GovHK 棣欐腐鏀垮簻涓€绔欓€?/a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-balance-scale me-2 text-secondary"></i>
+                                                <a href="https://www.doj.gov.hk/" target="_blank" class="text-decoration-none">doj.gov.hk 寰嬫斂鍙?/a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-file-alt me-2 text-primary"></i>
+                                                <a href="https://www.elegislation.gov.hk/" target="_blank" class="text-decoration-none">e-legislation 棣欐腐鐢靛瓙娉曚緥</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-chart-line me-2 text-info"></i>
+                                                <a href="https://www.hkex.com.hk/" target="_blank" class="text-decoration-none">HKEX 棣欐腐浜ゆ槗鎵€</a>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Translation History -->
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <h5 class="text-gray-700 mb-3">鍘嗗彶璁板綍</h5>
+                                            <button id="clearHistoryBtn" class="btn btn-xs btn-outline-danger float-end">娓呯┖</button>
+                                            <p class="text-gray-500 text-sm mb-3">缈昏瘧鍘嗗彶涓€閿紝鍙洖婧埌缈昏瘧宸ヤ綔鍙?/p>
+                                            <div id="historyList"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Audio/Video Transcribe Tab -->
+                            <div class="tab-pane fade" id="av" role="tabpanel">
+                                <!-- AV Sub Tabs -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <ul class="nav nav-pills" id="avSubTabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="file-transcribe-tab" data-bs-toggle="tab" data-bs-target="#file-transcribe" type="button" role="tab">
+                                                    <i class="fas fa-file-audio"></i> 鏂囦欢杞綍
+                                                </button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="live-chat-tab" data-bs-toggle="tab" data-bs-target="#live-chat" type="button" role="tab">
+                                                    <i class="fas fa-comments"></i> 瀹炴椂瀵硅瘽
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content" id="avSubTabContent">
+                                    <!-- File Transcription -->
+                                    <div class="tab-pane fade show active" id="file-transcribe" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">闊?瑙嗛涓婁紶涓庤浆褰?/h5>
+                                                    <p class="text-gray-500 text-sm mb-4">涓婁紶闊?瑙嗛鏂囦欢杩涜鑷姩杞綍锛岀敓鎴愬瓧骞曞拰缈昏瘧</p>
+                                                    
+                                                    <div class="mb-4">
+                                                        <input type="file" id="avFile" class="form-control" accept=".mp3,.wav,.mp4,.avi,.mov">
+                                                    </div>
+                                                    
+                                                    <div class="row mb-4">
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">杞綍璇█</label>
+                                                            <select id="avSourceLang" class="form-select">
+                                                                <option value="auto">鑷姩妫€娴?/option>
+                                                                <option value="zh">涓枃</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">绮よ</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">缈昏瘧鐩爣璇█</label>
+                                                            <select id="avTargetLang" class="form-select">
+                                                                <option value="zh">涓枃</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">绮よ</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <button id="avTranscribeBtn" class="btn btn-primary w-full mb-4"><i class="fas fa-microphone"></i> 寮€濮嬭浆褰?/button>
+                                                    
+                                                    <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                        <h5 class="text-gray-700 mb-3">杞綍缁撴灉</h5>
+                                                        <button id="translateTranscriptBtn" class="btn btn-primary mb-3" style="width: 100%;">
+                                                            <i class="fas fa-arrow-down"></i> 缈昏瘧涓嬫柟杞綍鍐呭
+                                                        </button>
+                                                        <textarea id="avResult" class="form-control" rows="10" readonly></textarea>
+                                                        <div class="mt-3">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="downloadFormatDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="fas fa-download"></i> 涓嬭浇杞綍鍐呭
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="downloadFormatDropdown">
+                                                                    <li><a class="dropdown-item" href="#" onclick="downloadTranscript('txt')">馃搫 涓嬭浇涓?TXT</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="downloadTranscript('doc')">馃摑 涓嬭浇涓?DOC</a></li>
+                                                                    <li><a class="dropdown-item" href="#" onclick="downloadTranscript('pdf')">馃摃 涓嬭浇涓?PDF</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-4">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">杞綍缈昏瘧缁撴灉</h5>
+                                                    <textarea id="avTranslation" class="form-control" rows="10" readonly></textarea>
+                                                    <button id="copyAVTranslation" class="btn btn-outline-secondary mt-3"><i class="fas fa-copy"></i> 澶嶅埗缈昏瘧</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Live Chat -->
+                                    <div class="tab-pane fade" id="live-chat" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">馃帳 瀹炴椂瀵硅瘽缈昏瘧</h5>
+                                                    <p class="text-gray-500 text-sm mb-4">鏀寔涓嫳绮や笁璇疄鏃剁炕璇戯紝閫傚悎鏃呮父鍦烘櫙瀵硅瘽</p>
+                                                    
+                                                    <!-- Language Selection -->
+                                                    <div class="row mb-4">
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">馃煝 鎮ㄧ殑璇█</label>
+                                                            <select id="liveSourceLang" class="form-select">
+                                                                <option value="zh">涓枃</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">绮よ</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="text-sm text-gray-600 mb-2">馃敶 瀵规柟璇█</label>
+                                                            <select id="liveTargetLang" class="form-select">
+                                                                <option value="en">English</option>
+                                                                <option value="zh">涓枃</option>
+                                                                <option value="zh-HK">绮よ</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Speak Button -->
+                                                    <div class="text-center mb-4">
+                                                        <button id="liveChatBtn" class="btn btn-primary btn-lg" style="width: 200px; height: 200px; border-radius: 50%; font-size: 1.5rem;">
+                                                            <i class="fas fa-microphone"></i><br>
+                                                            <span id="liveChatStatus">鐐瑰嚮璇磋瘽</span>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <!-- Conversation History -->
+                                                    <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                        <h5 class="text-gray-700 mb-3">瀵硅瘽鍘嗗彶</h5>
+                                                        <div id="liveChatHistory" class="mb-4" style="max-height: 300px; overflow-y: auto;">
+                                                            <p class="text-muted text-center">鏆傛棤瀵硅瘽璁板綍</p>
+                                                        </div>
+                                                        
+                                                        <!-- Manual Input -->
+                                                        <div class="input-group">
+                                                            <input type="text" id="liveInput" class="form-control" placeholder="鎴栬緭鍏ユ枃瀛?..">
+                                                            <button id="liveSendBtn" class="btn btn-primary">鍙戦€?/button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Rewrite Tab -->
+                            <div class="tab-pane fade" id="rewrite" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">AI鏀瑰啓宸ヤ綔鍙?/h5>
+                                            <p class="text-gray-500 text-sm mb-4">鏀寔鎰忚瘧鍜岄缂栬緫涓ょ妯″紡锛屽府鍔╀紭鍖栨枃鏈?/p>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">鏀瑰啓妯″紡</label>
+                                                    <select id="rewriteMode" class="form-select">
+                                                        <option value="paraphrase">鎰忚瘧 - 閲嶆柊缁勭粐璇█琛ㄨ揪</option>
+                                                        <option value="pre-edit">棰勭紪杈?- 浼樺寲鏂囨湰渚夸簬缈昏瘧</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">椋庢牸閫夋嫨</label>
+                                                    <select id="rewriteStyle" class="form-select">
+                                                        <option value="standard">鏍囧噯</option>
+                                                        <option value="formal">姝ｅ紡</option>
+                                                        <option value="casual">鍙ｈ鍖?/option>
+                                                        <option value="academic">瀛︽湳</option>
+                                                        <option value="business">鍟嗗姟</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label class="text-sm text-gray-600 mb-2">鍘熸枃杈撳叆</label>
+                                                    <textarea id="rewriteInput" class="form-control" rows="6">杩欎釜椤圭洰闈炲父濂斤紝鎴戜滑搴旇澶у姏鎺ㄥ箍瀹冦€?/textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button id="rewriteBtn" class="btn btn-primary mb-3"><i class="fas fa-magic"></i> 寮€濮嬫敼鍐?/button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h6 class="text-gray-600 mb-2">鏀瑰啓缁撴灉</h6>
+                                                <textarea id="rewriteOutput" class="form-control" rows="4" readonly></textarea>
+                                                <button id="copyRewriteBtn" class="btn btn-outline-secondary mt-2"><i class="fas fa-copy"></i> 澶嶅埗</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Rewrite History -->
+                                <div class="row mt-4">
+                                    <div class="col-lg-12">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">鏀瑰啓鍘嗗彶</h5>
+                                                <button id="clearRewriteHistoryBtn" class="btn btn-xs btn-outline-danger">娓呯┖</button>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mb-3">澶氭鏀瑰啓缁撴灉瀵规瘮锛屽彲閫夋嫨浣跨敤</p>
+                                            <div id="rewriteHistoryList"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Polish Tab -->
+                            <div class="tab-pane fade" id="polish" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">AI娑﹁壊宸ヤ綔鍙?/h5>
+                                            <p class="text-gray-500 text-sm mb-4">鍚庣紪杈戞鼎鑹诧紝鎻愬崌鏂囨湰璐ㄩ噺鍜岃〃杈炬晥鏋?/p>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label class="text-sm text-gray-600 mb-2">娑﹁壊椋庢牸</label>
+                                                    <select id="polishStyle" class="form-select">
+                                                        <option value="standard">鏍囧噯</option>
+                                                        <option value="formal">姝ｅ紡</option>
+                                                        <option value="casual">鍙ｈ鍖?/option>
+                                                        <option value="academic">瀛︽湳</option>
+                                                        <option value="business">鍟嗗姟</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label class="text-sm text-gray-600 mb-2">鍘熸枃杈撳叆</label>
+                                                    <textarea id="polishInput" class="form-control" rows="6">杩欎唤鎶ュ憡鍐欏緱涓嶉敊锛屽彲浠ュ啀鏀硅繘涓€涓嬨€?/textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button id="polishBtn" class="btn btn-success mb-3"><i class="fas fa-sparkles"></i> 寮€濮嬫鼎鑹?/button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h6 class="text-gray-600 mb-2">娑﹁壊缁撴灉</h6>
+                                                <textarea id="polishOutput" class="form-control" rows="4" readonly></textarea>
+                                                <button id="copyPolishBtn" class="btn btn-outline-secondary mt-2"><i class="fas fa-copy"></i> 澶嶅埗</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Polish History -->
+                                <div class="row mt-4">
+                                    <div class="col-lg-12">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">娑﹁壊鍘嗗彶</h5>
+                                                <button id="clearPolishHistoryBtn" class="btn btn-xs btn-outline-danger">娓呯┖</button>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mb-3">澶氭娑﹁壊缁撴灉瀵规瘮锛屽彲閫夋嫨浣跨敤</p>
+                                            <div id="polishHistoryList"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sentence Alignment Modal -->
+                    <div class="modal fade" id="alignModal" tabindex="-1" aria-labelledby="alignModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="alignModalLabel"><i class="fas fa-list me-2"></i>閫愬彞瀵圭収</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                                    <div id="alignContent"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">鍏抽棴</button>
+                                    <button type="button" class="btn btn-primary" onclick="copyAlignResult()"><i class="fas fa-copy me-1"></i>澶嶅埗缁撴灉</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Add Term Modal -->
+                    <div class="modal fade" id="addTermModal" tabindex="-1" aria-labelledby="addTermModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addTermModalLabel">娣诲姞鏈</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="termInput" class="form-label">鏈</label>
+                                        <input type="text" class="form-control" id="termInput" placeholder="杈撳叆鏈锛堝锛欰rt Basel锛?>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="translationInput" class="form-label">缈昏瘧</label>
+                                        <input type="text" class="form-control" id="translationInput" placeholder="杈撳叆缈昏瘧锛堝锛氬反濉炲皵鑹烘湳灞曪級">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sourceInput" class="form-label">鏉ユ簮锛堝彲閫夛級</label>
+                                        <input type="text" class="form-control" id="sourceInput" placeholder="濡傦細鏀垮簻缃戠珯">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">鍙栨秷</button>
+                                    <button type="button" class="btn btn-primary" id="saveTermBtn">淇濆瓨</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-center gap-4">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-lock"></i> 闅愮绠＄悊</button>
+                            <button class="btn btn-primary btn-sm"><i class="fas fa-comment"></i> 鎰忚鍙嶉</button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-user"></i> 鑱旂粶浣滆€?/button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let alignResultText = '';
+        let translationHistory = [];
+        let rewriteHistory = [];
+        let polishHistory = [];
+        
+        // Initialize history
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('translationHistory');
+            if (savedHistory) {
+                translationHistory = JSON.parse(savedHistory);
+                renderHistoryList();
+            }
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
+        }
+        
+        function renderHistoryList() {
+            const historyList = document.getElementById('historyList');
+            if (translationHistory.length === 0) {
+                historyList.innerHTML = '<p class="text-muted text-center">鏆傛棤鍘嗗彶璁板綍</p>';
+                return;
+            }
+            
+            historyList.innerHTML = translationHistory.map((item, index) => {
+                const source = item.source || '';
+                const target = item.target || '';
+                return `
+                <div class="history-item">
+                    <p class="text-sm text-gray-600 mb-1">${source.substring(0, 50)}${source.length > 50 ? '...' : ''}</p>
+                    <p class="text-sm text-primary mb-1">${target.substring(0, 50)}${target.length > 50 ? '...' : ''}</p>
+                    <span class="lang-tag">${item.sourceLang || ''} 鈫?${item.targetLang || ''}</span>
+                    <span class="lang-tag">${item.timestamp || ''}</span>
+                    <button class="btn btn-xs btn-outline-primary float-end" onclick="useHistoryItem(${index})">浣跨敤</button>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        function useHistoryItem(index) {
+            const item = translationHistory[index];
+            document.getElementById('sourceText').value = item.source;
+            document.getElementById('targetText').value = item.target;
+            document.getElementById('sourceLang').value = item.sourceLang;
+            document.getElementById('targetLang').value = item.targetLang;
+        }
+        
+        // Character count
+        document.getElementById('sourceText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length + '/5000';
+        });
+        
+        // Swap languages
+        document.getElementById('swapLang').addEventListener('click', function() {
+            const source = document.getElementById('sourceLang').value;
+            const target = document.getElementById('targetLang').value;
+            document.getElementById('sourceLang').value = target;
+            document.getElementById('targetLang').value = source;
+        });
+        
+        // Translate
+        document.getElementById('translateBtn').addEventListener('click', async function() {
+            const text = document.getElementById('sourceText').value;
+            const sourceLang = document.getElementById('sourceLang').value;
+            const targetLang = document.getElementById('targetLang').value;
+            
+            if (!text.trim()) return;
+            
+            this.disabled = true;
+            document.getElementById('targetText').value = '缈昏瘧涓?..';
+            
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: text,
+                        source_lang: sourceLang,
+                        target_lang: targetLang
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('targetText').value = data.result;
+                    
+                    // Add to history
+                    translationHistory.unshift({
+                        source: text,
+                        target: data.result,
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    
+                    if (translationHistory.length > 20) {
+                        translationHistory = translationHistory.slice(0, 20);
+                    }
+                    
+                    saveHistory();
+                    renderHistoryList();
+                } else {
+                    alert('缈昏瘧澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // Clean text
+        document.getElementById('cleanTextBtn').addEventListener('click', async function() {
+            const text = document.getElementById('sourceText').value;
+            if (!text.trim()) return;
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 鏁寸悊涓?..';
+            
+            try {
+                const response = await fetch('/api/clean-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('sourceText').value = data.result;
+                    document.getElementById('charCount').textContent = data.result.length + '/5000';
+                } else {
+                    alert('鏁寸悊澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-align-left"></i> 鏁寸悊鏂囨湰';
+            }
+        });
+        
+        // Copy buttons
+        document.getElementById('copySourceBtn').addEventListener('click', function() {
+            copyToClipboard('sourceText');
+        });
+        
+        document.getElementById('copyTargetBtn').addEventListener('click', function() {
+            copyToClipboard('targetText');
+        });
+        
+        // Speak buttons
+        document.getElementById('speakSourceBtn').addEventListener('click', function() {
+            const text = document.getElementById('sourceText').value;
+            const lang = document.getElementById('sourceLang').value;
+            speakText(text, lang);
+        });
+        
+        document.getElementById('speakTargetBtn').addEventListener('click', function() {
+            const text = document.getElementById('targetText').value;
+            const lang = document.getElementById('targetLang').value;
+            speakText(text, lang);
+        });
+        
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            try {
+                document.execCommand('copy');
+                alert('宸插鍒?);
+            } catch (err) {
+                alert('澶嶅埗澶辫触');
+            }
+        }
+        
+        // Text-to-speech function
+        function speakText(text, lang) {
+            if (!('speechSynthesis' in window)) {
+                alert('鎮ㄧ殑娴忚鍣ㄤ笉鏀寔璇煶鍚堟垚鍔熻兘');
+                return;
+            }
+            
+            if (!text.trim()) {
+                alert('娌℃湁鍙湕璇荤殑鍐呭');
+                return;
+            }
+            
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'zh-HK';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        // Sentence alignment
+        document.getElementById('alignBtn').addEventListener('click', function() {
+            const sourceText = document.getElementById('sourceText').value.trim();
+            const targetText = document.getElementById('targetText').value.trim();
+            
+            if (!sourceText || !targetText) {
+                alert('璇峰厛杈撳叆鍘熸枃鍜岃瘧鏂?);
+                return;
+            }
+            
+            const sourceSentences = sourceText.split(/(?<=[銆傦紒锛?!?])\s*/).filter(s => s.trim());
+            const targetSentences = targetText.split(/(?<=[銆傦紒锛?!?])\s*/).filter(s => s.trim());
+            
+            let html = '<div class="align-container">';
+            alignResultText = '';
+            
+            const maxLen = Math.max(sourceSentences.length, targetSentences.length);
+            for (let i = 0; i < maxLen; i++) {
+                const src = sourceSentences[i] || '';
+                const tgt = targetSentences[i] || '';
+                
+                if (src || tgt) {
+                    html += `
+                    <div class="align-item mb-4 p-3 bg-light rounded">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <span class="badge bg-primary me-2">${i + 1}</span>
+                                <span class="text-muted small">鍘熸枃</span>
+                                <p class="mt-2 mb-0 fs-6">${src}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="badge bg-success me-2">${i + 1}</span>
+                                <span class="text-muted small">璇戞枃</span>
+                                <p class="mt-2 mb-0 fs-6">${tgt}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                    
+                    alignResultText += `[${i + 1}] 鍘熸枃: ${src}\n[${i + 1}] 璇戞枃: ${tgt}\n\n`;
+                }
+            }
+            
+            html += '</div>';
+            document.getElementById('alignContent').innerHTML = html;
+            
+            const modal = new bootstrap.Modal(document.getElementById('alignModal'));
+            modal.show();
+        });
+        
+        function copyAlignResult() {
+            navigator.clipboard.writeText(alignResultText).then(() => alert('宸插鍒跺埌鍓创鏉?));
+        }
+        
+        // OCR
+        document.getElementById('ocrBtn').addEventListener('click', async function() {
+            const fileInput = document.getElementById('ocrFile');
+            if (!fileInput.files[0]) {
+                alert('璇峰厛閫夋嫨鏂囦欢');
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 璇嗗埆涓?..';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                const response = await fetch('/api/ocr', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('sourceText').value = data.result;
+                    document.getElementById('charCount').textContent = data.result.length + '/5000';
+                } else {
+                    alert('璇嗗埆澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-file-image"></i> 涓婁紶骞惰瘑鍒?;
+            }
+        });
+        
+        // Back translate
+        document.getElementById('backTranslateBtn').addEventListener('click', async function() {
+            const text = document.getElementById('targetText').value;
+            if (!text.trim()) {
+                alert('璇峰厛缈昏瘧鍐呭');
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 鍥炶瘧涓?..';
+            
+            try {
+                const response = await fetch('/api/back-translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('backTranslateResult').value = data.result;
+                } else {
+                    alert('鍥炶瘧澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-sync"></i> 鍙屽悜鍥炶瘧';
+            }
+        });
+        
+        // Dictionary
+        document.getElementById('dictBtn').addEventListener('click', async function() {
+            const word = document.getElementById('dictInput').value;
+            if (!word.trim()) {
+                alert('璇疯緭鍏ヨ鏌ヨ鐨勫崟璇?);
+                return;
+            }
+            
+            this.disabled = true;
+            
+            try {
+                const response = await fetch('/api/dictionary?word=' + encodeURIComponent(word));
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('dictResult').innerHTML = `
+                        <pre class="bg-white p-3 rounded">
+${word}
+
+璇嶆€э細${data.result.part_of_speech || '鍚嶈瘝'}
+瀹氫箟锛?{data.result.definition || '鏆傛棤瀹氫箟'}
+涓枃锛?{data.result.chinese || '鏆傛棤涓枃缈昏瘧'}
+渚嬪彞锛?{data.result.example || '鏆傛棤渚嬪彞'}
+鍚屼箟璇嶏細${data.result.synonyms || '鏆傛棤鍚屼箟璇?}
+</pre>
+                    `;
+                } else {
+                    alert('鏌ヨ澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // Glossary
+        document.getElementById('glossaryBtn').addEventListener('click', async function() {
+            const query = document.getElementById('glossaryQuery').value;
+            const lang = document.getElementById('glossaryTargetLang').value;
+            
+            this.disabled = true;
+            
+            try {
+                const response = await fetch('/api/glossary?query=' + encodeURIComponent(query) + '&lang=' + lang);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = '';
+                    if (data.result.length === 0) {
+                        html = '<p class="text-muted">鏈壘鍒扮浉鍏虫湳璇?/p>';
+                    } else {
+                        data.result.forEach(item => {
+                            html += `<div class="glossary-item"><strong>${item.term}</strong><br>${item.translation}</div>`;
+                        });
+                    }
+                    document.getElementById('glossaryResult').innerHTML = html;
+                } else {
+                    alert('鏌ヨ澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // Save term
+        document.getElementById('saveTermBtn').addEventListener('click', async function() {
+            const term = document.getElementById('termInput').value.trim();
+            const translation = document.getElementById('translationInput').value.trim();
+            const source = document.getElementById('sourceInput').value.trim();
+            
+            if (!term || !translation) {
+                alert('璇疯緭鍏ユ湳璇拰缈昏瘧');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/glossary/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ term, translation, source })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('鏈宸叉坊鍔狅紒');
+                    bootstrap.Modal.getInstance(document.getElementById('addTermModal')).hide();
+                    document.getElementById('termInput').value = '';
+                    document.getElementById('translationInput').value = '';
+                    document.getElementById('sourceInput').value = '';
+                } else {
+                    alert('娣诲姞澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            }
+        });
+        
+        // Update glossary
+        document.getElementById('updateGlossaryBtn').addEventListener('click', async function() {
+            if (!confirm('纭畾瑕佹洿鏂拌瘝搴撳悧锛熻繖鍙兘闇€瑕佷竴浜涙椂闂?)) {
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 鏇存柊涓?..';
+            
+            try {
+                const response = await fetch('/api/glossary/update', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('璇嶅簱鏇存柊鎴愬姛锛?);
+                } else {
+                    alert('鏇存柊澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> 鏇存柊璇嶅簱';
+            }
+        });
+        
+        // AV Transcribe
+        document.getElementById('avTranscribeBtn').addEventListener('click', async function() {
+            const fileInput = document.getElementById('avFile');
+            const sourceLang = document.getElementById('avSourceLang').value;
+            
+            if (!fileInput.files[0]) {
+                alert('璇峰厛閫夋嫨鏂囦欢');
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 杞綍涓?..';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('lang', sourceLang);
+                
+                const response = await fetch('/api/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('avResult').value = data.result;
+                } else {
+                    alert('杞綍澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-microphone"></i> 寮€濮嬭浆褰?;
+            }
+        });
+        
+        // Translate transcript
+        document.getElementById('translateTranscriptBtn').addEventListener('click', async function() {
+            const text = document.getElementById('avResult').value;
+            const sourceLang = document.getElementById('avSourceLang').value;
+            const targetLang = document.getElementById('avTargetLang').value;
+            
+            if (!text.trim()) {
+                alert('璇峰厛杞綍鍐呭');
+                return;
+            }
+            
+            this.disabled = true;
+            
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, source_lang: sourceLang, target_lang: targetLang })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('avTranslation').value = data.result;
+                } else {
+                    alert('缈昏瘧澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // Copy AV translation
+        document.getElementById('copyAVTranslation').addEventListener('click', function() {
+            copyToClipboard('avTranslation');
+        });
+        
+        // Download transcript
+        function downloadTranscript(format) {
+            const text = document.getElementById('avResult').value;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transcript.' + format;
+            a.click();
+        }
+        
+        // Live Chat
+        let recognition = null;
+        let isListening = false;
+        
+        document.getElementById('liveChatBtn').addEventListener('click', async function() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('鎮ㄧ殑娴忚鍣ㄤ笉鏀寔璇煶璇嗗埆鍔熻兘');
+                return;
+            }
+            
+            if (isListening) {
+                stopListening();
+                return;
+            }
+            
+            startListening();
+        });
+        
+        document.getElementById('liveSendBtn').addEventListener('click', async function() {
+            const text = document.getElementById('liveInput').value.trim();
+            if (!text) return;
+            
+            await sendMessage(text);
+            document.getElementById('liveInput').value = '';
+        });
+        
+        document.getElementById('liveInput').addEventListener('keypress', async function(e) {
+            if (e.key === 'Enter') {
+                await sendMessage(this.value.trim());
+                this.value = '';
+            }
+        });
+        
+        function startListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            const sourceLang = document.getElementById('liveSourceLang').value;
+            recognition.lang = sourceLang === 'zh' ? 'zh-CN' : sourceLang === 'en' ? 'en-US' : 'zh-HK';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('liveChatBtn').classList.add('btn-danger');
+                document.getElementById('liveChatBtn').classList.remove('btn-primary');
+                document.getElementById('liveChatStatus').textContent = '姝ｅ湪鑱嗗惉...';
+            };
+            
+            recognition.onresult = async function(event) {
+                const text = event.results[0][0].transcript;
+                await sendMessage(text);
+                stopListening();
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('璇煶璇嗗埆閿欒:', event.error);
+                if (event.error !== 'no-speech') {
+                    alert('璇煶璇嗗埆澶辫触: ' + event.error);
+                }
+                stopListening();
+            };
+            
+            recognition.onend = function() {
+                if (isListening) {
+                    stopListening();
+                }
+            };
+            
+            recognition.start();
+        }
+        
+        function stopListening() {
+            if (recognition) {
+                recognition.stop();
+                recognition = null;
+            }
+            isListening = false;
+            document.getElementById('liveChatBtn').classList.remove('btn-danger');
+            document.getElementById('liveChatBtn').classList.add('btn-primary');
+            document.getElementById('liveChatStatus').textContent = '鐐瑰嚮璇磋瘽';
+        }
+        
+        async function sendMessage(text) {
+            const sourceLang = document.getElementById('liveSourceLang').value;
+            const targetLang = document.getElementById('liveTargetLang').value;
+            
+            addMessage('me', text, sourceLang);
+            
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, source_lang: sourceLang, target_lang: targetLang })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    addMessage('other', data.result, targetLang);
+                    speakText(data.result, targetLang);
+                } else {
+                    addMessage('system', '缈昏瘧澶辫触: ' + data.error, 'system');
+                }
+            } catch (error) {
+                // 浣跨敤妯℃嫙缈昏瘧浣滀负澶囬€?                const mockResult = text + ' (' + targetLang + ')';
+                addMessage('other', mockResult, targetLang);
+                speakText(mockResult, targetLang);
+            }
+        }
+        
+        function addMessage(sender, text, lang) {
+            const history = document.getElementById('liveChatHistory');
+            
+            if (history.querySelector('.text-muted')) {
+                history.innerHTML = '';
+            }
+            
+            const langLabel = lang === 'zh' ? '涓枃' : lang === 'en' ? 'English' : lang === 'zh-HK' ? '绮よ' : '';
+            
+            const message = document.createElement('div');
+            message.className = 'mb-3 ' + (sender === 'me' ? 'text-right' : 'text-left');
+            
+            message.innerHTML = `
+                <div class="${sender === 'me' ? 'bg-primary text-white' : 'bg-gray-200'} rounded-lg px-4 py-2 inline-block max-w-[70%]">
+                    <p class="text-sm mb-1">${text}</p>
+                    <span class="text-xs opacity-75">${langLabel}</span>
+                </div>
+            `;
+            
+            history.appendChild(message);
+            history.scrollTop = history.scrollHeight;
+        }
+        
+        // AI Rewrite
+        document.getElementById('rewriteBtn').addEventListener('click', async function() {
+            const text = document.getElementById('rewriteInput').value;
+            const mode = document.getElementById('rewriteMode').value;
+            const style = document.getElementById('rewriteStyle').value;
+            
+            if (!text.trim()) {
+                alert('璇疯緭鍏ヨ鏀瑰啓鐨勫唴瀹?);
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 鏀瑰啓涓?..';
+            
+            try {
+                const response = await fetch('/api/rewrite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, mode, style })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('rewriteOutput').value = data.result;
+                    
+                    rewriteHistory.unshift({
+                        original: text,
+                        result: data.result,
+                        mode: mode,
+                        style: style,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    
+                    if (rewriteHistory.length > 10) {
+                        rewriteHistory = rewriteHistory.slice(0, 10);
+                    }
+                    
+                    renderRewriteHistory();
+                } else {
+                    alert('鏀瑰啓澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-magic"></i> 寮€濮嬫敼鍐?;
+            }
+        });
+        
+        function renderRewriteHistory() {
+            const historyList = document.getElementById('rewriteHistoryList');
+            if (rewriteHistory.length === 0) {
+                historyList.innerHTML = '<p class="text-muted text-center">鏆傛棤鍘嗗彶璁板綍</p>';
+                return;
+            }
+            
+            historyList.innerHTML = rewriteHistory.map((item, index) => `
+                <div class="history-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <p class="text-sm text-gray-600 mb-1"><strong>鍘熸枃:</strong> ${item.original}</p>
+                            <p class="text-sm text-primary mb-1"><strong>鏀瑰啓:</strong> ${item.result}</p>
+                            <span class="lang-tag">${item.mode} - ${item.style}</span>
+                            <span class="lang-tag">${item.timestamp}</span>
+                        </div>
+                        <button class="btn btn-xs btn-outline-primary" onclick="useRewriteHistory(${index})">浣跨敤</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function useRewriteHistory(index) {
+            document.getElementById('rewriteInput').value = rewriteHistory[index].result;
+        }
+        
+        document.getElementById('copyRewriteBtn').addEventListener('click', function() {
+            copyToClipboard('rewriteOutput');
+        });
+        
+        // AI Polish
+        document.getElementById('polishBtn').addEventListener('click', async function() {
+            const text = document.getElementById('polishInput').value;
+            const style = document.getElementById('polishStyle').value;
+            
+            if (!text.trim()) {
+                alert('璇疯緭鍏ヨ娑﹁壊鐨勫唴瀹?);
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 娑﹁壊涓?..';
+            
+            try {
+                const response = await fetch('/api/polish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, style })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('polishOutput').value = data.result;
+                    
+                    polishHistory.unshift({
+                        original: text,
+                        result: data.result,
+                        style: style,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    
+                    if (polishHistory.length > 10) {
+                        polishHistory = polishHistory.slice(0, 10);
+                    }
+                    
+                    renderPolishHistory();
+                } else {
+                    alert('娑﹁壊澶辫触: ' + data.error);
+                }
+            } catch (error) {
+                alert('缃戠粶閿欒');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-sparkles"></i> 寮€濮嬫鼎鑹?;
+            }
+        });
+        
+        function renderPolishHistory() {
+            const historyList = document.getElementById('polishHistoryList');
+            if (polishHistory.length === 0) {
+                historyList.innerHTML = '<p class="text-muted text-center">鏆傛棤鍘嗗彶璁板綍</p>';
+                return;
+            }
+            
+            historyList.innerHTML = polishHistory.map((item, index) => `
+                <div class="history-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <p class="text-sm text-gray-600 mb-1"><strong>鍘熸枃:</strong> ${item.original}</p>
+                            <p class="text-sm text-primary mb-1"><strong>娑﹁壊:</strong> ${item.result}</p>
+                            <span class="lang-tag">polish - ${item.style}</span>
+                            <span class="lang-tag">${item.timestamp}</span>
+                        </div>
+                        <button class="btn btn-xs btn-outline-primary" onclick="usePolishHistory(${index})">浣跨敤</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function usePolishHistory(index) {
+            document.getElementById('polishInput').value = polishHistory[index].result;
+        }
+        
+        document.getElementById('copyPolishBtn').addEventListener('click', function() {
+            copyToClipboard('polishOutput');
+        });
+        
+        // Clear history
+        document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+            if (confirm('纭畾瑕佹竻绌哄巻鍙茶褰曞悧锛?)) {
+                translationHistory = [];
+                saveHistory();
+                renderHistoryList();
+            }
+        });
+        
+        document.getElementById('clearRewriteHistoryBtn').addEventListener('click', function() {
+            if (confirm('纭畾瑕佹竻绌烘敼鍐欏巻鍙插悧锛?)) {
+                rewriteHistory = [];
+                renderRewriteHistory();
+            }
+        });
+        
+        document.getElementById('clearPolishHistoryBtn').addEventListener('click', function() {
+            if (confirm('纭畾瑕佹竻绌烘鼎鑹插巻鍙插悧锛?)) {
+                polishHistory = [];
+                renderPolishHistory();
+            }
+        });
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadHistory();
+            renderRewriteHistory();
+            renderPolishHistory();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

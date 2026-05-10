@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBA TransPilot - Preview</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .nav-tabs .nav-link {
+            color: #666;
+            border-radius: 12px 12px 0 0;
+        }
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .glossary-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .history-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .lang-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-6">
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-white border-0 py-4">
+                        <h1 class="text-center text-primary">GBA TransPilot</h1>
+                        <p class="text-center text-muted small">面向大湾区场景的智能翻译、跨境政务工具展示版</p>
+                        
+                        <ul class="nav nav-tabs justify-content-center mt-4" id="mainTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab">文本翻译</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="av-tab" data-bs-toggle="tab" data-bs-target="#av" type="button" role="tab">音/视频翻译</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab">AI改写/润色</button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-body p-6">
+                        <div class="tab-content" id="mainTabContent">
+                            <!-- Text Translation Tab -->
+                            <div class="tab-pane fade show active" id="text" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">翻译工作台</h5>
+                                            <p class="text-gray-500 text-sm mb-4">支持翻译、查输入内容，核心操作保持简洁清爽</p>
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-5">
+                                                    <select id="sourceLang" class="form-select">
+                                                        <option value="auto">自动检测</option>
+                                                        <option value="zh">中文</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">粤语</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2 text-center">
+                                                    <button id="swapLang" class="btn btn-outline-primary" style="border-radius: 50%; width: 36px; height: 36px;">
+                                                        <i class="fas fa-exchange-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <select id="targetLang" class="form-select">
+                                                        <option value="zh">中文</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">粤语</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="sourceText" class="form-control" rows="8" placeholder="请输入需要翻译的文本..." maxlength="5000"></textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="charCount">0/5000</div>
+                                                </div>
+                                                
+                                                <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
+                                                    <button id="translateBtn" class="btn btn-primary" style="border-radius: 50%; width: 56px; height: 56px; font-size: 20px;">
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">翻译结果</label>
+                                                    <textarea id="targetText" class="form-control" rows="8" placeholder="翻译结果将显示在这里..." readonly></textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mt-4">
+                                                <div class="col-md-5">
+                                                    <button id="cleanTextBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-align-left"></i> 整理文本</button>
+                                                    <button id="removeLineBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-minus"></i> 剔除断行</button>
+                                                    <button id="speakSourceBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copySourceBtn" class="btn btn-outline-secondary"><i class="fas fa-copy"></i></button>
+                                                </div>
+                                                <div class="col-md-5 offset-md-2">
+                                                    <button id="alignBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-list"></i> 逐句对照</button>
+                                                    <button id="speakTargetBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copyTargetBtn" class="btn btn-outline-secondary"><i class="fas fa-copy"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">OCR 图片/PDF文字提取</h5>
+                                            <p class="text-gray-500 text-sm mb-4">支持图片上传，不依赖云识别实现数据隐私</p>
+                                            <input type="file" id="ocrFile" accept=".jpg,.png,.pdf" class="form-control mb-3">
+                                            <button id="ocrBtn" class="btn btn-primary">提取文字</button>
+                                            <p class="text-xs text-gray-400 mt-2">支持格式：JPG/PNG/PDF，表格保留展示后精度更优</p>
+                                        </div>
+                                        
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">OneLook 词典查询</h5>
+                                            <p class="text-gray-500 text-sm mb-4">聚合多源词典提供完整释义</p>
+                                            <input type="text" id="dictInput" class="form-control mb-3" placeholder="输入要查询的单词/词组...">
+                                            <button id="dictBtn" class="btn btn-primary">查询</button>
+                                            <div id="dictResult" class="mt-4"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-4">
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">词库与历史记录</h5>
+                                            <p class="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded inline-block mb-3">2026-04-30</p>
+                                            <div class="glossary-item">中国政府 | State Council</div>
+                                            <div class="glossary-item">中国人大 | NPC</div>
+                                            <div class="glossary-item">中国证监会 | CSRC</div>
+                                            <div class="glossary-item">中国司法部 | MOJ</div>
+                                            <div class="glossary-item">香港交易所 | HKEX</div>
+                                            <div class="glossary-item">GovHK 香港政府一站通</div>
+                                        </div>
+                                        
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 500px; overflow-y: auto;">
+                                            <h5 class="text-gray-700 mb-3">历史记录</h5>
+                                            <button id="clearHistoryBtn" class="btn btn-xs btn-outline-danger float-end">清空</button>
+                                            <p class="text-gray-500 text-sm mb-3">翻译历史一键，可回溯到翻译工作台</p>
+                                            <div id="historyList">
+                                                <div class="history-item">
+                                                    <p class="text-sm text-gray-600 mb-1">香港是一个国际化城市</p>
+                                                    <p class="text-sm text-primary mb-1">Hong Kong is an international city</p>
+                                                    <span class="lang-tag">zh → en</span>
+                                                </div>
+                                                <div class="history-item">
+                                                    <p class="text-sm text-gray-600 mb-1">Welcome to GBA</p>
+                                                    <p class="text-sm text-primary mb-1">欢迎来到大湾区</p>
+                                                    <span class="lang-tag">en → zh</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-lg-6">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">回译 (Back Translation)</h5>
+                                            <p class="text-gray-500 text-sm mb-4">快速检验翻译是否符合预期</p>
+                                            <button id="backTranslateBtn" class="btn btn-warning">
+                                                <i class="fas fa-undo"></i> 生成回译结果
+                                            </button>
+                                            <textarea id="backTranslateResult" class="form-control mt-3" rows="4" placeholder="回译结果将显示在这里..." readonly></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">实时词库查询</h5>
+                                            <p class="text-gray-500 text-sm mb-4">从政府网站获取最新术语</p>
+                                            <input type="text" id="glossaryQuery" class="form-control mb-3" placeholder="输入术语查询...">
+                                            <button id="glossaryBtn" class="btn btn-primary">查询术语</button>
+                                            <div id="glossaryResult" class="mt-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane fade" id="av" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">音/视频翻译</h5>
+                                            <p class="text-gray-500 text-sm mb-4">先转写，再翻译，流程清晰更直观</p>
+                                            <input type="file" id="avFile" class="form-control mb-3">
+                                            <input type="text" id="avUrl" class="form-control mb-3" placeholder="或粘贴上视频链接...">
+                                            <button id="avTranslateBtn" class="btn btn-primary"><i class="fas fa-arrow-right"></i> 翻译</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">翻译结果</h5>
+                                            <textarea id="avResult" class="form-control" rows="10" placeholder="音/视频翻译文本将显示在这里..." readonly></textarea>
+                                            <label class="form-check mt-3">
+                                                <input type="checkbox" class="form-check-input"> 按影棚翻译
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-lg-12">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">翻译结果</h5>
+                                            <textarea id="avFinalResult" class="form-control" rows="6" placeholder="翻译结果将显示在这里..." readonly></textarea>
+                                            <button id="downloadAvBtn" class="btn btn-primary mt-3"><i class="fas fa-download"></i> 下载翻译内容</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane fade" id="ai" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">AI 改写/润色</h5>
+                                            <p class="text-gray-500 text-sm mb-4">保持原意，同时让语言更正、更通顺</p>
+                                            <textarea id="rewriteInput" class="form-control" rows="8" placeholder="在此输入或粘贴文本..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">润色结果</h5>
+                                            <p class="text-gray-500 text-sm mb-2">更清晰、正式、自然</p>
+                                            <textarea id="rewriteOutput" class="form-control" rows="8" placeholder="改写后的文本将显示在这里..." readonly></textarea>
+                                            <button id="copyRewriteBtn" class="btn btn-outline-secondary mt-3"><i class="fas fa-copy"></i> 复制</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-lg-12 text-center">
+                                        <button id="paraphraseBtn" class="btn btn-primary mx-2">意译</button>
+                                        <button id="preEditBtn" class="btn btn-outline-primary mx-2">预编辑</button>
+                                        <button id="polishBtn" class="btn btn-outline-primary mx-2">润色</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-center gap-4">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-lock"></i> 隐私管理</button>
+                            <button class="btn btn-primary btn-sm"><i class="fas fa-comment"></i> 意见反馈</button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-user"></i> 联络作者</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sourceText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length + '/5000';
+        });
+
+        document.getElementById('swapLang').addEventListener('click', function() {
+            const source = document.getElementById('sourceLang').value;
+            const target = document.getElementById('targetLang').value;
+            document.getElementById('sourceLang').value = target;
+            document.getElementById('targetLang').value = source;
+        });
+
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const text = document.getElementById('sourceText').value;
+            if (!text.trim()) return;
+            
+            this.disabled = true;
+            document.getElementById('targetText').value = '翻译中...';
+            
+            setTimeout(() => {
+                document.getElementById('targetText').value = 'This is a translated result preview.\n\n这是翻译结果预览。';
+                this.disabled = false;
+            }, 1000);
+        });
+
+        document.getElementById('ocrBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('ocrFile');
+            if (!fileInput.files[0]) {
+                alert('请先选择文件');
+                return;
+            }
+            alert('OCR功能演示：图片/PDF文字已提取');
+        });
+
+        document.getElementById('backTranslateBtn').addEventListener('click', function() {
+            document.getElementById('backTranslateResult').value = 'English translation: Hello\n\n中文回译：你好';
+        });
+
+        document.getElementById('dictBtn').addEventListener('click', function() {
+            const word = document.getElementById('dictInput').value;
+            if (!word.trim()) {
+                alert('请输入查询词');
+                return;
+            }
+            document.getElementById('dictResult').innerHTML = `<pre class="bg-white p-3 rounded">${word} - Dictionary entry\n\n词性：名词\n定义：示例定义\n例句：This is an example sentence.</pre>`;
+        });
+
+        document.getElementById('glossaryBtn').addEventListener('click', function() {
+            const query = document.getElementById('glossaryQuery').value;
+            document.getElementById('glossaryResult').innerHTML = `<div class="glossary-item"><strong>${query}</strong><br>Translation result</div>`;
+        });
+
+        document.getElementById('paraphraseBtn').addEventListener('click', function() {
+            document.getElementById('rewriteOutput').value = '这是意译后的文本示例...';
+        });
+
+        document.getElementById('preEditBtn').addEventListener('click', function() {
+            document.getElementById('rewriteOutput').value = '这是预编辑后的文本示例...';
+        });
+
+        document.getElementById('polishBtn').addEventListener('click', function() {
+            document.getElementById('rewriteOutput').value = '这是润色后的文本示例...';
+        });
+
+        document.getElementById('removeLineBtn').addEventListener('click', function() {
+            const text = document.getElementById('sourceText').value;
+            document.getElementById('sourceText').value = text.replace(/\n/g, ' ');
+        });
+
+        document.getElementById('cleanTextBtn').addEventListener('click', function() {
+            let text = document.getElementById('sourceText').value;
+            document.getElementById('sourceText').value = text.replace(/\s+/g, ' ').trim();
+        });
+    </script>
+</body>
+</html>
