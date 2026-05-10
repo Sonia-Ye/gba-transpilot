@@ -2,19 +2,51 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import json
-import pytesseract
-from PIL import Image
-import pdfplumber
 import requests
-from bs4 import BeautifulSoup
-import schedule
-import time
-from threading import Thread
-import whoosh.index as index
-from whoosh.fields import Schema, TEXT, ID
-from whoosh.qparser import QueryParser
-from whoosh import scoring
 import datetime
+from threading import Thread
+
+# Optional imports (may fail on Python 3.14 due to removed find_loader)
+PYTESSERACT_AVAILABLE = False
+WHOOSH_AVAILABLE = False
+
+try:
+    import pytesseract
+    PYTESSERACT_AVAILABLE = True
+except ImportError:
+    print("Warning: pytesseract is not available (OCR features disabled)")
+
+try:
+    import whoosh.index as index
+    from whoosh.fields import Schema, TEXT, ID
+    from whoosh.qparser import QueryParser
+    from whoosh import scoring
+    WHOOSH_AVAILABLE = True
+except ImportError:
+    print("Warning: whoosh is not available (glossary search features disabled)")
+
+try:
+    from PIL import Image
+except ImportError:
+    print("Warning: Pillow is not available (image processing disabled)")
+
+try:
+    import pdfplumber
+except ImportError:
+    print("Warning: pdfplumber is not available (PDF processing disabled)")
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    print("Warning: beautifulsoup4 is not available (web scraping disabled)")
+
+try:
+    import schedule
+    import time
+except ImportError:
+    print("Warning: schedule is not available (scheduled tasks disabled)")
+    schedule = None
+    time = None
 
 # Try to import genai only if not in demo mode
 try:
@@ -232,15 +264,17 @@ def mock_translate(text, source_lang, target_lang):
     
     return translated
 
-# Initialize Whoosh index for glossary
+# Initialize Whoosh index for glossary (conditional on availability)
 GLOSSARY_DIR = "glossary_index"
-schema = Schema(term=TEXT(stored=True), translation=TEXT(stored=True), source=TEXT(stored=True))
+ix = None
 
-if not os.path.exists(GLOSSARY_DIR):
-    os.mkdir(GLOSSARY_DIR)
-    ix = index.create_in(GLOSSARY_DIR, schema)
-else:
-    ix = index.open_dir(GLOSSARY_DIR)
+if WHOOSH_AVAILABLE:
+    schema = Schema(term=TEXT(stored=True), translation=TEXT(stored=True), source=TEXT(stored=True))
+    if not os.path.exists(GLOSSARY_DIR):
+        os.mkdir(GLOSSARY_DIR)
+        ix = index.create_in(GLOSSARY_DIR, schema)
+    else:
+        ix = index.open_dir(GLOSSARY_DIR)
 
 # History storage
 HISTORY_FILE = "translation_history.json"
@@ -291,6 +325,9 @@ def extract_proper_nouns(text):
     return chinese_terms, english_terms
 
 def scrape_government_sites():
+    if not WHOOSH_AVAILABLE or ix is None:
+        return
+    
     glossary_entries = []
     
     for site in GOVERNMENT_SITES:
@@ -356,8 +393,10 @@ def scrape_government_sites():
         print(f"Error updating glossary index: {e}")
 
 def translate_term(term, target_lang='en'):
+    if not GENAI_AVAILABLE:
+        return term
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-2.0-flash')
         lang_map = {
             'en': 'English',
             'zh': 'Chinese',
@@ -489,14 +528,15 @@ def remove_line_breaks(text):
     # 用空格连接而不是\n\n（去除所有段落分隔）
     return ' '.join(cleaned_paragraphs)
 
-# Schedule daily update
+# Schedule daily update (conditional on availability)
 def scheduled_update():
     while True:
         schedule.run_pending()
         time.sleep(60)
 
-schedule.every().day.at("02:00").do(scrape_government_sites)
-Thread(target=scheduled_update, daemon=True).start()
+if schedule is not None:
+    schedule.every().day.at("02:00").do(scrape_government_sites)
+    Thread(target=scheduled_update, daemon=True).start()
 
 @app.route('/')
 def index():
@@ -527,8 +567,10 @@ def translate_text():
         # DEMO MODE: Use mock translation
         if DEMO_MODE:
             translation = mock_translate(text, source_lang, target_lang)
+        elif not GENAI_AVAILABLE:
+            return jsonify({"error": "Gemini API is not available", "success": False}), 503
         else:
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             prompt = f"""Translate the following text from {source_lang} to {target_lang}. 
             Keep the meaning accurate and natural:
@@ -557,12 +599,15 @@ def translate_text():
 
 @app.route('/api/ocr', methods=['POST'])
 def ocr_image():
+    if not PYTESSERACT_AVAILABLE:
+        return jsonify({"error": "OCR feature is not available (pytesseract not installed)", "success": False}), 503
+
     if 'file' not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
-    
+
     file = request.files['file']
     filename = file.filename.lower()
-    
+
     try:
         if filename.endswith('.pdf'):
             with pdfplumber.open(file) as pdf:
@@ -573,7 +618,7 @@ def ocr_image():
             # Image file
             image = Image.open(file)
             text = pytesseract.image_to_string(image, lang='chi_sim+eng')
-        
+
         return jsonify({
             "text": text.strip(),
             "success": True
@@ -591,7 +636,10 @@ def back_translate():
         return jsonify({"error": "No text provided"}), 400
     
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        if not GENAI_AVAILABLE:
+            return jsonify({"error": "Gemini API is not available", "success": False}), 503
+        
+        model = genai.GenerativeModel('gemini-2.0-flash')
         
         prompt = f"""First translate this text to English, then translate it back to {target_lang}.
         Show both translations:
@@ -614,10 +662,10 @@ def dictionary_query():
     else:
         data = request.json
         word = data.get('word', '') if data else ''
-    
+
     if not word:
         return jsonify({"error": "No word provided"}), 400
-    
+
     try:
         # DEMO MODE: Use mock dictionary
         if DEMO_MODE:
@@ -645,19 +693,31 @@ def dictionary_query():
                 "success": True
             })
         else:
-            model = genai.GenerativeModel('gemini-pro')
+            # Try OneLook Dictionary API first
+            result = _query_onelook(word)
+            if result:
+                return jsonify({
+                    "definition": result,
+                    "success": True
+                })
+
+            # Fallback to Gemini API
+            if not GENAI_AVAILABLE:
+                return jsonify({"error": "Gemini API is not available", "success": False}), 503
             
+            model = genai.GenerativeModel('gemini-2.0-flash')
+
             prompt = f"""Provide a comprehensive dictionary entry for the word/phrase '{word}' including:
             1. Part of speech
             2. Definitions
             3. Example sentences
             4. Synonyms and antonyms
             5. Related terms
-            
+
             Output in both English and Chinese."""
-            
+
             response = model.generate_content(prompt)
-            
+
             return jsonify({
                 "definition": response.text.strip(),
                 "success": True
@@ -665,16 +725,62 @@ def dictionary_query():
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
 
+
+def _query_onelook(word):
+    """Query OneLook Dictionary API and return formatted definition with Chinese translation."""
+    try:
+        api_url = f"https://api.onelook.com/definitions?v=4&term={requests.utils.quote(word)}&format=json"
+        resp = requests.get(api_url, timeout=10)
+        if resp.status_code != 200:
+            return None
+
+        data = resp.json()
+        entries = []
+
+        # Collect definitions grouped by part of speech
+        if 'definitions' in data and data['definitions']:
+            pos_defs = {}
+            for defn in data['definitions']:
+                pos = defn.get('part_of_speech', '')
+                def_text = defn.get('definition', '')
+                example = defn.get('example', '')
+                if not def_text:
+                    continue
+                if pos not in pos_defs:
+                    pos_defs[pos] = []
+                entry = def_text
+                if example:
+                    entry += f"\n  Example: {example}"
+                pos_defs[pos].append(entry)
+
+            # Build English definition text
+            en_parts = []
+            for pos, defs in pos_defs.items():
+                pos_label = f"[{pos}]" if pos else ""
+                defs_text = "\n  ".join(f"{i+1}. {d}" for i, d in enumerate(defs))
+                en_parts.append(f"{pos_label}\n  {defs_text}")
+            en_definition = "\n\n".join(en_parts)
+
+            # Return English definition only (no translation)
+            result_parts = [f"Word: {word}"]
+            result_parts.append(f"\n{en_definition}")
+
+            return "\n".join(result_parts)
+
+        return None
+    except Exception:
+        return None
+
 @app.route('/api/rewrite', methods=['POST'])
 def rewrite_text():
     data = request.json
     text = data.get('text', '')
     mode = data.get('mode', 'paraphrase')  # paraphrase, pre-edit, polish
     style = data.get('style', 'standard')  # standard, formal, casual, academic, business
-    
+
     if not text:
         return jsonify({"error": "No text provided"}), 400
-    
+
     try:
         # DEMO MODE: Use mock rewrite
         if DEMO_MODE:
@@ -691,35 +797,22 @@ def rewrite_text():
                 'business': '[商务风格]'
             }
             result = f"{style_descriptions.get(style, '[标准风格]')}{text}{mode_descriptions.get(mode, '')}"
-            
-            # Save to rewrite history
-            history = load_history()
-            if not history.get('rewrite_history'):
-                history['rewrite_history'] = []
-            history['rewrite_history'].append({
-                'original': text,
-                'result': result,
-                'mode': mode,
-                'style': style,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            })
-            if len(history['rewrite_history']) > 10:
-                history['rewrite_history'] = history['rewrite_history'][-10:]
-            save_history(history)
-            
+
             return jsonify({
                 "result": result,
                 "success": True
             })
+        elif not GENAI_AVAILABLE:
+            return jsonify({"error": "Gemini API is not available", "success": False}), 503
         else:
-            model = genai.GenerativeModel('gemini-pro')
-            
+            model = genai.GenerativeModel('gemini-2.0-flash')
+
             mode_prompts = {
                 'paraphrase': "Rewrite the following text in the same language while keeping the original meaning:",
                 'pre-edit': "Pre-edit this text to make it clearer and easier to translate (keep in same language):",
                 'polish': "Polish and improve the following text for better quality and professionalism (keep in same language):"
             }
-            
+
             style_descriptions = {
                 'standard': 'standard style',
                 'formal': 'formal and professional style',
@@ -727,29 +820,13 @@ def rewrite_text():
                 'academic': 'academic and scholarly style',
                 'business': 'business and corporate style'
             }
-            
+
             style_text = f"Use {style_descriptions.get(style, style_descriptions['standard'])}."
             prompt = f"{mode_prompts.get(mode, mode_prompts['paraphrase'])} {style_text}\n\n{text}"
             response = model.generate_content(prompt)
-            
+
             result = response.text.strip()
-            
-            # Save to rewrite history
-            history = load_history()
-            if not history.get('rewrite_history'):
-                history['rewrite_history'] = []
-            history['rewrite_history'].append({
-                'original': text,
-                'result': result,
-                'mode': mode,
-                'style': style,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            })
-            # Keep only last 10 rewrite history items
-            if len(history['rewrite_history']) > 10:
-                history['rewrite_history'] = history['rewrite_history'][-10:]
-            save_history(history)
-        
+
         return jsonify({
             "result": result,
             "success": True
@@ -759,6 +836,9 @@ def rewrite_text():
 
 @app.route('/api/glossary', methods=['GET', 'POST'])
 def query_glossary():
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "Glossary search is not available (whoosh not installed)", "success": False}), 503
+
     if request.method == 'GET':
         query = request.args.get('query', '')
         target_lang = request.args.get('lang', 'en')
@@ -766,10 +846,10 @@ def query_glossary():
         data = request.json
         query = data.get('query', '') if data else ''
         target_lang = data.get('target_lang', 'en') if data else 'en'
-    
+
     if not query:
         return jsonify({"result": [], "success": True})
-    
+
     results = []
     try:
         # First search in local index
@@ -777,7 +857,7 @@ def query_glossary():
             qp = QueryParser("term", ix.schema)
             q = qp.parse(query)
             hits = searcher.search(q, limit=5)
-            
+
             for hit in hits:
                 translated = translate_term(hit['term'], target_lang)
                 results.append({
@@ -785,7 +865,7 @@ def query_glossary():
                     "translation": translated,
                     "source": hit['source']
                 })
-        
+
         # Also translate the query term directly for more results
         if len(results) < 10:
             translated = translate_term(query, target_lang)
@@ -807,7 +887,7 @@ def query_glossary():
             })
         except:
             pass
-    
+
     return jsonify({
         "results": results,
         "success": True
@@ -832,6 +912,9 @@ def clear_history():
 
 @app.route('/api/update-glossary', methods=['POST'])
 def update_glossary():
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "Glossary feature is not available (whoosh not installed)", "success": False}), 503
+
     try:
         scrape_government_sites()
         return jsonify({
@@ -846,14 +929,17 @@ def update_glossary():
 
 @app.route('/api/add-term', methods=['POST'])
 def add_term():
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "Glossary feature is not available (whoosh not installed)", "success": False}), 503
+
     data = request.json
     term = data.get('term', '')
     translation = data.get('translation', '')
     source = data.get('source', 'Manual Entry')
-    
+
     if not term or not translation:
         return jsonify({"error": "Term and translation are required", "success": False}), 400
-    
+
     try:
         writer = ix.writer()
         writer.add_document(
@@ -874,6 +960,9 @@ def add_term():
 
 @app.route('/api/list-terms', methods=['GET'])
 def list_terms():
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "Glossary feature is not available (whoosh not installed)", "success": False}), 503
+
     try:
         results = []
         with ix.searcher() as searcher:
