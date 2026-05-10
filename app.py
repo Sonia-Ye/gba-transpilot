@@ -50,13 +50,14 @@ except ImportError:
 
 # Try to import genai only if not in demo mode
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
     GENAI_AVAILABLE = True
-    # Configure Gemini API key
-    genai.configure(api_key=os.environ.get('GEMINI_API_KEY', ''))
+    genai_client = genai.Client(api_key=os.environ.get('GEMINI_API_KEY', ''))
 except ImportError as e:
-    print(f"Warning: Could not import google.generativeai: {e}")
+    print(f"Warning: Could not import google.genai: {e}")
     GENAI_AVAILABLE = False
+    genai_client = None
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -396,13 +397,15 @@ def translate_term(term, target_lang='en'):
     if not GENAI_AVAILABLE:
         return term
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
         lang_map = {
             'en': 'English',
             'zh': 'Chinese',
             'zh-HK': 'Cantonese'
         }
-        response = model.generate_content(f"Translate this term to {lang_map.get(target_lang, 'English')}: {term}")
+        response = genai_client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=f"Translate this term to {lang_map.get(target_lang, 'English')}: {term}"
+        )
         return response.text.strip()
     except:
         return term
@@ -570,15 +573,16 @@ def translate_text():
         elif not GENAI_AVAILABLE:
             return jsonify({"error": "Gemini API is not available", "success": False}), 503
         else:
-            model = genai.GenerativeModel('gemini-2.0-flash')
-            
-            prompt = f"""Translate the following text from {source_lang} to {target_lang}. 
+            prompt = f"""Translate the following text from {source_lang} to {target_lang}.
             Keep the meaning accurate and natural:
-            
+
             {text}"""
-            
-            response = model.generate_content(prompt)
-            
+
+            response = genai_client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
+
             translation = response.text.strip()
         
         # Save to history
@@ -639,14 +643,15 @@ def back_translate():
         if not GENAI_AVAILABLE:
             return jsonify({"error": "Gemini API is not available", "success": False}), 503
         
-        model = genai.GenerativeModel('gemini-2.0-flash')
-        
         prompt = f"""First translate this text to English, then translate it back to {target_lang}.
         Show both translations:
-        
+
         Original: {text}"""
-        
-        response = model.generate_content(prompt)
+
+        response = genai_client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt
+        )
         
         return jsonify({
             "result": response.text.strip(),
@@ -705,8 +710,6 @@ def dictionary_query():
             if not GENAI_AVAILABLE:
                 return jsonify({"error": "Gemini API is not available", "success": False}), 503
             
-            model = genai.GenerativeModel('gemini-2.0-flash')
-
             prompt = f"""Provide a comprehensive dictionary entry for the word/phrase '{word}' including:
             1. Part of speech
             2. Definitions
@@ -716,7 +719,10 @@ def dictionary_query():
 
             Output in both English and Chinese."""
 
-            response = model.generate_content(prompt)
+            response = genai_client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
 
             return jsonify({
                 "definition": response.text.strip(),
@@ -805,8 +811,6 @@ def rewrite_text():
         elif not GENAI_AVAILABLE:
             return jsonify({"error": "Gemini API is not available", "success": False}), 503
         else:
-            model = genai.GenerativeModel('gemini-2.0-flash')
-
             mode_prompts = {
                 'paraphrase': "Rewrite the following text in the same language while keeping the original meaning:",
                 'pre-edit': "Pre-edit this text to make it clearer and easier to translate (keep in same language):",
@@ -823,7 +827,10 @@ def rewrite_text():
 
             style_text = f"Use {style_descriptions.get(style, style_descriptions['standard'])}."
             prompt = f"{mode_prompts.get(mode, mode_prompts['paraphrase'])} {style_text}\n\n{text}"
-            response = model.generate_content(prompt)
+            response = genai_client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
 
             result = response.text.strip()
 
