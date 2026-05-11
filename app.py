@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import json
 import requests
+import base64
 import datetime
 from threading import Thread
 
@@ -888,12 +889,7 @@ def transcribe_audio():
             tmp_path = tmp.name
 
         try:
-            # Try using OpenAI Whisper API if OPENAI_API_KEY is available
-            openai_api_key = os.environ.get('OPENAI_API_KEY', '')
-            if openai_api_key:
-                transcript = _transcribe_with_whisper(tmp_path, source_lang, openai_api_key)
-            else:
-                transcript = None
+            transcript = _transcribe_with_qwen(tmp_path, source_lang)
 
             if transcript:
                 result = {"transcript": transcript, "success": True}
@@ -911,7 +907,7 @@ def transcribe_audio():
                 return jsonify(result)
             else:
                 return jsonify({
-                    "error": "Audio transcription is not available. Please set the OPENAI_API_KEY environment variable to enable Whisper transcription.",
+                    "error": "Audio transcription failed. Please check your QWEN_API_KEY and try again.",
                     "success": False
                 }), 503
         finally:
@@ -922,28 +918,78 @@ def transcribe_audio():
         return jsonify({"error": str(e), "success": False}), 500
 
 
-def _transcribe_with_whisper(file_path, language, api_key):
-    """Transcribe audio using OpenAI Whisper API."""
+def _transcribe_with_qwen(file_path, language='auto'):
+    """Transcribe audio using Qwen qwen-audio-turbo model."""
     try:
-        url = "https://api.openai.com/v1/audio/transcriptions"
-
+        # Read audio file and encode to base64
         with open(file_path, 'rb') as audio_file:
-            response = requests.post(
-                url,
-                headers={"Authorization": "Bearer " + api_key},
-                files={"file": audio_file},
-                data={"model": "whisper-1", "language": language if language != 'auto' else None},
-                timeout=120
-            )
+            audio_data = audio_file.read()
+        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+
+        # Determine audio format from file extension
+        ext = os.path.splitext(file_path)[1].lower().lstrip('.')
+        if not ext:
+            ext = 'wav'
+
+        url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+        headers = {
+            "Authorization": "Bearer " + QWEN_API_KEY,
+            "Content-Type": "application/json"
+        }
+
+        # Build language instruction
+        lang_instruction = ""
+        if language and language != 'auto':
+            lang_map = {
+                'zh': '中文',
+                'en': 'English',
+                'ja': '日本語',
+                'ko': '한국어',
+                'fr': 'Français',
+                'de': 'Deutsch',
+                'es': 'Español',
+                'ru': 'Русский',
+                'ar': 'العربية',
+                'pt': 'Português',
+                'it': 'Italiano',
+            }
+            lang_name = lang_map.get(language, language)
+            lang_instruction = f" Please transcribe in {lang_name}."
+
+        data = {
+            "model": "qwen-audio-turbo",
+            "input": {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"audio": f"data:audio/{ext};base64,{audio_base64}"},
+                            {"text": f"Transcribe the following audio.{lang_instruction} Output only the transcribed text without any additional explanation or formatting."}
+                        ]
+                    }
+                ]
+            }
+        }
+
+        response = requests.post(url, headers=headers, json=data, timeout=120)
 
         if response.status_code == 200:
             result = response.json()
-            return result.get('text', '')
+            # Extract text from qwen-audio-turbo response
+            if "output" in result and "choices" in result["output"]:
+                text = result["output"]["choices"][0]["message"]["content"]
+                return text.strip() if text else None
+            elif "output" in result and "text" in result["output"]:
+                text = result["output"]["text"]
+                return text.strip() if text else None
+            else:
+                print(f"Qwen Audio API unexpected response: {result}")
+                return None
         else:
-            print(f"Whisper API error: {response.status_code} - {response.text}")
+            print(f"Qwen Audio API error: {response.status_code} - {response.text}")
             return None
     except Exception as e:
-        print(f"Whisper transcription error: {e}")
+        print(f"Qwen audio transcription error: {e}")
         return None
 
 
