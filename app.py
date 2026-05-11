@@ -299,8 +299,18 @@ if WHOOSH_AVAILABLE:
     if not os.path.exists(GLOSSARY_DIR):
         os.mkdir(GLOSSARY_DIR)
         ix = index.create_in(GLOSSARY_DIR, schema)
+        print(f"Created new glossary index in {GLOSSARY_DIR}")
     else:
-        ix = index.open_dir(GLOSSARY_DIR)
+        try:
+            ix = index.open_dir(GLOSSARY_DIR)
+            print(f"Opened existing glossary index in {GLOSSARY_DIR}")
+        except Exception as e:
+            print(f"Error opening glossary index, creating new one: {e}")
+            # If index is corrupted, recreate it
+            import shutil
+            shutil.rmtree(GLOSSARY_DIR)
+            os.mkdir(GLOSSARY_DIR)
+            ix = index.create_in(GLOSSARY_DIR, schema)
 
 # Global variable to track glossary last update time
 glossary_last_update = None
@@ -482,8 +492,14 @@ def scrape_government_sites():
                 source=entry['source']
             )
         writer.commit()
-        glossary_last_update = datetime.datetime.now().isoformat()
+        # FIX: Only store date, not time
+        glossary_last_update = datetime.datetime.now().strftime('%Y-%m-%d')
         print(f"Updated glossary with {len(unique_entries)} unique entries")
+        
+        # Verify index was written
+        with ix.searcher() as searcher:
+            doc_count = searcher.doc_count()
+            print(f"Glossary index now contains {doc_count} documents")
     except Exception as e:
         print(f"Error updating glossary index: {e}")
 
@@ -690,8 +706,9 @@ def query_glossary_for_translation(source_text):
                         term_translation = hit['translation']
                         if term_translation:  # Only include if translation exists
                             results.append((term_text, term_translation))
-                except:
-                    pass
+                            print(f"  Found glossary match: {term_text} -> {term_translation}")
+                except Exception as e:
+                    print(f"  Error searching for term '{term}': {e}")
                 
                 # Also search in translation field for reverse lookup
                 qp2 = QueryParser("translation", ix.schema)
@@ -829,14 +846,30 @@ def ocr_image():
                 ]
             }
         }
+        # FIX: Add detailed logging for debugging
+        print(f"Calling qwen-vl-max OCR API...")
+        print(f"Image MIME type: {mime_type}")
+        print(f"Image data URI length: {len(data_uri)}")
+        
         response = requests.post(url, headers=headers, json=data, timeout=60)
-        response.raise_for_status()
+        
+        print(f"OCR API response status: {response.status_code}")
+        if response.status_code != 200:
+            print(f"OCR API error response: {response.text}")
+            return jsonify({
+                "error": f"OCR API error: {response.status_code} - {response.text}",
+                "success": False
+            }), 500
+        
         result = response.json()
+        print(f"OCR API response: {result}")
+        
         if "output" in result and "choices" in result["output"]:
             text = result["output"]["choices"][0]["message"]["content"]
         elif "output" in result and "text" in result["output"]:
             text = result["output"]["text"]
         else:
+            print(f"OCR API unexpected response format: {result}")
             return jsonify({"error": "OCR model returned unexpected format", "success": False}), 500
 
         return jsonify({
@@ -844,31 +877,50 @@ def ocr_image():
             "success": True
         })
     except Exception as e:
+        print(f"OCR error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e), "success": False}), 500
 
 @app.route('/api/back-translate', methods=['POST'])
 def back_translate():
     data = request.json
     text = data.get('text', '')
-    target_lang = data.get('target_lang', 'zh')
+    target_lang = data.get('target_lang', 'zh')  # This is the ORIGINAL source language
 
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
     try:
-        # 改进的prompt：先识别语言，然后只输出回译结果（原文语言）
+        # FIX: Improved back-translation logic
+        # target_lang is the original source language (where we want to translate back to)
+        # text is the translation result
+        
+        # Map language codes to full names
+        lang_names = {
+            'zh': 'Chinese (Simplified)',
+            'en': 'English', 
+            'zh-HK': 'Cantonese (Traditional Chinese)',
+            'yue': 'Cantonese (Traditional Chinese)',
+            'auto': 'the original language'
+        }
+        target_lang_name = lang_names.get(target_lang, target_lang)
+        
         prompt = f"""Task: Back-translation verification.
 
-IMPORTANT RULES:
-1. First identify the original language of the input text (detect if it's Chinese, English, or other)
-2. Translate the text to English
-3. Translate the English text back to the ORIGINAL language you detected in step 1
-4. Only output the FINAL back-translated result in the original language
-5. Do NOT show intermediate steps, explanations, or any other text
-6. Output ONLY the final back-translated text
+You are given a TRANSLATED text. Your task is to translate it back to {target_lang_name}.
 
-Input text:
-{text}"""
+IMPORTANT RULES:
+1. The input text below is a TRANSLATION (not the original)
+2. Translate this text back to {target_lang_name}
+3. Output ONLY the back-translated text in {target_lang_name}
+4. Do NOT show intermediate steps, explanations, or any other text
+5. Keep the meaning as close as possible to the input text
+
+Input text (translation):
+{text}
+
+Back-translation to {target_lang_name}:"""
 
         result = call_qwen(prompt)
 
@@ -1222,9 +1274,17 @@ def _transcribe_with_qwen(file_path, language='auto'):
             "Authorization": f"Bearer {QWEN_API_KEY}",
         }
 
-        print(f"Calling Paraformer API for transcription (language={lang_param or 'auto'})...")
+        # FIX: Add detailed logging
+        print(f"Calling Paraformer API for transcription...")
+        print(f"  File: {os.path.basename(file_path)}")
+        print(f"  MIME type: {mime_type}")
+        print(f"  Language: {lang_param or 'auto'}")
+        print(f"  File size: {len(audio_data)} bytes")
+        
         response = requests.post(url, headers=headers, files=files, data=data, timeout=120)
 
+        print(f"Paraformer API response status: {response.status_code}")
+        
         if response.status_code == 200:
             result = response.json()
             print(f"Paraformer API response: {result}")
@@ -1240,7 +1300,14 @@ def _transcribe_with_qwen(file_path, language='auto'):
                 print(f"Paraformer API unexpected response format: {result}")
                 return None
         else:
-            print(f"Paraformer API error: {response.status_code} - {response.text}")
+            # FIX: Print detailed error response
+            print(f"Paraformer API error: {response.status_code}")
+            print(f"Error response body: {response.text}")
+            try:
+                error_json = response.json()
+                print(f"Error JSON: {error_json}")
+            except:
+                pass
             return None
     except Exception as e:
         print(f"Paraformer audio transcription error: {e}")
@@ -1265,12 +1332,20 @@ def query_glossary():
     if not query:
         return jsonify({"results": [], "success": True})
 
+    print(f"Glossary search query: '{query}'")
     results = []
     try:
+        # Check index status
+        with ix.searcher() as searcher:
+            doc_count = searcher.doc_count()
+            print(f"Glossary index contains {doc_count} documents")
+        
         with ix.searcher(weighting=scoring.BM25F()) as searcher:
             qp = QueryParser("term", ix.schema)
             q = qp.parse(query)
+            print(f"Parsed query: {q}")
             hits = searcher.search(q, limit=10)
+            print(f"Found {len(hits)} hits in term field")
 
             for hit in hits:
                 results.append({
@@ -1281,10 +1356,12 @@ def query_glossary():
 
         # If no results from index, try exact match on translation field
         if not results:
+            print("No results in term field, searching translation field...")
             with ix.searcher(weighting=scoring.BM25F()) as searcher:
                 qp = QueryParser("translation", ix.schema)
                 q = qp.parse(query)
                 hits = searcher.search(q, limit=10)
+                print(f"Found {len(hits)} hits in translation field")
 
                 for hit in hits:
                     results.append({
@@ -1295,8 +1372,11 @@ def query_glossary():
 
     except Exception as e:
         print(f"Glossary search error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": "术语库查询出错", "success": False}), 500
 
+    print(f"Returning {len(results)} results")
     return jsonify({
         "results": results,
         "success": True
@@ -1342,9 +1422,19 @@ def update_glossary():
 @app.route('/api/glossary-status', methods=['GET'])
 def glossary_status():
     """Return the last glossary update time and availability status."""
+    # Check actual document count
+    doc_count = 0
+    if WHOOSH_AVAILABLE and ix is not None:
+        try:
+            with ix.searcher() as searcher:
+                doc_count = searcher.doc_count()
+        except:
+            pass
+    
     return jsonify({
         "available": WHOOSH_AVAILABLE and ix is not None,
         "last_update": glossary_last_update,
+        "doc_count": doc_count,
         "success": True
     })
 
