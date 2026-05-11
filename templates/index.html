@@ -1168,6 +1168,144 @@ Art Basel是世界著名的艺术博览会。
             }
         });
 
+        // ==================== Dictionary Query ====================
+        document.getElementById('dictBtn').addEventListener('click', async function() {
+            var word = document.getElementById('dictInput').value.trim();
+            if (!word) {
+                alert('\u8bf7\u8f93\u5165\u8981\u67e5\u8be2\u7684\u5355\u8bcd');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u67e5\u8be2\u4e2d...';
+            document.getElementById('dictResult').innerHTML = '<p class="text-muted">\u67e5\u8be2\u4e2d...</p>';
+
+            try {
+                var response = await fetch('/api/dictionary?word=' + encodeURIComponent(word));
+                var data = await response.json();
+
+                if (data.success) {
+                    var definition = data.definition || '\u6682\u65e0\u5b9a\u4e49';
+                    document.getElementById('dictResult').innerHTML =
+                        '<pre class="bg-white p-3 rounded" style="white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto;">' + escapeHtml(definition) + '</pre>';
+                } else {
+                    alert('\u67e5\u8be2\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-book"></i> \u67e5\u8be2';
+            }
+        });
+
+        // ==================== Glossary Search ====================
+        document.getElementById('glossaryBtn').addEventListener('click', async function() {
+            var query = document.getElementById('glossaryQuery').value.trim();
+            var lang = document.getElementById('glossaryTargetLang').value;
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u67e5\u8be2\u4e2d...';
+
+            try {
+                var response = await fetch('/api/glossary?query=' + encodeURIComponent(query) + '&lang=' + encodeURIComponent(lang));
+                var data = await response.json();
+
+                if (data.success) {
+                    var html = '';
+                    if (!data.results || data.results.length === 0) {
+                        html = '<p class="text-muted">\u672a\u627e\u5230\u76f8\u5173\u672f\u8bed</p>';
+                    } else {
+                        for (var i = 0; i < data.results.length; i++) {
+                            var item = data.results[i];
+                            html += '<div class="glossary-item"><strong>' + escapeHtml(item.term) + '</strong><br><span class="text-muted text-sm">' + escapeHtml(item.source || '') + '</span><br>' + escapeHtml(item.translation) + '</div>';
+                        }
+                    }
+                    document.getElementById('glossaryResult').innerHTML = html;
+                } else {
+                    alert('\u67e5\u8be2\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> \u67e5\u8be2';
+            }
+        });
+
+        // ==================== Update Glossary ====================
+        document.getElementById('updateGlossaryBtn').addEventListener('click', async function() {
+            if (!confirm('\u786e\u5b9a\u8981\u66f4\u65b0\u8bcd\u5e93\u5417\uff1f\u8fd9\u53ef\u80fd\u9700\u8981\u4e00\u4e9b\u65f6\u95f4')) {
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u66f4\u65b0\u4e2d...';
+
+            try {
+                var response = await fetch('/api/update-glossary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    alert('\u8bcd\u5e93\u66f4\u65b0\u6210\u529f\uff01');
+                } else {
+                    alert('\u66f4\u65b0\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> \u66f4\u65b0\u8bcd\u5e93';
+            }
+        });
+
+        // ==================== Save Term ====================
+        document.getElementById('saveTermBtn').addEventListener('click', async function() {
+            var term = document.getElementById('termInput').value.trim();
+            var translation = document.getElementById('translationInput').value.trim();
+            var source = document.getElementById('sourceInput').value.trim() || 'Manual Entry';
+
+            if (!term || !translation) {
+                alert('\u8bf7\u8f93\u5165\u672f\u8bed\u548c\u7ffb\u8bd1');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u4fdd\u5b58\u4e2d...';
+
+            try {
+                var response = await fetch('/api/add-term', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ term: term, translation: translation, source: source })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    alert('\u672f\u8bed\u5df2\u6dfb\u52a0\uff01');
+                    bootstrap.Modal.getInstance(document.getElementById('addTermModal')).hide();
+                    document.getElementById('termInput').value = '';
+                    document.getElementById('translationInput').value = '';
+                    document.getElementById('sourceInput').value = '';
+                } else {
+                    alert('\u6dfb\u52a0\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '\u4fdd\u5b58';
+            }
+        });
+
+
         // ==================== Audio/Video Transcribe Tab ====================
 
         // --- File Transcribe Sub Tab ---

@@ -811,9 +811,9 @@ def rewrite_text():
             })
         else:
             mode_prompts = {
-                'paraphrase': "Rewrite the following text in the same language while keeping the original meaning:",
-                'pre-edit': "Pre-edit this text to make it clearer and easier to translate (keep in same language):",
-                'polish': "Polish and improve the following text for better quality and professionalism (keep in same language):"
+                'paraphrase': "Rewrite the following text while keeping the original meaning. IMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language.",
+                'pre-edit': "Pre-edit this text to make it clearer and easier to translate. IMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language.",
+                'polish': "Polish and improve the following text for better quality and professionalism. IMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language."
             }
 
             style_descriptions = {
@@ -833,6 +833,119 @@ def rewrite_text():
         })
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
+
+
+@app.route('/api/polish', methods=['POST'])
+def polish_text():
+    data = request.json
+    text = data.get('text', '')
+    style = data.get('style', 'general')
+
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    try:
+        style_descriptions = {
+            'general': 'standard and natural style',
+            'standard': 'standard and natural style',
+            'formal': 'formal and professional style',
+            'casual': 'casual and conversational style',
+            'academic': 'academic and scholarly style',
+            'business': 'business and corporate style'
+        }
+
+        style_text = "Use " + style_descriptions.get(style, style_descriptions['general']) + "."
+        prompt = "Polish and improve the following text for better quality, fluency, and professionalism. " + style_text + "\nIMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language.\n\n" + text
+
+        result = call_qwen(prompt)
+        return jsonify({
+            "result": result,
+            "success": True
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
+
+
+
+@app.route('/api/transcribe', methods=['POST'])
+def transcribe_audio():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded", "success": False}), 400
+
+    file = request.files['file']
+    source_lang = request.form.get('source_lang', 'auto')
+    target_lang = request.form.get('target_lang', 'zh')
+
+    if not file.filename:
+        return jsonify({"error": "No file selected", "success": False}), 400
+
+    try:
+        import tempfile
+
+        suffix = os.path.splitext(file.filename)[1] or '.wav'
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            file.save(tmp.name)
+            tmp_path = tmp.name
+
+        try:
+            # Try using OpenAI Whisper API if OPENAI_API_KEY is available
+            openai_api_key = os.environ.get('OPENAI_API_KEY', '')
+            if openai_api_key:
+                transcript = _transcribe_with_whisper(tmp_path, source_lang, openai_api_key)
+            else:
+                transcript = None
+
+            if transcript:
+                result = {"transcript": transcript, "success": True}
+
+                # Auto-translate if target_lang is specified
+                if target_lang and target_lang != source_lang and transcript:
+                    try:
+                        translation = call_qwen(
+                            "Translate the following text to " + target_lang + ". Keep the translation natural and accurate:\n\n" + transcript
+                        )
+                        result["translation"] = translation
+                    except:
+                        pass
+
+                return jsonify(result)
+            else:
+                return jsonify({
+                    "error": "Audio transcription is not available. Please set the OPENAI_API_KEY environment variable to enable Whisper transcription.",
+                    "success": False
+                }), 503
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
+
+
+def _transcribe_with_whisper(file_path, language, api_key):
+    """Transcribe audio using OpenAI Whisper API."""
+    try:
+        url = "https://api.openai.com/v1/audio/transcriptions"
+
+        with open(file_path, 'rb') as audio_file:
+            response = requests.post(
+                url,
+                headers={"Authorization": "Bearer " + api_key},
+                files={"file": audio_file},
+                data={"model": "whisper-1", "language": language if language != 'auto' else None},
+                timeout=120
+            )
+
+        if response.status_code == 200:
+            result = response.json()
+            return result.get('text', '')
+        else:
+            print(f"Whisper API error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"Whisper transcription error: {e}")
+        return None
+
 
 @app.route('/api/glossary', methods=['GET', 'POST'])
 def query_glossary():
