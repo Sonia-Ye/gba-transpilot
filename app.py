@@ -302,6 +302,9 @@ if WHOOSH_AVAILABLE:
     else:
         ix = index.open_dir(GLOSSARY_DIR)
 
+# Global variable to track glossary last update time
+glossary_last_update = None
+
 # History storage
 HISTORY_FILE = "translation_history.json"
 
@@ -321,14 +324,8 @@ def save_history(item):
 
 # Government websites to scrape for glossary
 GOVERNMENT_SITES = [
-    "https://www.gov.hk/",
-    "https://www.doj.gov.hk/",
-    "https://www.elegislation.gov.hk/",
-    "https://www.hkex.com.hk/",
-    "https://www.gov.cn/",
-    "https://www.state.gov.cn/",
-    "https://www.court.gov.cn/",
-    "https://www.npc.gov.cn/"
+    "https://www.info.gov.hk/gia/general/",
+    "https://www.gov.hk/tc/about/govdirectory/",
 ]
 
 def extract_proper_nouns(text):
@@ -351,69 +348,141 @@ def extract_proper_nouns(text):
     return chinese_terms, english_terms
 
 def scrape_government_sites():
+    """Scrape Hong Kong government bilingual pages to extract Chinese-English term pairs."""
+    import re
+    global glossary_last_update
     if not WHOOSH_AVAILABLE or ix is None:
         return
-    
+
     glossary_entries = []
-    
-    for site in GOVERNMENT_SITES:
-        try:
-            print(f"Scraping {site}...")
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-            response = requests.get(site, timeout=30, headers=headers)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            text = soup.get_text(separator=' ', strip=True)
-            
-            chinese_terms, english_terms = extract_proper_nouns(text)
-            
-            chinese_terms = chinese_terms[:50]
-            english_terms = english_terms[:50]
-            
-            for term in chinese_terms:
-                if len(term) >= 2:
-                    translation = translate_term(term, 'en')
-                    glossary_entries.append({
-                        "term": term,
-                        "translation": translation,
-                        "source": site,
-                        "type": "proper_noun"
-                    })
-            
-            for term in english_terms:
-                if len(term) >= 3:
-                    translation = translate_term(term, 'zh')
-                    glossary_entries.append({
-                        "term": term,
-                        "translation": translation,
-                        "source": site,
-                        "type": "proper_noun"
-                    })
-            
-            print(f"Extracted {len(chinese_terms)} Chinese terms and {len(english_terms)} English terms from {site}")
-            
-        except Exception as e:
-            print(f"Error scraping {site}: {e}")
-    
+
+    # Scrape Hong Kong Government News Gazette (bilingual press releases)
+    try:
+        print("Scraping Hong Kong Government News Gazette...")
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        response = requests.get("https://www.info.gov.hk/gia/general/", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Find links to individual press release pages
+        links = soup.find_all('a', href=True)
+        press_links = []
+        for link in links:
+            href = link.get('href', '')
+            if '/gia/general/' in href and href.endswith('.htm'):
+                if href.startswith('/'):
+                    href = 'https://www.info.gov.hk' + href
+                press_links.append(href)
+
+        # Deduplicate and limit
+        seen_urls = set()
+        unique_links = []
+        for url in press_links:
+            if url not in seen_urls:
+                seen_urls.add(url)
+                unique_links.append(url)
+
+        # Scrape up to 10 press release pages
+        for url in unique_links[:10]:
+            try:
+                print(f"  Scraping press release: {url}")
+                resp = requests.get(url, timeout=20, headers=headers)
+                page_soup = BeautifulSoup(resp.text, 'html.parser')
+
+                # Look for bilingual content - HK government pages often have
+                # Chinese and English versions with parallel structure
+                # Extract text blocks that contain both Chinese and English
+                text = page_soup.get_text(separator='\n', strip=True)
+
+                # Try to find Chinese-English pairs from the page structure
+                # Many HK gov pages have tables or divs with bilingual content
+                tables = page_soup.find_all('table')
+                for table in tables:
+                    rows = table.find_all('tr')
+                    for row in rows:
+                        cells = row.find_all(['td', 'th'])
+                        if len(cells) >= 2:
+                            cell_texts = [c.get_text(strip=True) for c in cells]
+                            for i in range(len(cell_texts) - 1):
+                                zh_text = cell_texts[i]
+                                en_text = cell_texts[i + 1]
+                                # Check if one is Chinese and the other is English
+                                has_chinese = bool(re.search(r'[\u4e00-\u9fff]', zh_text))
+                                has_english = bool(re.search(r'[a-zA-Z]', en_text)) and not bool(re.search(r'[\u4e00-\u9fff]', en_text))
+                                if has_chinese and has_english and len(zh_text) >= 2 and len(en_text) >= 2:
+                                    glossary_entries.append({
+                                        "term": zh_text,
+                                        "translation": en_text,
+                                        "source": url,
+                                        "type": "bilingual"
+                                    })
+                                # Also try reverse order
+                                has_chinese2 = bool(re.search(r'[\u4e00-\u9fff]', en_text))
+                                has_english2 = bool(re.search(r'[a-zA-Z]', zh_text)) and not bool(re.search(r'[\u4e00-\u9fff]', zh_text))
+                                if has_chinese2 and has_english2 and len(en_text) >= 2 and len(zh_text) >= 2:
+                                    glossary_entries.append({
+                                        "term": en_text,
+                                        "translation": zh_text,
+                                        "source": url,
+                                        "type": "bilingual"
+                                    })
+
+            except Exception as e:
+                print(f"  Error scraping press release {url}: {e}")
+
+        print(f"Extracted {len(glossary_entries)} bilingual entries from press releases")
+
+    except Exception as e:
+        print(f"Error scraping government news: {e}")
+
+    # Scrape government directory for organization names
+    try:
+        print("Scraping Hong Kong Government Directory...")
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        response = requests.get("https://www.gov.hk/tc/about/govdirectory/", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Extract organization names - look for links with Chinese text
+        org_links = soup.find_all('a', href=True)
+        for link in org_links:
+            text = link.get_text(strip=True)
+            # Filter for Chinese organization names (usually 2-10 characters)
+            if re.search(r'[\u4e00-\u9fff]{2,10}', text) and len(text) <= 20:
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "gov.hk directory",
+                    "type": "organization"
+                })
+
+        print(f"Extracted organization entries from directory")
+
+    except Exception as e:
+        print(f"Error scraping government directory: {e}")
+
+    # Deduplicate entries
     seen_terms = set()
     unique_entries = []
     for entry in glossary_entries:
-        term_key = entry['term'] + entry['source']
+        term_key = entry['term']
         if term_key not in seen_terms:
             seen_terms.add(term_key)
             unique_entries.append(entry)
-    
+
+    # Write to whoosh index
     try:
         writer = ix.writer()
         for entry in unique_entries:
             writer.add_document(
-                term=entry['term'], 
-                translation=entry['translation'], 
+                term=entry['term'],
+                translation=entry['translation'],
                 source=entry['source']
             )
         writer.commit()
+        glossary_last_update = datetime.datetime.now().isoformat()
         print(f"Updated glossary with {len(unique_entries)} unique entries")
     except Exception as e:
         print(f"Error updating glossary index: {e}")
@@ -430,6 +499,22 @@ def translate_term(term, target_lang='en'):
         return call_qwen(prompt)
     except:
         return term
+
+
+def detect_language(text):
+    """Detect the language of the input text.
+    Returns 'zh' for Chinese, 'yue' for Cantonese, 'en' for English/other.
+    """
+    import re
+    # Cantonese characteristic characters
+    cantonese_chars = set('嘅咗喺咁唔喇叻啱靓哋冇睇喥嗰啲乜嘢冚唞噃')
+    has_cantonese = bool(cantonese_chars & set(text))
+    if has_cantonese:
+        return 'yue'
+    # Chinese characters (CJK Unified Ideographs)
+    if re.search(r'[\u4e00-\u9fff]', text):
+        return 'zh'
+    return 'en'
 
 def clean_text(text):
     import re
@@ -617,9 +702,6 @@ def translate_text():
 
 @app.route('/api/ocr', methods=['POST'])
 def ocr_image():
-    if not PYTESSERACT_AVAILABLE:
-        return jsonify({"error": "OCR feature is not available (pytesseract not installed)", "success": False}), 503
-
     if 'file' not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
@@ -627,15 +709,62 @@ def ocr_image():
     filename = file.filename.lower()
 
     try:
-        if filename.endswith('.pdf'):
-            with pdfplumber.open(file) as pdf:
-                text = ""
-                for page in pdf.pages:
-                    text += page.extract_text() + "\n"
+        if PYTESSERACT_AVAILABLE:
+            # Use pytesseract if available
+            if filename.endswith('.pdf'):
+                with pdfplumber.open(file) as pdf:
+                    text = ""
+                    for page in pdf.pages:
+                        text += page.extract_text() + "\n"
+            else:
+                image = Image.open(file)
+                text = pytesseract.image_to_string(image, lang='chi_sim+eng')
         else:
-            # Image file
-            image = Image.open(file)
-            text = pytesseract.image_to_string(image, lang='chi_sim+eng')
+            # Fallback: use qwen-vl-max multimodal model for OCR
+            file.seek(0)
+            file_bytes = file.read()
+
+            # Determine MIME type
+            mime_map = {
+                '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+                '.png': 'image/png', '.bmp': 'image/bmp',
+                '.gif': 'image/gif', '.tiff': 'image/tiff',
+                '.webp': 'image/webp', '.pdf': 'application/pdf'
+            }
+            ext = os.path.splitext(filename)[1].lower()
+            mime_type = mime_map.get(ext, 'image/jpeg')
+
+            file_b64 = base64.b64encode(file_bytes).decode('utf-8')
+            data_uri = f"data:{mime_type};base64,{file_b64}"
+
+            url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+            headers = {
+                "Authorization": f"Bearer {QWEN_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": "qwen-vl-max",
+                "input": {
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": [
+                                {"image": data_uri},
+                                {"text": "请识别图片中的所有文字，只输出文字内容，不要任何解释"}
+                            ]
+                        }
+                    ]
+                }
+            }
+            response = requests.post(url, headers=headers, json=data, timeout=60)
+            response.raise_for_status()
+            result = response.json()
+            if "output" in result and "choices" in result["output"]:
+                text = result["output"]["choices"][0]["message"]["content"]
+            elif "output" in result and "text" in result["output"]:
+                text = result["output"]["text"]
+            else:
+                return jsonify({"error": "OCR model returned unexpected format", "success": False}), 500
 
         return jsonify({
             "text": text.strip(),
@@ -820,29 +949,25 @@ def rewrite_text():
                 "success": True
             })
         else:
-            # Improved prompt that first detects language, then requires same language output
-            mode_prompts = {
-                'paraphrase': """First, identify the language of the input text below.
-Then, rewrite the text while preserving its original meaning.
-CRITICAL: You MUST output the rewritten text in the SAME language as the input.
-- If input is Chinese (contains Chinese characters), output in Chinese
-- If input is English, output in English
-- If input is Cantonese, output in Cantonese
-Do NOT change the language under any circumstances.""",
-                'pre-edit': """First, identify the language of the input text below.
-Then, pre-edit the text to make it clearer and easier to translate, while preserving its original meaning.
-CRITICAL: You MUST output the pre-edited text in the SAME language as the input.
-- If input is Chinese (contains Chinese characters), output in Chinese
-- If input is English, output in English
-- If input is Cantonese, output in Cantonese
-Do NOT change the language under any circumstances.""",
-                'polish': """First, identify the language of the input text below.
-Then, polish and optimize the text to improve its quality and professionalism, while preserving its original meaning.
-CRITICAL: You MUST output the polished text in the SAME language as the input.
-- If input is Chinese (contains Chinese characters), output in Chinese
-- If input is English, output in English
-- If input is Cantonese, output in Cantonese
-Do NOT change the language under any circumstances."""
+            # Detect language and use appropriate prompt directly
+            detected_lang = detect_language(text)
+
+            lang_prompts = {
+                'zh': {
+                    'paraphrase': '请用中文改写以下文本，保持原意不变：',
+                    'pre-edit': '请用中文对以下文本进行预编辑，使其更清晰、更易于翻译，保持原意不变：',
+                    'polish': '请用中文润色以下文本，提升其质量和专业性，保持原意不变：'
+                },
+                'yue': {
+                    'paraphrase': '請用粵語改寫以下文本，保持原意不變：',
+                    'pre-edit': '請用粵語對以下文本進行預編輯，使其更清晰、更易於翻譯，保持原意不變：',
+                    'polish': '請用粵語潤色以下文本，提升其質量和專業性，保持原意不變：'
+                },
+                'en': {
+                    'paraphrase': 'Please rewrite the following text in English while preserving its original meaning:',
+                    'pre-edit': 'Please pre-edit the following text in English to make it clearer and easier to translate, while preserving its original meaning:',
+                    'polish': 'Please polish the following text in English to improve its quality and professionalism, while preserving its original meaning:'
+                }
             }
 
             style_descriptions = {
@@ -853,8 +978,22 @@ Do NOT change the language under any circumstances."""
                 'business': '商务风格'
             }
 
-            style_text = f"请使用{style_descriptions.get(style, style_descriptions['standard'])}。"
-            prompt = f"{mode_prompts.get(mode, mode_prompts['paraphrase'])} {style_text}\n\n{text}"
+            lang_mode = lang_prompts.get(detected_lang, lang_prompts['en'])
+            base_prompt = lang_mode.get(mode, lang_mode['paraphrase'])
+
+            if detected_lang in ('zh', 'yue'):
+                style_text = f"请使用{style_descriptions.get(style, style_descriptions['standard'])}。"
+            else:
+                style_map_en = {
+                    'standard': 'standard style',
+                    'formal': 'formal and professional style',
+                    'casual': 'casual and natural style',
+                    'academic': 'academic style',
+                    'business': 'business style'
+                }
+                style_text = f"Please use a {style_map_en.get(style, style_map_en['standard'])}."
+
+            prompt = f"{base_prompt}\n{style_text}\n\n{text}"
             result = call_qwen(prompt)
         return jsonify({
             "result": result,
@@ -874,27 +1013,33 @@ def polish_text():
         return jsonify({"error": "No text provided"}), 400
 
     try:
-        style_descriptions = {
-            'general': '标准自然风格',
-            'standard': '标准自然风格',
-            'formal': '正式专业风格',
-            'casual': '随意自然风格',
-            'academic': '学术风格',
-            'business': '商务风格'
-        }
+        detected_lang = detect_language(text)
 
-        style_text = "请使用" + style_descriptions.get(style, style_descriptions['general']) + "。"
-        prompt = """First, identify the language of the input text below.
-Then, polish and optimize the text to improve its quality, fluency, and professionalism, while preserving its original meaning.
-""" + style_text + """
-CRITICAL: You MUST output the polished text in the SAME language as the input.
-- If input is Chinese (contains Chinese characters), output in Chinese
-- If input is English, output in English
-- If input is Cantonese, output in Cantonese
-Do NOT change the language under any circumstances.
-
-Input text:
-""" + text
+        if detected_lang in ('zh', 'yue'):
+            style_descriptions = {
+                'general': '标准自然风格',
+                'standard': '标准自然风格',
+                'formal': '正式专业风格',
+                'casual': '随意自然风格',
+                'academic': '学术风格',
+                'business': '商务风格'
+            }
+            style_text = "请使用" + style_descriptions.get(style, style_descriptions['general']) + "。"
+            if detected_lang == 'yue':
+                prompt = "請用粵語潤色以下文本，提升其質量、流暢性和專業性，保持原意不變。\n" + style_text + "\n\n" + text
+            else:
+                prompt = "请用中文润色以下文本，提升其质量、流畅性和专业性，保持原意不变。\n" + style_text + "\n\n" + text
+        else:
+            style_map_en = {
+                'general': 'natural and standard style',
+                'standard': 'natural and standard style',
+                'formal': 'formal and professional style',
+                'casual': 'casual and natural style',
+                'academic': 'academic style',
+                'business': 'business style'
+            }
+            style_text = "Please use a " + style_map_en.get(style, style_map_en['general']) + "."
+            prompt = "Please polish the following text in English to improve its quality, fluency, and professionalism, while preserving its original meaning.\n" + style_text + "\n\nInput text:\n" + text
 
         result = call_qwen(prompt)
         return jsonify({
@@ -957,109 +1102,67 @@ def transcribe_audio():
 
 
 def _transcribe_with_qwen(file_path, language='auto'):
-    """Transcribe audio using Qwen qwen-audio-turbo model."""
+    """Transcribe audio using DashScope Paraformer API (OpenAI-compatible)."""
     try:
-        # Read audio file and encode to base64
-        with open(file_path, 'rb') as audio_file:
-            audio_data = audio_file.read()
-        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        url = "https://dashscope.aliyuncs.com/compatible-mode/v1/audio/transcriptions"
 
-        # Determine audio format from file extension
-        ext = os.path.splitext(file_path)[1].lower().lstrip('.')
-        if not ext:
-            ext = 'wav'
-
-        # Map extension to format
-        format_map = {
-            'mp3': 'mp3',
-            'wav': 'wav',
-            'm4a': 'm4a',
-            'aac': 'aac',
-            'ogg': 'ogg',
-            'flac': 'flac',
-            'wma': 'wma'
-        }
-        audio_format = format_map.get(ext, 'mp3')
-
-        # Build language instruction
-        lang_instruction = ""
+        # Build language parameter
+        lang_param = "zh"  # default
         if language and language != 'auto':
             lang_map = {
-                'zh': 'Chinese (Simplified)',
-                'zh-HK': 'Cantonese',
-                'en': 'English',
-                'ja': 'Japanese',
-                'ko': 'Korean',
-                'fr': 'French',
-                'de': 'German',
-                'es': 'Spanish',
-                'ru': 'Russian',
-                'ar': 'Arabic',
-                'pt': 'Portuguese',
-                'it': 'Italian',
+                'zh': 'zh',
+                'zh-HK': 'yue',
+                'en': 'en',
+                'ja': 'ja',
+                'ko': 'ko',
+                'fr': 'fr',
+                'de': 'de',
+                'es': 'es',
+                'ru': 'ru',
             }
-            lang_name = lang_map.get(language, language)
-            lang_instruction = f" Please transcribe in {lang_name}."
+            lang_param = lang_map.get(language, language)
 
-        # Use the correct API format for qwen-audio-turbo
-        url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
-        headers = {
-            "Authorization": "Bearer " + QWEN_API_KEY,
-            "Content-Type": "application/json"
-        }
-
-        # Correct format for audio transcription with qwen-audio-turbo
-        data = {
-            "model": "qwen-audio-turbo",
-            "input": {
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "audio": f"data:audio/{audio_format};base64,{audio_base64}"
-                            },
-                            {
-                                "text": f"Transcribe the following audio to text.{lang_instruction} Only output the transcribed text, no explanations or formatting."
-                            }
-                        ]
-                    }
-                ]
+        with open(file_path, 'rb') as audio_file:
+            files = {
+                'file': (os.path.basename(file_path), audio_file)
             }
-        }
+            data = {
+                'model': 'paraformer-v2',
+                'language': lang_param,
+            }
+            headers = {
+                "Authorization": f"Bearer {QWEN_API_KEY}",
+            }
 
-        print(f"Calling Qwen Audio API with format: {audio_format}")
-        response = requests.post(url, headers=headers, json=data, timeout=120)
+            print(f"Calling Paraformer API for transcription (language={lang_param})...")
+            response = requests.post(url, headers=headers, files=files, data=data, timeout=120)
 
         if response.status_code == 200:
             result = response.json()
-            print(f"Qwen Audio API response: {result}")
-            # Extract text from qwen-audio-turbo response
-            if "output" in result:
-                if "choices" in result["output"]:
-                    text = result["output"]["choices"][0]["message"]["content"]
-                    return text.strip() if text else None
-                elif "text" in result["output"]:
-                    text = result["output"]["text"]
-                    return text.strip() if text else None
-            # Try alternative response format
-            if "choices" in result:
-                text = result["choices"][0]["message"]["content"]
+            print(f"Paraformer API response: {result}")
+            # Response format: {"output": {"text": "..."}}
+            if "output" in result and "text" in result["output"]:
+                text = result["output"]["text"]
                 return text.strip() if text else None
-            print(f"Qwen Audio API unexpected response format: {result}")
-            return None
+            # Alternative format
+            elif "text" in result:
+                text = result["text"]
+                return text.strip() if text else None
+            else:
+                print(f"Paraformer API unexpected response format: {result}")
+                return None
         else:
-            print(f"Qwen Audio API error: {response.status_code} - {response.text}")
+            print(f"Paraformer API error: {response.status_code} - {response.text}")
             return None
     except Exception as e:
-        print(f"Qwen audio transcription error: {e}")
+        print(f"Paraformer audio transcription error: {e}")
         return None
 
 
 @app.route('/api/glossary', methods=['GET', 'POST'])
 def query_glossary():
     if not WHOOSH_AVAILABLE or ix is None:
-        return jsonify({"error": "Glossary search is not available (whoosh not installed)", "success": False}), 503
+        return jsonify({"error": "术语库搜索功能不可用（whoosh 未安装）", "success": False}), 503
 
     if request.method == 'GET':
         query = request.args.get('query', '')
@@ -1070,45 +1173,39 @@ def query_glossary():
         target_lang = data.get('target_lang', 'en') if data else 'en'
 
     if not query:
-        return jsonify({"result": [], "success": True})
+        return jsonify({"results": [], "success": True})
 
     results = []
     try:
-        # First search in local index
         with ix.searcher(weighting=scoring.BM25F()) as searcher:
             qp = QueryParser("term", ix.schema)
             q = qp.parse(query)
-            hits = searcher.search(q, limit=5)
+            hits = searcher.search(q, limit=10)
 
             for hit in hits:
-                translated = translate_term(hit['term'], target_lang)
                 results.append({
                     "term": hit['term'],
-                    "translation": translated,
+                    "translation": hit['translation'],
                     "source": hit['source']
                 })
 
-        # Also translate the query term directly for more results
-        if len(results) < 10:
-            translated = translate_term(query, target_lang)
-            if translated != query:
-                results.append({
-                    "term": query,
-                    "translation": translated,
-                    "source": "AI Translation"
-                })
+        # If no results from index, try exact match on translation field
+        if not results:
+            with ix.searcher(weighting=scoring.BM25F()) as searcher:
+                qp = QueryParser("translation", ix.schema)
+                q = qp.parse(query)
+                hits = searcher.search(q, limit=10)
+
+                for hit in hits:
+                    results.append({
+                        "term": hit['term'],
+                        "translation": hit['translation'],
+                        "source": hit['source']
+                    })
+
     except Exception as e:
         print(f"Glossary search error: {e}")
-        # Fallback: direct translation
-        try:
-            translated = translate_term(query, target_lang)
-            results.append({
-                "term": query,
-                "translation": translated,
-                "source": "AI Translation"
-            })
-        except:
-            pass
+        return jsonify({"error": "术语库查询出错", "success": False}), 500
 
     return jsonify({
         "results": results,
@@ -1135,7 +1232,7 @@ def clear_history():
 @app.route('/api/update-glossary', methods=['POST'])
 def update_glossary():
     if not WHOOSH_AVAILABLE or ix is None:
-        return jsonify({"error": "Glossary feature is not available (whoosh not installed)", "success": False}), 503
+        return jsonify({"error": "术语库功能不可用（whoosh 未安装）", "success": False}), 503
 
     try:
         # Run scraping in background thread to avoid request timeout
@@ -1143,13 +1240,23 @@ def update_glossary():
         thread.start()
         return jsonify({
             "success": True,
-            "message": "Glossary update started in background. This may take a few minutes."
+            "message": "术语库更新已在后台启动，可能需要几分钟时间。"
         })
     except Exception as e:
         return jsonify({
             "success": False,
             "error": str(e)
         }), 500
+
+
+@app.route('/api/glossary-status', methods=['GET'])
+def glossary_status():
+    """Return the last glossary update time and availability status."""
+    return jsonify({
+        "available": WHOOSH_AVAILABLE and ix is not None,
+        "last_update": glossary_last_update,
+        "success": True
+    })
 
 @app.after_request
 def after_request(response):

@@ -1057,6 +1057,42 @@ Art Basel是世界著名的艺术博览会。
         });
 
         // Back translate button
+        
+        // OCR button
+        document.getElementById('ocrBtn').addEventListener('click', async function() {
+            var fileInput = document.getElementById('ocrFile');
+            if (!fileInput.files[0]) {
+                alert('请先选择文件');
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 识别中...';
+
+            try {
+                var formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                var response = await fetch('/api/ocr', {
+                    method: 'POST',
+                    body: formData
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('sourceText').value = data.text;
+                    document.getElementById('charCount').textContent = data.text.length + '/5000';
+                } else {
+                    alert('识别失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('网络错误');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-file-image"></i> 上传并识别';
+            }
+        });
+
         document.getElementById('backTranslateBtn').addEventListener('click', async function() {
             var text = document.getElementById('targetText').value;
             if (!text.trim()) {
