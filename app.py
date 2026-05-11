@@ -48,16 +48,40 @@ except ImportError:
     schedule = None
     time = None
 
-# Try to import genai only if not in demo mode
-try:
-    from google import genai
-    from google.genai import types
-    GENAI_AVAILABLE = True
-    genai_client = genai.Client(api_key=os.environ.get('GEMINI_API_KEY', ''))
-except ImportError as e:
-    print(f"Warning: Could not import google.genai: {e}")
-    GENAI_AVAILABLE = False
-    genai_client = None
+# Qwen API configuration
+QWEN_API_KEY = os.environ.get('QWEN_API_KEY', 'sk-ab3828c98786402992377e7088054b17')
+QWEN_API_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
+QWEN_MODEL = "qwen-turbo"
+
+def call_qwen(prompt, system_message="You are a helpful assistant."):
+    """Call Qwen API with the given prompt and return the response text."""
+    headers = {
+        "Authorization": f"Bearer {QWEN_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": QWEN_MODEL,
+        "input": {
+            "messages": [
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt}
+            ]
+        }
+    }
+    try:
+        response = requests.post(QWEN_API_URL, headers=headers, json=data, timeout=60)
+        response.raise_for_status()
+        result = response.json()
+        # Extract text from Qwen response format
+        if "output" in result and "text" in result["output"]:
+            return result["output"]["text"].strip()
+        elif "output" in result and "choices" in result["output"]:
+            return result["output"]["choices"][0]["message"]["content"].strip()
+        else:
+            return str(result)
+    except Exception as e:
+        print(f"Qwen API error: {e}")
+        raise
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -78,7 +102,7 @@ app.config['JSON_AS_ASCII'] = False
 #     'https': PROXY_URL
 # }
 
-# DEMO MODE: Use local mock translation instead of Gemini
+# DEMO MODE: Use local mock translation instead of Qwen
 DEMO_MODE = False
 
 # Mock translation dictionary for demo
@@ -394,19 +418,15 @@ def scrape_government_sites():
         print(f"Error updating glossary index: {e}")
 
 def translate_term(term, target_lang='en'):
-    if not GENAI_AVAILABLE:
-        return term
+    """Translate a single term using Qwen API."""
     try:
         lang_map = {
             'en': 'English',
             'zh': 'Chinese',
             'zh-HK': 'Cantonese'
         }
-        response = genai_client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=f"Translate this term to {lang_map.get(target_lang, 'English')}: {term}"
-        )
-        return response.text.strip()
+        prompt = f"Translate this term to {lang_map.get(target_lang, 'English')}: {term}"
+        return call_qwen(prompt)
     except:
         return term
 
@@ -570,20 +590,13 @@ def translate_text():
         # DEMO MODE: Use mock translation
         if DEMO_MODE:
             translation = mock_translate(text, source_lang, target_lang)
-        elif not GENAI_AVAILABLE:
-            return jsonify({"error": "Gemini API is not available", "success": False}), 503
         else:
             prompt = f"""Translate the following text from {source_lang} to {target_lang}.
             Keep the meaning accurate and natural:
 
             {text}"""
 
-            response = genai_client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
-            )
-
-            translation = response.text.strip()
+            translation = call_qwen(prompt)
         
         # Save to history
         save_history({
@@ -640,21 +653,15 @@ def back_translate():
         return jsonify({"error": "No text provided"}), 400
     
     try:
-        if not GENAI_AVAILABLE:
-            return jsonify({"error": "Gemini API is not available", "success": False}), 503
-        
         prompt = f"""First translate this text to English, then translate it back to {target_lang}.
         Show both translations:
 
         Original: {text}"""
 
-        response = genai_client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=prompt
-        )
+        result = call_qwen(prompt)
         
         return jsonify({
-            "result": response.text.strip(),
+            "result": result,
             "success": True
         })
     except Exception as e:
@@ -706,10 +713,7 @@ def dictionary_query():
                     "success": True
                 })
 
-            # Fallback to Gemini API
-            if not GENAI_AVAILABLE:
-                return jsonify({"error": "Gemini API is not available", "success": False}), 503
-            
+            # Fallback to Qwen API
             prompt = f"""Provide a comprehensive dictionary entry for the word/phrase '{word}' including:
             1. Part of speech
             2. Definitions
@@ -719,13 +723,10 @@ def dictionary_query():
 
             Output in both English and Chinese."""
 
-            response = genai_client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
-            )
+            definition = call_qwen(prompt)
 
             return jsonify({
-                "definition": response.text.strip(),
+                "definition": definition,
                 "success": True
             })
     except Exception as e:
@@ -808,8 +809,6 @@ def rewrite_text():
                 "result": result,
                 "success": True
             })
-        elif not GENAI_AVAILABLE:
-            return jsonify({"error": "Gemini API is not available", "success": False}), 503
         else:
             mode_prompts = {
                 'paraphrase': "Rewrite the following text in the same language while keeping the original meaning:",
@@ -827,13 +826,7 @@ def rewrite_text():
 
             style_text = f"Use {style_descriptions.get(style, style_descriptions['standard'])}."
             prompt = f"{mode_prompts.get(mode, mode_prompts['paraphrase'])} {style_text}\n\n{text}"
-            response = genai_client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
-            )
-
-            result = response.text.strip()
-
+            result = call_qwen(prompt)
         return jsonify({
             "result": result,
             "success": True
