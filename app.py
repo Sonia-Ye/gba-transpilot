@@ -476,8 +476,8 @@ def clean_text(text):
                 
                 if (not ends_with_sentence_end and next_starts_with_lower) or line_ends_with_hyphen:
                     # 这是断行，需要连接，但要去除当前行末尾的连字符
-                    line = re.sub(r'[\-–—]$', '', line)
-                    processed_lines.append(line)
+                    line = re.sub(r'[\-–—]$', '', line).rstrip()
+                    processed_lines.append(line + ' ')  # 添加空格连接
                 else:
                     # 这是有意换行或者是句子边界
                     processed_lines.append(line)
@@ -485,11 +485,11 @@ def clean_text(text):
                 # 最后一行
                 processed_lines.append(line)
         
-        # 合并处理后的行（直接连接，不额外添加空格）
+        # 合并处理后的行
         result = ''.join(processed_lines)
         
-        # 最后一次清理多余空格
-        result = re.sub(r'[ \t]+', ' ', result).strip()
+        # 清理行内多余空格（只保留句子间必要的单空格）
+        result = re.sub(r'  +', ' ', result).strip()
         
         if result:
             cleaned_paragraphs.append(result)
@@ -536,15 +536,15 @@ def remove_line_breaks(text):
                 line_ends_with_hyphen = re.search(r'[\-–—]$', line) is not None
                 
                 if (not ends_with_sentence_end and next_starts_with_lower) or line_ends_with_hyphen:
-                    line = re.sub(r'[\-–—]$', '', line)
-                    processed_lines.append(line)
+                    line = re.sub(r'[\-–—]$', '', line).rstrip()
+                    processed_lines.append(line + ' ')  # 添加空格连接
                 else:
                     processed_lines.append(line)
             else:
                 processed_lines.append(line)
         
         result = ''.join(processed_lines)
-        result = re.sub(r'[ \t]+', ' ', result).strip()
+        result = re.sub(r'  +', ' ', result).strip()
         
         if result:
             cleaned_paragraphs.append(result)
@@ -649,18 +649,27 @@ def back_translate():
     data = request.json
     text = data.get('text', '')
     target_lang = data.get('target_lang', 'zh')
-    
+
     if not text:
         return jsonify({"error": "No text provided"}), 400
-    
-    try:
-        prompt = f"""First translate this text to English, then translate it back to {target_lang}.
-        Show both translations:
 
-        Original: {text}"""
+    try:
+        # 改进的prompt：先识别语言，然后只输出回译结果（原文语言）
+        prompt = f"""Task: Back-translation verification.
+
+IMPORTANT RULES:
+1. First identify the original language of the input text (detect if it's Chinese, English, or other)
+2. Translate the text to English
+3. Translate the English text back to the ORIGINAL language you detected in step 1
+4. Only output the FINAL back-translated result in the original language
+5. Do NOT show intermediate steps, explanations, or any other text
+6. Output ONLY the final back-translated text
+
+Input text:
+{text}"""
 
         result = call_qwen(prompt)
-        
+
         return jsonify({
             "result": result,
             "success": True
@@ -811,10 +820,29 @@ def rewrite_text():
                 "success": True
             })
         else:
+            # Improved prompt that first detects language, then requires same language output
             mode_prompts = {
-                'paraphrase': "请对以下文本进行改写，保持原意不变。重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。",
-                'pre-edit': "请对以下文本进行预编辑，使其更清晰、更易于翻译。重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。",
-                'polish': "请对以下文本进行润色和优化，提升质量和专业性。重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。"
+                'paraphrase': """First, identify the language of the input text below.
+Then, rewrite the text while preserving its original meaning.
+CRITICAL: You MUST output the rewritten text in the SAME language as the input.
+- If input is Chinese (contains Chinese characters), output in Chinese
+- If input is English, output in English
+- If input is Cantonese, output in Cantonese
+Do NOT change the language under any circumstances.""",
+                'pre-edit': """First, identify the language of the input text below.
+Then, pre-edit the text to make it clearer and easier to translate, while preserving its original meaning.
+CRITICAL: You MUST output the pre-edited text in the SAME language as the input.
+- If input is Chinese (contains Chinese characters), output in Chinese
+- If input is English, output in English
+- If input is Cantonese, output in Cantonese
+Do NOT change the language under any circumstances.""",
+                'polish': """First, identify the language of the input text below.
+Then, polish and optimize the text to improve its quality and professionalism, while preserving its original meaning.
+CRITICAL: You MUST output the polished text in the SAME language as the input.
+- If input is Chinese (contains Chinese characters), output in Chinese
+- If input is English, output in English
+- If input is Cantonese, output in Cantonese
+Do NOT change the language under any circumstances."""
             }
 
             style_descriptions = {
@@ -856,7 +884,17 @@ def polish_text():
         }
 
         style_text = "请使用" + style_descriptions.get(style, style_descriptions['general']) + "。"
-        prompt = "请对以下文本进行润色和优化，提升文本的质量、流畅度和专业性。 " + style_text + "\n重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。\n\n" + text
+        prompt = """First, identify the language of the input text below.
+Then, polish and optimize the text to improve its quality, fluency, and professionalism, while preserving its original meaning.
+""" + style_text + """
+CRITICAL: You MUST output the polished text in the SAME language as the input.
+- If input is Chinese (contains Chinese characters), output in Chinese
+- If input is English, output in English
+- If input is Cantonese, output in Cantonese
+Do NOT change the language under any circumstances.
+
+Input text:
+""" + text
 
         result = call_qwen(prompt)
         return jsonify({
@@ -931,31 +969,46 @@ def _transcribe_with_qwen(file_path, language='auto'):
         if not ext:
             ext = 'wav'
 
+        # Map extension to format
+        format_map = {
+            'mp3': 'mp3',
+            'wav': 'wav',
+            'm4a': 'm4a',
+            'aac': 'aac',
+            'ogg': 'ogg',
+            'flac': 'flac',
+            'wma': 'wma'
+        }
+        audio_format = format_map.get(ext, 'mp3')
+
+        # Build language instruction
+        lang_instruction = ""
+        if language and language != 'auto':
+            lang_map = {
+                'zh': 'Chinese (Simplified)',
+                'zh-HK': 'Cantonese',
+                'en': 'English',
+                'ja': 'Japanese',
+                'ko': 'Korean',
+                'fr': 'French',
+                'de': 'German',
+                'es': 'Spanish',
+                'ru': 'Russian',
+                'ar': 'Arabic',
+                'pt': 'Portuguese',
+                'it': 'Italian',
+            }
+            lang_name = lang_map.get(language, language)
+            lang_instruction = f" Please transcribe in {lang_name}."
+
+        # Use the correct API format for qwen-audio-turbo
         url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
         headers = {
             "Authorization": "Bearer " + QWEN_API_KEY,
             "Content-Type": "application/json"
         }
 
-        # Build language instruction
-        lang_instruction = ""
-        if language and language != 'auto':
-            lang_map = {
-                'zh': '中文',
-                'en': 'English',
-                'ja': '日本語',
-                'ko': '한국어',
-                'fr': 'Français',
-                'de': 'Deutsch',
-                'es': 'Español',
-                'ru': 'Русский',
-                'ar': 'العربية',
-                'pt': 'Português',
-                'it': 'Italiano',
-            }
-            lang_name = lang_map.get(language, language)
-            lang_instruction = f" Please transcribe in {lang_name}."
-
+        # Correct format for audio transcription with qwen-audio-turbo
         data = {
             "model": "qwen-audio-turbo",
             "input": {
@@ -963,28 +1016,38 @@ def _transcribe_with_qwen(file_path, language='auto'):
                     {
                         "role": "user",
                         "content": [
-                            {"audio": audio_base64},
-                            {"text": f"Transcribe the following audio.{lang_instruction} Output only the transcribed text without any additional explanation or formatting."}
+                            {
+                                "audio": f"data:audio/{audio_format};base64,{audio_base64}"
+                            },
+                            {
+                                "text": f"Transcribe the following audio to text.{lang_instruction} Only output the transcribed text, no explanations or formatting."
+                            }
                         ]
                     }
                 ]
             }
         }
 
+        print(f"Calling Qwen Audio API with format: {audio_format}")
         response = requests.post(url, headers=headers, json=data, timeout=120)
 
         if response.status_code == 200:
             result = response.json()
+            print(f"Qwen Audio API response: {result}")
             # Extract text from qwen-audio-turbo response
-            if "output" in result and "choices" in result["output"]:
-                text = result["output"]["choices"][0]["message"]["content"]
+            if "output" in result:
+                if "choices" in result["output"]:
+                    text = result["output"]["choices"][0]["message"]["content"]
+                    return text.strip() if text else None
+                elif "text" in result["output"]:
+                    text = result["output"]["text"]
+                    return text.strip() if text else None
+            # Try alternative response format
+            if "choices" in result:
+                text = result["choices"][0]["message"]["content"]
                 return text.strip() if text else None
-            elif "output" in result and "text" in result["output"]:
-                text = result["output"]["text"]
-                return text.strip() if text else None
-            else:
-                print(f"Qwen Audio API unexpected response: {result}")
-                return None
+            print(f"Qwen Audio API unexpected response format: {result}")
+            return None
         else:
             print(f"Qwen Audio API error: {response.status_code} - {response.text}")
             return None
@@ -1087,6 +1150,14 @@ def update_glossary():
             "success": False,
             "error": str(e)
         }), 500
+
+@app.after_request
+def after_request(response):
+    """Add CORS headers to all responses"""
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    return response
 
 @app.route('/api/add-term', methods=['POST'])
 def add_term():
