@@ -812,20 +812,20 @@ def rewrite_text():
             })
         else:
             mode_prompts = {
-                'paraphrase': "Rewrite the following text while keeping the original meaning. IMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language.",
-                'pre-edit': "Pre-edit this text to make it clearer and easier to translate. IMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language.",
-                'polish': "Polish and improve the following text for better quality and professionalism. IMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language."
+                'paraphrase': "请对以下文本进行改写，保持原意不变。重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。",
+                'pre-edit': "请对以下文本进行预编辑，使其更清晰、更易于翻译。重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。",
+                'polish': "请对以下文本进行润色和优化，提升质量和专业性。重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。"
             }
 
             style_descriptions = {
-                'standard': 'standard style',
-                'formal': 'formal and professional style',
-                'casual': 'casual and conversational style',
-                'academic': 'academic and scholarly style',
-                'business': 'business and corporate style'
+                'standard': '标准风格',
+                'formal': '正式专业风格',
+                'casual': '随意自然风格',
+                'academic': '学术风格',
+                'business': '商务风格'
             }
 
-            style_text = f"Use {style_descriptions.get(style, style_descriptions['standard'])}."
+            style_text = f"请使用{style_descriptions.get(style, style_descriptions['standard'])}。"
             prompt = f"{mode_prompts.get(mode, mode_prompts['paraphrase'])} {style_text}\n\n{text}"
             result = call_qwen(prompt)
         return jsonify({
@@ -847,16 +847,16 @@ def polish_text():
 
     try:
         style_descriptions = {
-            'general': 'standard and natural style',
-            'standard': 'standard and natural style',
-            'formal': 'formal and professional style',
-            'casual': 'casual and conversational style',
-            'academic': 'academic and scholarly style',
-            'business': 'business and corporate style'
+            'general': '标准自然风格',
+            'standard': '标准自然风格',
+            'formal': '正式专业风格',
+            'casual': '随意自然风格',
+            'academic': '学术风格',
+            'business': '商务风格'
         }
 
-        style_text = "Use " + style_descriptions.get(style, style_descriptions['general']) + "."
-        prompt = "Polish and improve the following text for better quality, fluency, and professionalism. " + style_text + "\nIMPORTANT: You MUST output in the SAME LANGUAGE as the input. If the input is in Chinese, output in Chinese. If the input is in English, output in English. Do not change the language.\n\n" + text
+        style_text = "请使用" + style_descriptions.get(style, style_descriptions['general']) + "。"
+        prompt = "请对以下文本进行润色和优化，提升文本的质量、流畅度和专业性。 " + style_text + "\n重要：必须使用与输入文本完全相同的语言输出。如果输入是中文，必须用中文输出；如果输入是英文，必须用英文输出。绝对不要更换语言。\n\n" + text
 
         result = call_qwen(prompt)
         return jsonify({
@@ -963,7 +963,7 @@ def _transcribe_with_qwen(file_path, language='auto'):
                     {
                         "role": "user",
                         "content": [
-                            {"audio": f"data:audio/{ext};base64,{audio_base64}"},
+                            {"audio": audio_base64},
                             {"text": f"Transcribe the following audio.{lang_instruction} Output only the transcribed text without any additional explanation or formatting."}
                         ]
                     }
@@ -1075,10 +1075,12 @@ def update_glossary():
         return jsonify({"error": "Glossary feature is not available (whoosh not installed)", "success": False}), 503
 
     try:
-        scrape_government_sites()
+        # Run scraping in background thread to avoid request timeout
+        thread = Thread(target=scrape_government_sites, daemon=True)
+        thread.start()
         return jsonify({
             "success": True,
-            "message": "Glossary updated successfully"
+            "message": "Glossary update started in background. This may take a few minutes."
         })
     except Exception as e:
         return jsonify({
