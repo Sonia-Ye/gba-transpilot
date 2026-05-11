@@ -276,10 +276,8 @@
                                             <div class="row">
                                                 <div class="col-md-5">
                                                     <label class="text-sm text-gray-600 mb-2">原文输入</label>
-                                                    <textarea id="sourceText" class="form-control" rows="8" maxlength="5000">香港是一个国际化大都市，拥有繁荣的金融市场和丰富的文化遗产。
-Art Basel是世界著名的艺术博览会。
-大湾区建设正在稳步推进。</textarea>
-                                                    <div class="text-right text-sm text-gray-400 mt-1" id="charCount">69/5000</div>
+                                                    <textarea id="sourceText" class="form-control" rows="8" maxlength="5000" placeholder="请输入或粘贴要翻译的文本..."></textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="charCount">0/5000</div>
                                                 </div>
 
                                                 <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
@@ -372,7 +370,7 @@ Art Basel是世界著名的艺术博览会。
                                                     </button>
                                                 </div>
                                             </div>
-                                            <p class="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded inline-block mb-3">2026-05-01</p>
+                                            <p class="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded inline-block mb-3" id="glossaryUpdateTime">加载中...</p>
                                             <p class="text-gray-500 text-sm mb-3">从以下官方政府网站实时提取最新术语（支持中英粤三语）</p>
 
                                             <div class="glossary-item">
@@ -890,6 +888,29 @@ Art Basel是世界著名的艺术博览会。
         var rtRecognition = null;
         var rtChatMessages = [];
 
+        // ==================== Load Glossary Status ====================
+        function loadGlossaryStatus() {
+            fetch('/api/glossary-status')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    var updateTimeEl = document.getElementById('glossaryUpdateTime');
+                    if (data.success && data.last_update) {
+                        updateTimeEl.textContent = data.last_update;
+                    } else if (data.success) {
+                        updateTimeEl.textContent = '暂无更新记录';
+                    } else {
+                        updateTimeEl.textContent = '术语库不可用';
+                    }
+                })
+                .catch(function(error) {
+                    var updateTimeEl = document.getElementById('glossaryUpdateTime');
+                    updateTimeEl.textContent = '加载失败';
+                });
+        }
+        
+        // Load glossary status on page load
+        loadGlossaryStatus();
+
         // ==================== History Helpers ====================
         function loadHistory() {
             var savedHistory = localStorage.getItem('translationHistory');
@@ -1325,6 +1346,8 @@ Art Basel是世界著名的艺术博览会。
 
                 if (data.success) {
                     alert('\u8bcd\u5e93\u66f4\u65b0\u6210\u529f\uff01');
+                    // Refresh glossary status after update
+                    setTimeout(loadGlossaryStatus, 2000);
                 } else {
                     alert('\u66f4\u65b0\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
                 }

@@ -662,6 +662,55 @@ def index():
     )
     return response
 
+def query_glossary_for_translation(source_text):
+    """Query glossary for terms found in the source text.
+    Returns a list of (term, translation) pairs for use in translation prompts.
+    """
+    if not WHOOSH_AVAILABLE or ix is None:
+        return []
+    
+    import re
+    results = []
+    try:
+        # Extract potential terms from source text (2-10 character Chinese phrases or English words)
+        chinese_terms = re.findall(r'[\u4e00-\u9fff]{2,10}', source_text)
+        english_terms = re.findall(r'\b[A-Z][a-z]{2,}\b', source_text)
+        all_terms = list(set(chinese_terms + english_terms))
+        
+        with ix.searcher(weighting=scoring.BM25F()) as searcher:
+            for term in all_terms:
+                # Try to find exact or fuzzy match in glossary
+                qp = QueryParser("term", ix.schema)
+                try:
+                    q = qp.parse(term)
+                    hits = searcher.search(q, limit=1)
+                    if hits:
+                        hit = hits[0]
+                        term_text = hit['term']
+                        term_translation = hit['translation']
+                        if term_translation:  # Only include if translation exists
+                            results.append((term_text, term_translation))
+                except:
+                    pass
+                
+                # Also search in translation field for reverse lookup
+                qp2 = QueryParser("translation", ix.schema)
+                try:
+                    q2 = qp2.parse(term)
+                    hits2 = searcher.search(q2, limit=1)
+                    if hits2:
+                        hit = hits2[0]
+                        term_text = hit['term']
+                        term_translation = hit['translation']
+                        if term_translation and (term_text, term_translation) not in results:
+                            results.append((term_text, term_translation))
+                except:
+                    pass
+    except Exception as e:
+        print(f"Glossary query error: {e}")
+    
+    return results
+
 @app.route('/api/translate', methods=['POST'])
 def translate_text():
     data = request.json
@@ -677,10 +726,21 @@ def translate_text():
         if DEMO_MODE:
             translation = mock_translate(text, source_lang, target_lang)
         else:
+            # Query glossary for relevant terms (RAG integration)
+            glossary_terms = query_glossary_for_translation(text)
+            
+            # Build glossary instruction if terms found
+            glossary_instruction = ""
+            if glossary_terms:
+                glossary_lines = ["以下术语请使用指定翻译："]
+                for term, trans in glossary_terms:
+                    glossary_lines.append(f"- {term} = {trans}")
+                glossary_instruction = "\n".join(glossary_lines) + "\n\n"
+            
             prompt = f"""Translate the following text from {source_lang} to {target_lang}.
-            Keep the meaning accurate and natural:
+{glossary_instruction}Keep the meaning accurate and natural:
 
-            {text}"""
+{text}"""
 
             translation = call_qwen(prompt)
         
@@ -709,62 +769,75 @@ def ocr_image():
     filename = file.filename.lower()
 
     try:
+        # Determine MIME type first (needed for both paths)
+        mime_map = {
+            '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+            '.png': 'image/png', '.bmp': 'image/bmp',
+            '.gif': 'image/gif', '.tiff': 'image/tiff',
+            '.webp': 'image/webp', '.pdf': 'application/pdf'
+        }
+        ext = os.path.splitext(filename)[1].lower()
+        mime_type = mime_map.get(ext, 'image/jpeg')
+
+        # Try pytesseract if available, but fallback to qwen-vl-max on error
         if PYTESSERACT_AVAILABLE:
-            # Use pytesseract if available
-            if filename.endswith('.pdf'):
-                with pdfplumber.open(file) as pdf:
-                    text = ""
-                    for page in pdf.pages:
-                        text += page.extract_text() + "\n"
-            else:
-                image = Image.open(file)
-                text = pytesseract.image_to_string(image, lang='chi_sim+eng')
+            try:
+                if filename.endswith('.pdf'):
+                    with pdfplumber.open(file) as pdf:
+                        text = ""
+                        for page in pdf.pages:
+                            text += page.extract_text() + "\n"
+                else:
+                    image = Image.open(file)
+                    text = pytesseract.image_to_string(image, lang='chi_sim+eng')
+                
+                # If we got text, return it
+                if text and text.strip():
+                    return jsonify({
+                        "text": text.strip(),
+                        "success": True
+                    })
+            except Exception as e:
+                print(f"pytesseract failed, falling back to qwen-vl-max: {e}")
+                # Fall through to qwen-vl-max fallback
+        
+        # Fallback: use qwen-vl-max multimodal model for OCR
+        # This is used when:
+        # 1. PYTESSERACT_AVAILABLE is False, OR
+        # 2. pytesseract failed (e.g., tesseract not installed)
+        file.seek(0)
+        file_bytes = file.read()
+        file_b64 = base64.b64encode(file_bytes).decode('utf-8')
+        data_uri = f"data:{mime_type};base64,{file_b64}"
+
+        url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+        headers = {
+            "Authorization": f"Bearer {QWEN_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "qwen-vl-max",
+            "input": {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"image": data_uri},
+                            {"text": "请识别图片中的所有文字，只输出文字内容，不要任何解释"}
+                        ]
+                    }
+                ]
+            }
+        }
+        response = requests.post(url, headers=headers, json=data, timeout=60)
+        response.raise_for_status()
+        result = response.json()
+        if "output" in result and "choices" in result["output"]:
+            text = result["output"]["choices"][0]["message"]["content"]
+        elif "output" in result and "text" in result["output"]:
+            text = result["output"]["text"]
         else:
-            # Fallback: use qwen-vl-max multimodal model for OCR
-            file.seek(0)
-            file_bytes = file.read()
-
-            # Determine MIME type
-            mime_map = {
-                '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-                '.png': 'image/png', '.bmp': 'image/bmp',
-                '.gif': 'image/gif', '.tiff': 'image/tiff',
-                '.webp': 'image/webp', '.pdf': 'application/pdf'
-            }
-            ext = os.path.splitext(filename)[1].lower()
-            mime_type = mime_map.get(ext, 'image/jpeg')
-
-            file_b64 = base64.b64encode(file_bytes).decode('utf-8')
-            data_uri = f"data:{mime_type};base64,{file_b64}"
-
-            url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
-            headers = {
-                "Authorization": f"Bearer {QWEN_API_KEY}",
-                "Content-Type": "application/json"
-            }
-            data = {
-                "model": "qwen-vl-max",
-                "input": {
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": [
-                                {"image": data_uri},
-                                {"text": "请识别图片中的所有文字，只输出文字内容，不要任何解释"}
-                            ]
-                        }
-                    ]
-                }
-            }
-            response = requests.post(url, headers=headers, json=data, timeout=60)
-            response.raise_for_status()
-            result = response.json()
-            if "output" in result and "choices" in result["output"]:
-                text = result["output"]["choices"][0]["message"]["content"]
-            elif "output" in result and "text" in result["output"]:
-                text = result["output"]["text"]
-            else:
-                return jsonify({"error": "OCR model returned unexpected format", "success": False}), 500
+            return jsonify({"error": "OCR model returned unexpected format", "success": False}), 500
 
         return jsonify({
             "text": text.strip(),
@@ -952,48 +1025,46 @@ def rewrite_text():
             # Detect language and use appropriate prompt directly
             detected_lang = detect_language(text)
 
-            lang_prompts = {
-                'zh': {
-                    'paraphrase': '请用中文改写以下文本，保持原意不变：',
-                    'pre-edit': '请用中文对以下文本进行预编辑，使其更清晰、更易于翻译，保持原意不变：',
-                    'polish': '请用中文润色以下文本，提升其质量和专业性，保持原意不变：'
-                },
-                'yue': {
-                    'paraphrase': '請用粵語改寫以下文本，保持原意不變：',
-                    'pre-edit': '請用粵語對以下文本進行預編輯，使其更清晰、更易於翻譯，保持原意不變：',
-                    'polish': '請用粵語潤色以下文本，提升其質量和專業性，保持原意不變：'
-                },
-                'en': {
-                    'paraphrase': 'Please rewrite the following text in English while preserving its original meaning:',
-                    'pre-edit': 'Please pre-edit the following text in English to make it clearer and easier to translate, while preserving its original meaning:',
-                    'polish': 'Please polish the following text in English to improve its quality and professionalism, while preserving its original meaning:'
-                }
-            }
-
-            style_descriptions = {
+            # Style descriptions integrated into prompts
+            style_map_zh = {
                 'standard': '标准风格',
                 'formal': '正式专业风格',
                 'casual': '随意自然风格',
                 'academic': '学术风格',
                 'business': '商务风格'
             }
+            style_map_en = {
+                'standard': 'standard style',
+                'formal': 'formal and professional style',
+                'casual': 'casual and natural style',
+                'academic': 'academic style',
+                'business': 'business style'
+            }
+            style_zh = style_map_zh.get(style, style_map_zh['standard'])
+            style_en = style_map_en.get(style, style_map_en['standard'])
+
+            lang_prompts = {
+                'zh': {
+                    'paraphrase': f'请用中文（{style_zh}）改写以下文本，保持原意不变。只输出改写后的文本，不要输出任何解释或说明：',
+                    'pre-edit': f'请用中文（{style_zh}）对以下文本进行预编辑，使其更清晰、更易于翻译，保持原意不变。只输出编辑后的文本，不要输出任何解释或说明：',
+                    'polish': f'请用中文（{style_zh}）润色以下文本，提升其质量和专业性，保持原意不变。只输出润色后的文本，不要输出任何解释或说明：'
+                },
+                'yue': {
+                    'paraphrase': f'請用粵語（{style_zh}）改寫以下文本，保持原意不變。只輸出改寫後的文本，不要輸出任何解釋或說明：',
+                    'pre-edit': f'請用粵語（{style_zh}）對以下文本進行預編輯，使其更清晰、更易於翻譯，保持原意不變。只輸出編輯後的文本，不要輸出任何解釋或說明：',
+                    'polish': f'請用粵語（{style_zh}）潤色以下文本，提升其質量和專業性，保持原意不變。只輸出潤色後的文本，不要輸出任何解釋或說明：'
+                },
+                'en': {
+                    'paraphrase': f'Please rewrite the following text in English ({style_en}) while preserving its original meaning. Output ONLY the rewritten text, no explanations:',
+                    'pre-edit': f'Please pre-edit the following text in English ({style_en}) to make it clearer and easier to translate, while preserving its original meaning. Output ONLY the edited text, no explanations:',
+                    'polish': f'Please polish the following text in English ({style_en}) to improve its quality and professionalism, while preserving its original meaning. Output ONLY the polished text, no explanations:'
+                }
+            }
 
             lang_mode = lang_prompts.get(detected_lang, lang_prompts['en'])
             base_prompt = lang_mode.get(mode, lang_mode['paraphrase'])
 
-            if detected_lang in ('zh', 'yue'):
-                style_text = f"请使用{style_descriptions.get(style, style_descriptions['standard'])}。"
-            else:
-                style_map_en = {
-                    'standard': 'standard style',
-                    'formal': 'formal and professional style',
-                    'casual': 'casual and natural style',
-                    'academic': 'academic style',
-                    'business': 'business style'
-                }
-                style_text = f"Please use a {style_map_en.get(style, style_map_en['standard'])}."
-
-            prompt = f"{base_prompt}\n{style_text}\n\n{text}"
+            prompt = f"{base_prompt}\n\n{text}"
             result = call_qwen(prompt)
         return jsonify({
             "result": result,
@@ -1107,7 +1178,7 @@ def _transcribe_with_qwen(file_path, language='auto'):
         url = "https://dashscope.aliyuncs.com/compatible-mode/v1/audio/transcriptions"
 
         # Build language parameter
-        lang_param = "zh"  # default
+        lang_param = None  # Don't specify language for auto-detection
         if language and language != 'auto':
             lang_map = {
                 'zh': 'zh',
@@ -1122,20 +1193,37 @@ def _transcribe_with_qwen(file_path, language='auto'):
             }
             lang_param = lang_map.get(language, language)
 
-        with open(file_path, 'rb') as audio_file:
-            files = {
-                'file': (os.path.basename(file_path), audio_file)
-            }
-            data = {
-                'model': 'paraformer-v2',
-                'language': lang_param,
-            }
-            headers = {
-                "Authorization": f"Bearer {QWEN_API_KEY}",
-            }
+        # Determine audio MIME type based on file extension
+        ext = os.path.splitext(file_path)[1].lower()
+        mime_types = {
+            '.wav': 'audio/wav',
+            '.mp3': 'audio/mpeg',
+            '.m4a': 'audio/mp4',
+            '.flac': 'audio/flac',
+            '.ogg': 'audio/ogg',
+            '.webm': 'audio/webm',
+        }
+        mime_type = mime_types.get(ext, 'audio/wav')
 
-            print(f"Calling Paraformer API for transcription (language={lang_param})...")
-            response = requests.post(url, headers=headers, files=files, data=data, timeout=120)
+        with open(file_path, 'rb') as audio_file:
+            audio_data = audio_file.read()
+        
+        # Prepare multipart form data
+        files = {
+            'file': (os.path.basename(file_path), audio_data, mime_type)
+        }
+        data = {
+            'model': 'paraformer-v2',
+        }
+        if lang_param:
+            data['language'] = lang_param
+
+        headers = {
+            "Authorization": f"Bearer {QWEN_API_KEY}",
+        }
+
+        print(f"Calling Paraformer API for transcription (language={lang_param or 'auto'})...")
+        response = requests.post(url, headers=headers, files=files, data=data, timeout=120)
 
         if response.status_code == 200:
             result = response.json()
@@ -1144,7 +1232,7 @@ def _transcribe_with_qwen(file_path, language='auto'):
             if "output" in result and "text" in result["output"]:
                 text = result["output"]["text"]
                 return text.strip() if text else None
-            # Alternative format
+            # Alternative OpenAI-compatible format
             elif "text" in result:
                 text = result["text"]
                 return text.strip() if text else None
@@ -1156,6 +1244,8 @@ def _transcribe_with_qwen(file_path, language='auto'):
             return None
     except Exception as e:
         print(f"Paraformer audio transcription error: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 
