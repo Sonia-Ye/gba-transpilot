@@ -1,0 +1,671 @@
+{
+  "glossary_entries": [
+    {
+      "term": "立法會",
+      "translation": "Legislative Council",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Legislative Council",
+      "translation": "立法会",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "香港交易所",
+      "translation": "Hong Kong Exchanges and Clearing Limited",
+      "source": "HKEX",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hong Kong Exchanges and Clearing",
+      "translation": "香港交易所",
+      "source": "HKEX",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "香港政府",
+      "translation": "Hong Kong Government",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hong Kong Government",
+      "translation": "香港政府",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "律政司",
+      "translation": "Department of Justice",
+      "source": "DOJ",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Department of Justice",
+      "translation": "律政司",
+      "source": "DOJ",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "基本法",
+      "translation": "Basic Law",
+      "source": "e-legislation",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Basic Law",
+      "translation": "基本法",
+      "source": "e-legislation",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "國安法",
+      "translation": "National Security Law",
+      "source": "e-legislation",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "National Security Law",
+      "translation": "国安法",
+      "source": "e-legislation",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Art Basel",
+      "translation": "巴塞尔艺术展",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "巴塞尔艺术展",
+      "translation": "Art Basel",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "宏福苑",
+      "translation": "Wang Fuk Court",
+      "source": "housing",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Wang Fuk Court",
+      "translation": "宏福苑",
+      "source": "housing",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "故宮博物館",
+      "translation": "Palace Museum Hong Kong",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Palace Museum",
+      "translation": "故宫博物馆",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "西九龍",
+      "translation": "West Kowloon",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "West Kowloon",
+      "translation": "西九龙",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "高鐵",
+      "translation": "High Speed Rail",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "High Speed Rail",
+      "translation": "高铁",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "地鐵",
+      "translation": "MTR",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "MTR",
+      "translation": "地铁",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "八達通",
+      "translation": "Octopus Card",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Octopus Card",
+      "translation": "八达通",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "出入境",
+      "translation": "Immigration",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Immigration",
+      "translation": "出入境",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "簽證",
+      "translation": "Visa",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Visa",
+      "translation": "签证",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "海關",
+      "translation": "Customs",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Customs",
+      "translation": "海关",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "藥房",
+      "translation": "Pharmacy",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Pharmacy",
+      "translation": "药房",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "茶餐廳",
+      "translation": "Cha Chaan Teng",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Cha Chaan Teng",
+      "translation": "茶餐厅",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "燒味",
+      "translation": "Siu Mei",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Siu Mei",
+      "translation": "烧味",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "點心",
+      "translation": "Dim Sum",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Dim Sum",
+      "translation": "点心",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "醫院",
+      "translation": "Hospital",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hospital",
+      "translation": "医院",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "急症室",
+      "translation": "Accident and Emergency",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Accident and Emergency",
+      "translation": "急诊室",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "失業援助",
+      "translation": "Unemployment Support",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Unemployment Support",
+      "translation": "失业援助",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "中央政策組",
+      "translation": "Central Policy Unit",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Central Policy Unit",
+      "translation": "中央政策组",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "行政會議",
+      "translation": "Executive Council",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Executive Council",
+      "translation": "行政会议",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "廉政專員公署",
+      "translation": "Independent Commission Against Corruption",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "ICAC",
+      "translation": "廉政专员公署",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Independent Commission Against Corruption",
+      "translation": "廉政专员公署",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "旅游",
+      "translation": "Tourism",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Tourism",
+      "translation": "旅游",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "酒店",
+      "translation": "Hotel",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hotel",
+      "translation": "酒店",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "風景名勝",
+      "translation": "Tourist Attraction",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Tourist Attraction",
+      "translation": "风景名胜",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "維多利亞港",
+      "translation": "Victoria Harbour",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Victoria Harbour",
+      "translation": "维多利亚港",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "太平山頂",
+      "translation": "The Peak",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "The Peak",
+      "translation": "太平山顶",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "海洋公園",
+      "translation": "Ocean Park",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Ocean Park",
+      "translation": "海洋公园",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "迪斯尼樂園",
+      "translation": "Disneyland",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Disneyland",
+      "translation": "迪士尼乐园",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "天星小輪",
+      "translation": "Star Ferry",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Star Ferry",
+      "translation": "天星小轮",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "昂坪360",
+      "translation": "Ngong Ping 360",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Ngong Ping 360",
+      "translation": "昂坪360",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "大嶼山",
+      "translation": "Lantau Island",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Lantau Island",
+      "translation": "大屿山",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "議事廳",
+      "translation": "Legislative Council Chamber",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Legislative Council Chamber",
+      "translation": "议事厅",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "金紫荊廣場",
+      "translation": "Golden Bauhinia Square",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Golden Bauhinia Square",
+      "translation": "金紫荆广场",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "連青人網絡",
+      "translation": "Youth Connect",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Youth Connect",
+      "translation": "连青人网络",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "香港特別行政區",
+      "translation": "Hong Kong Special Administrative Region",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hong Kong Special Administrative Region",
+      "translation": "香港特别行政区",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "大灣區",
+      "translation": "Greater Bay Area",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Greater Bay Area",
+      "translation": "大湾区",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "港珠澳大橋",
+      "translation": "Hong Kong-Zhuhai-Macao Bridge",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hong Kong-Zhuhai-Macao Bridge",
+      "translation": "港珠澳大桥",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "機場快線",
+      "translation": "Airport Express",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Airport Express",
+      "translation": "机场快线",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "港鐵",
+      "translation": "MTR Corporation",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "MTR Corporation",
+      "translation": "港铁",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "巴士",
+      "translation": "Bus",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Bus",
+      "translation": "巴士",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "的士",
+      "translation": "Taxi",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Taxi",
+      "translation": "的士",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "渡輪",
+      "translation": "Ferry",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Ferry",
+      "translation": "渡轮",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "山頂纜車",
+      "translation": "Peak Tram",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Peak Tram",
+      "translation": "山顶缆车",
+      "source": "tourism",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "香港國際機場",
+      "translation": "Hong Kong International Airport",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hong Kong International Airport",
+      "translation": "香港国际机场",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "郵輪碼頭",
+      "translation": "Cruise Terminal",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Cruise Terminal",
+      "translation": "邮轮码头",
+      "source": "transport",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "入境事務處",
+      "translation": "Immigration Department",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Immigration Department",
+      "translation": "入境事务处",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "警務處",
+      "translation": "Hong Kong Police Force",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Hong Kong Police Force",
+      "translation": "警务处",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "消防處",
+      "translation": "Fire Services Department",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Fire Services Department",
+      "translation": "消防处",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "食物環境衞生署",
+      "translation": "Food and Environmental Hygiene Department",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    },
+    {
+      "term": "Food and Environmental Hygiene Department",
+      "translation": "食物环境卫生署",
+      "source": "GovHK",
+      "languages": ["en", "zh", "zh-HK"]
+    }
+  ],
+  "metadata": {
+    "last_updated": "2026-05-12",
+    "total_entries": 116,
+    "sources": [
+      "GovHK 香港政府一站通",
+      "DOJ 律政司",
+      "e-legislation 香港电子法例",
+      "HKEX 香港交易所",
+      "tourism 香港旅游",
+      "transport 交通运输",
+      "housing 房屋"
+    ]
+  }
+}
