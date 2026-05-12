@@ -1,671 +1,152 @@
-{
-  "glossary_entries": [
-    {
-      "term": "立法會",
-      "translation": "Legislative Council",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Legislative Council",
-      "translation": "立法会",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "香港交易所",
-      "translation": "Hong Kong Exchanges and Clearing Limited",
-      "source": "HKEX",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hong Kong Exchanges and Clearing",
-      "translation": "香港交易所",
-      "source": "HKEX",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "香港政府",
-      "translation": "Hong Kong Government",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hong Kong Government",
-      "translation": "香港政府",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "律政司",
-      "translation": "Department of Justice",
-      "source": "DOJ",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Department of Justice",
-      "translation": "律政司",
-      "source": "DOJ",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "基本法",
-      "translation": "Basic Law",
-      "source": "e-legislation",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Basic Law",
-      "translation": "基本法",
-      "source": "e-legislation",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "國安法",
-      "translation": "National Security Law",
-      "source": "e-legislation",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "National Security Law",
-      "translation": "国安法",
-      "source": "e-legislation",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Art Basel",
-      "translation": "巴塞尔艺术展",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "巴塞尔艺术展",
-      "translation": "Art Basel",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "宏福苑",
-      "translation": "Wang Fuk Court",
-      "source": "housing",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Wang Fuk Court",
-      "translation": "宏福苑",
-      "source": "housing",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "故宮博物館",
-      "translation": "Palace Museum Hong Kong",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Palace Museum",
-      "translation": "故宫博物馆",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "西九龍",
-      "translation": "West Kowloon",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "West Kowloon",
-      "translation": "西九龙",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "高鐵",
-      "translation": "High Speed Rail",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "High Speed Rail",
-      "translation": "高铁",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "地鐵",
-      "translation": "MTR",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "MTR",
-      "translation": "地铁",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "八達通",
-      "translation": "Octopus Card",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Octopus Card",
-      "translation": "八达通",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "出入境",
-      "translation": "Immigration",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Immigration",
-      "translation": "出入境",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "簽證",
-      "translation": "Visa",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Visa",
-      "translation": "签证",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "海關",
-      "translation": "Customs",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Customs",
-      "translation": "海关",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "藥房",
-      "translation": "Pharmacy",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Pharmacy",
-      "translation": "药房",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "茶餐廳",
-      "translation": "Cha Chaan Teng",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Cha Chaan Teng",
-      "translation": "茶餐厅",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "燒味",
-      "translation": "Siu Mei",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Siu Mei",
-      "translation": "烧味",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "點心",
-      "translation": "Dim Sum",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Dim Sum",
-      "translation": "点心",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "醫院",
-      "translation": "Hospital",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hospital",
-      "translation": "医院",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "急症室",
-      "translation": "Accident and Emergency",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Accident and Emergency",
-      "translation": "急诊室",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "失業援助",
-      "translation": "Unemployment Support",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Unemployment Support",
-      "translation": "失业援助",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "中央政策組",
-      "translation": "Central Policy Unit",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Central Policy Unit",
-      "translation": "中央政策组",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "行政會議",
-      "translation": "Executive Council",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Executive Council",
-      "translation": "行政会议",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "廉政專員公署",
-      "translation": "Independent Commission Against Corruption",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "ICAC",
-      "translation": "廉政专员公署",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Independent Commission Against Corruption",
-      "translation": "廉政专员公署",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "旅游",
-      "translation": "Tourism",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Tourism",
-      "translation": "旅游",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "酒店",
-      "translation": "Hotel",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hotel",
-      "translation": "酒店",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "風景名勝",
-      "translation": "Tourist Attraction",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Tourist Attraction",
-      "translation": "风景名胜",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "維多利亞港",
-      "translation": "Victoria Harbour",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Victoria Harbour",
-      "translation": "维多利亚港",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "太平山頂",
-      "translation": "The Peak",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "The Peak",
-      "translation": "太平山顶",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "海洋公園",
-      "translation": "Ocean Park",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Ocean Park",
-      "translation": "海洋公园",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "迪斯尼樂園",
-      "translation": "Disneyland",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Disneyland",
-      "translation": "迪士尼乐园",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "天星小輪",
-      "translation": "Star Ferry",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Star Ferry",
-      "translation": "天星小轮",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "昂坪360",
-      "translation": "Ngong Ping 360",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Ngong Ping 360",
-      "translation": "昂坪360",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "大嶼山",
-      "translation": "Lantau Island",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Lantau Island",
-      "translation": "大屿山",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "議事廳",
-      "translation": "Legislative Council Chamber",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Legislative Council Chamber",
-      "translation": "议事厅",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "金紫荊廣場",
-      "translation": "Golden Bauhinia Square",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Golden Bauhinia Square",
-      "translation": "金紫荆广场",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "連青人網絡",
-      "translation": "Youth Connect",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Youth Connect",
-      "translation": "连青人网络",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "香港特別行政區",
-      "translation": "Hong Kong Special Administrative Region",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hong Kong Special Administrative Region",
-      "translation": "香港特别行政区",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "大灣區",
-      "translation": "Greater Bay Area",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Greater Bay Area",
-      "translation": "大湾区",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "港珠澳大橋",
-      "translation": "Hong Kong-Zhuhai-Macao Bridge",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hong Kong-Zhuhai-Macao Bridge",
-      "translation": "港珠澳大桥",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "機場快線",
-      "translation": "Airport Express",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Airport Express",
-      "translation": "机场快线",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "港鐵",
-      "translation": "MTR Corporation",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "MTR Corporation",
-      "translation": "港铁",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "巴士",
-      "translation": "Bus",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Bus",
-      "translation": "巴士",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "的士",
-      "translation": "Taxi",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Taxi",
-      "translation": "的士",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "渡輪",
-      "translation": "Ferry",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Ferry",
-      "translation": "渡轮",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "山頂纜車",
-      "translation": "Peak Tram",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Peak Tram",
-      "translation": "山顶缆车",
-      "source": "tourism",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "香港國際機場",
-      "translation": "Hong Kong International Airport",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hong Kong International Airport",
-      "translation": "香港国际机场",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "郵輪碼頭",
-      "translation": "Cruise Terminal",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Cruise Terminal",
-      "translation": "邮轮码头",
-      "source": "transport",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "入境事務處",
-      "translation": "Immigration Department",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Immigration Department",
-      "translation": "入境事务处",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "警務處",
-      "translation": "Hong Kong Police Force",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Hong Kong Police Force",
-      "translation": "警务处",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "消防處",
-      "translation": "Fire Services Department",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Fire Services Department",
-      "translation": "消防处",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "食物環境衞生署",
-      "translation": "Food and Environmental Hygiene Department",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    },
-    {
-      "term": "Food and Environmental Hygiene Department",
-      "translation": "食物环境卫生署",
-      "source": "GovHK",
-      "languages": ["en", "zh", "zh-HK"]
-    }
-  ],
-  "metadata": {
-    "last_updated": "2026-05-12",
-    "total_entries": 116,
-    "sources": [
-      "GovHK 香港政府一站通",
-      "DOJ 律政司",
-      "e-legislation 香港电子法例",
-      "HKEX 香港交易所",
-      "tourism 香港旅游",
-      "transport 交通运输",
-      "housing 房屋"
-    ]
-  }
-}
+[
+  {"term": "连青人网络", "translation": "Youth Link", "source": "香港政府"},
+  {"term": "西九文化区", "translation": "West K", "source": "香港政府"},
+  {"term": "香港理财月", "translation": "Hong Kong Money Month", "source": "香港政府"},
+  {"term": "Art Basel", "translation": "巴塞尔艺术展", "source": "香港政府"},
+  {"term": "粤港澳大湾区", "translation": "Guangdong-Hong Kong-Macao Greater Bay Area", "source": "中国政府"},
+  {"term": "IFEC", "translation": "Investor and Financial Education Council", "source": "香港政府"},
+  {"term": "投资者及理财教育委员会", "translation": "Investor and Financial Education Council", "source": "香港政府"},
+  {"term": "香港交易所", "translation": "Hong Kong Exchanges and Clearing Limited", "source": "香港政府"},
+  {"term": "HKEX", "translation": "Hong Kong Exchanges and Clearing Limited", "source": "香港政府"},
+  {"term": "律政司", "translation": "Department of Justice", "source": "香港政府"},
+  {"term": "立法会", "translation": "Legislative Council", "source": "香港政府"},
+  {"term": "行政长官", "translation": "Chief Executive", "source": "香港政府"},
+  {"term": "政务司司长", "translation": "Chief Secretary for Administration", "source": "香港政府"},
+  {"term": "财政司司长", "translation": "Financial Secretary", "source": "香港政府"},
+  {"term": "发展局", "translation": "Development Bureau", "source": "香港政府"},
+  {"term": "教育局", "translation": "Education Bureau", "source": "香港政府"},
+  {"term": "环境局", "translation": "Environment Bureau", "source": "香港政府"},
+  {"term": "食物及卫生局", "translation": "Food and Health Bureau", "source": "香港政府"},
+  {"term": "民政事务局", "translation": "Home Affairs Bureau", "source": "香港政府"},
+  {"term": "劳工及福利局", "translation": "Labour and Welfare Bureau", "source": "香港政府"},
+  {"term": "保安局", "translation": "Security Bureau", "source": "香港政府"},
+  {"term": "运输及房屋局", "translation": "Transport and Housing Bureau", "source": "香港政府"},
+  {"term": "财经事务及库务局", "translation": "Financial Services and the Treasury Bureau", "source": "香港政府"},
+  {"term": "商务及经济发展局", "translation": "Commerce and Economic Development Bureau", "source": "香港政府"},
+  {"term": "公务员事务局", "translation": "Civil Service Bureau", "source": "香港政府"},
+  {"term": "创新及科技局", "translation": "Innovation and Technology Bureau", "source": "香港政府"},
+  {"term": "政制及内地事务局", "translation": "Constitutional and Mainland Affairs Bureau", "source": "香港政府"},
+  {"term": "香港金融管理局", "translation": "Hong Kong Monetary Authority", "source": "香港政府"},
+  {"term": "HKMA", "translation": "Hong Kong Monetary Authority", "source": "香港政府"},
+  {"term": "证券及期货事务监察委员会", "translation": "Securities and Futures Commission", "source": "香港政府"},
+  {"term": "SFC", "translation": "Securities and Futures Commission", "source": "香港政府"},
+  {"term": "保险业监管局", "translation": "Insurance Authority", "source": "香港政府"},
+  {"term": "IA", "translation": "Insurance Authority", "source": "香港政府"},
+  {"term": "强制性公积金计划管理局", "translation": "Mandatory Provident Fund Schemes Authority", "source": "香港政府"},
+  {"term": "MPFA", "translation": "Mandatory Provident Fund Schemes Authority", "source": "香港政府"},
+  {"term": "香港旅游发展局", "translation": "Hong Kong Tourism Board", "source": "香港政府"},
+  {"term": "HKTB", "translation": "Hong Kong Tourism Board", "source": "香港政府"},
+  {"term": "贸易发展局", "translation": "Hong Kong Trade Development Council", "source": "香港政府"},
+  {"term": "TDC", "translation": "Hong Kong Trade Development Council", "source": "香港政府"},
+  {"term": "生产力促进局", "translation": "Hong Kong Productivity Council", "source": "香港政府"},
+  {"term": "HKPC", "translation": "Hong Kong Productivity Council", "source": "香港政府"},
+  {"term": "科技园公司", "translation": "Hong Kong Science and Technology Parks Corporation", "source": "香港政府"},
+  {"term": "HKSTP", "translation": "Hong Kong Science and Technology Parks Corporation", "source": "香港政府"},
+  {"term": "数码港", "translation": "Cyberport", "source": "香港政府"},
+  {"term": "机场管理局", "translation": "Airport Authority", "source": "香港政府"},
+  {"term": "AAHK", "translation": "Airport Authority", "source": "香港政府"},
+  {"term": "港铁公司", "translation": "MTR Corporation Limited", "source": "香港政府"},
+  {"term": "MTR", "translation": "MTR Corporation Limited", "source": "香港政府"},
+  {"term": "中华电力", "translation": "CLP Power Hong Kong Limited", "source": "香港企业"},
+  {"term": "CLP", "translation": "CLP Power Hong Kong Limited", "source": "香港企业"},
+  {"term": "香港电灯", "translation": "The Hongkong Electric Company Limited", "source": "香港企业"},
+  {"term": "HK Electric", "translation": "The Hongkong Electric Company Limited", "source": "香港企业"},
+  {"term": "中华煤气", "translation": "The Hong Kong and China Gas Company Limited", "source": "香港企业"},
+  {"term": "Towngas", "translation": "The Hong Kong and China Gas Company Limited", "source": "香港企业"},
+  {"term": "领展", "translation": "Link Real Estate Investment Trust", "source": "香港企业"},
+  {"term": "Link REIT", "translation": "领展房地产投资信托基金", "source": "香港企业"},
+  {"term": "长江和记实业", "translation": "CK Hutchison Holdings Limited", "source": "香港企业"},
+  {"term": "CK Hutchison", "translation": "长江和记实业", "source": "香港企业"},
+  {"term": "新鸿基地产", "translation": "Sun Hung Kai Properties Limited", "source": "香港企业"},
+  {"term": "SHKP", "translation": "新鸿基地产", "source": "香港企业"},
+  {"term": "长实集团", "translation": "CK Asset Holdings Limited", "source": "香港企业"},
+  {"term": "恒基兆业", "translation": "Henderson Land Development Company Limited", "source": "香港企业"},
+  {"term": "太古集团", "translation": "Swire Group", "source": "香港企业"},
+  {"term": "嘉里集团", "translation": "Kerry Group", "source": "香港企业"},
+  {"term": "信和置业", "translation": "Sino Group", "source": "香港企业"},
+  {"term": "合和实业", "translation": "Hopewell Holdings Limited", "source": "香港企业"},
+  {"term": "九龙仓集团", "translation": "The Wharf (Holdings) Limited", "source": "香港企业"},
+  {"term": "会德丰", "translation": "Wheelock and Company Limited", "source": "香港企业"},
+  {"term": "华人置业", "translation": "Chinese Estates Holdings Limited", "source": "香港企业"},
+  {"term": "鹰君集团", "translation": "Great Eagle Holdings Limited", "source": "香港企业"},
+  {"term": "南丰集团", "translation": "Nan Fung Group", "source": "香港企业"},
+  {"term": "利丰集团", "translation": "Li & Fung Limited", "source": "香港企业"},
+  {"term": "怡和集团", "translation": "Jardine Matheson Holdings Limited", "source": "香港企业"},
+  {"term": "Jardines", "translation": "怡和集团", "source": "香港企业"},
+  {"term": "汇丰银行", "translation": "The Hongkong and Shanghai Banking Corporation", "source": "香港银行"},
+  {"term": "HSBC", "translation": "The Hongkong and Shanghai Banking Corporation", "source": "香港银行"},
+  {"term": "渣打银行", "translation": "Standard Chartered Bank (Hong Kong) Limited", "source": "香港银行"},
+  {"term": "Standard Chartered", "translation": "渣打银行", "source": "香港银行"},
+  {"term": "中银香港", "translation": "Bank of China (Hong Kong) Limited", "source": "香港银行"},
+  {"term": "BOCHK", "translation": "Bank of China (Hong Kong) Limited", "source": "香港银行"},
+  {"term": "恒生银行", "translation": "Hang Seng Bank Limited", "source": "香港银行"},
+  {"term": "Hang Seng Bank", "translation": "恒生银行", "source": "香港银行"},
+  {"term": "东亚银行", "translation": "The Bank of East Asia, Limited", "source": "香港银行"},
+  {"term": "BEA", "translation": "东亚银行", "source": "香港银行"},
+  {"term": "大新银行", "translation": "Dah Sing Bank Limited", "source": "香港银行"},
+  {"term": "星展银行", "translation": "DBS Bank (Hong Kong) Limited", "source": "香港银行"},
+  {"term": "DBS", "translation": "星展银行", "source": "香港银行"},
+  {"term": "华侨银行", "translation": "OCBC Wing Hang Bank Limited", "source": "香港银行"},
+  {"term": "OCBC", "translation": "华侨银行", "source": "香港银行"},
+  {"term": "花旗银行", "translation": "Citibank (Hong Kong) Limited", "source": "香港银行"},
+  {"term": "Citibank", "translation": "花旗银行", "source": "香港银行"},
+  {"term": "摩根大通", "translation": "JPMorgan Chase Bank, N.A.", "source": "香港银行"},
+  {"term": "JPMorgan", "translation": "摩根大通", "source": "香港银行"},
+  {"term": "高盛", "translation": "The Goldman Sachs Group, Inc.", "source": "投资银行"},
+  {"term": "Goldman Sachs", "translation": "高盛", "source": "投资银行"},
+  {"term": "摩根士丹利", "translation": "Morgan Stanley", "source": "投资银行"},
+  {"term": "Morgan Stanley", "translation": "摩根士丹利", "source": "投资银行"},
+  {"term": "瑞银", "translation": "UBS Group AG", "source": "投资银行"},
+  {"term": "UBS", "translation": "瑞银", "source": "投资银行"},
+  {"term": "瑞士信贷", "translation": "Credit Suisse Group AG", "source": "投资银行"},
+  {"term": "Credit Suisse", "translation": "瑞士信贷", "source": "投资银行"},
+  {"term": "野村证券", "translation": "Nomura Holdings, Inc.", "source": "投资银行"},
+  {"term": "Nomura", "translation": "野村证券", "source": "投资银行"},
+  {"term": "中金公司", "translation": "China International Capital Corporation Limited", "source": "投资银行"},
+  {"term": "CICC", "translation": "中国国际金融有限公司", "source": "投资银行"},
+  {"term": "中信里昂证券", "translation": "CLSA Limited", "source": "投资银行"},
+  {"term": "CLSA", "translation": "中信里昂证券", "source": "投资银行"},
+  {"term": "耀才证券", "translation": "Bright Smart Securities & Commodities Group Limited", "source": "香港券商"},
+  {"term": "辉立证券", "translation": "Phillip Securities (Hong Kong) Limited", "source": "香港券商"},
+  {"term": "耀才", "translation": "Bright Smart", "source": "香港券商"},
+  {"term": "港交所", "translation": "Hong Kong Exchanges and Clearing", "source": "香港交易所"},
+  {"term": "主板", "translation": "Main Board", "source": "香港交易所"},
+  {"term": "创业板", "translation": "GEM", "source": "香港交易所"},
+  {"term": "恒生指数", "translation": "Hang Seng Index", "source": "香港交易所"},
+  {"term": "HSI", "translation": "恒生指数", "source": "香港交易所"},
+  {"term": "国企指数", "translation": "Hang Seng China Enterprises Index", "source": "香港交易所"},
+  {"term": "恒生科技指数", "translation": "Hang Seng Tech Index", "source": "香港交易所"},
+  {"term": "港股通", "translation": "Stock Connect", "source": "香港交易所"},
+  {"term": "沪港通", "translation": "Shanghai-Hong Kong Stock Connect", "source": "香港交易所"},
+  {"term": "深港通", "translation": "Shenzhen-Hong Kong Stock Connect", "source": "香港交易所"},
+  {"term": "债券通", "translation": "Bond Connect", "source": "香港交易所"},
+  {"term": "粤港澳大湾区发展规划纲要", "translation": "Outline Development Plan for the Guangdong-Hong Kong-Macao Greater Bay Area", "source": "中国政府"},
+  {"term": "前海深港现代服务业合作区", "translation": "Qianhai Shenzhen-Hong Kong Modern Service Industry Cooperation Zone", "source": "中国政府"},
+  {"term": "横琴粤澳深度合作区", "translation": "Hengqin Guangdong-Macao In-Depth Cooperation Zone", "source": "中国政府"},
+  {"term": "河套深港科技创新合作区", "translation": "Hetao Shenzhen-Hong Kong Innovation and Technology Cooperation Zone", "source": "中国政府"},
+  {"term": "北部都会区", "translation": "Northern Metropolis", "source": "香港政府"},
+  {"term": "明日大屿愿景", "translation": "Lantau Tomorrow Vision", "source": "香港政府"},
+  {"term": "交椅洲人工岛", "translation": "Kau Yi Chau Artificial Islands", "source": "香港政府"},
+  {"term": "东大屿都会", "translation": "East Lantau Metropolis", "source": "香港政府"},
+  {"term": "启德发展区", "translation": "Kai Tak Development Area", "source": "香港政府"},
+  {"term": "西九文化区", "translation": "West Kowloon Cultural District", "source": "香港政府"},
+  {"term": "中环海滨", "translation": "Central Harbourfront", "source": "香港政府"},
+  {"term": "添马舰发展工程", "translation": "Tamar Development Project", "source": "香港政府"},
+  {"term": "广深港高速铁路", "translation": "Guangzhou-Shenzhen-Hong Kong Express Rail Link", "source": "香港政府"},
+  {"term": "广深港高铁", "translation": "Guangzhou-Shenzhen-Hong Kong Express Rail Link", "source": "香港政府"},
+  {"term": "港珠澳大桥", "translation": "Hong Kong-Zhuhai-Macao Bridge", "source": "中国政府"},
+  {"term": "莲塘/香园围口岸", "translation": "Liantang/Heung Yuen Wai Boundary Control Point", "source": "香港政府"},
+  {"term": "落马洲河套地区", "translation": "Lok Ma Chau Loop", "source": "香港政府"},
+  {"term": "港深创新及科技园", "translation": "Hong Kong-Shenzhen Innovation and Technology Park", "source": "香港政府"},
+  {"term": "InnoHK", "translation": "InnoHK创新香港研发平台", "source": "香港政府"},
+  {"term": "香港科技园", "translation": "Hong Kong Science Park", "source": "香港政府"},
+  {"term": "数码港", "translation": "Cyberport", "source": "香港政府"},
+  {"term": "香港应用科技研究院", "translation": "Hong Kong Applied Science and Technology Research Institute", "source": "香港政府"},
+  {"term": "ASTRI", "translation": "香港应用科技研究院", "source": "香港政府"},
+  {"term": "物流及供应链多元技术研发中心", "translation": "LSCM Research and Development Centre", "source": "香港政府"},
+  {"term": "LSCM", "translation": "物流及供应链多元技术研发中心", "source": "香港政府"},
+  {"term": "纳米及先进材料研发院", "translation": "Nano and Advanced Materials Institute", "source": "香港政府"},
+  {"term": "NAMI", "translation": "纳米及先进材料研发院", "source": "香港政府"},
+  {"term": "香港纺织及成衣研发中心", "translation": "Hong Kong Research Institute of Textiles and Apparel", "source": "香港政府"},
+  {"term": "HKRITA", "translation": "香港纺织及成衣研发中心", "source": "香港政府"}
+]

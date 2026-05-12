@@ -200,312 +200,431 @@
             border-radius: 3px;
             transition: width 0.3s ease;
         }
-
-        /* 术语库状态 */
-        .glossary-status {
-            font-size: 12px;
-            color: #666;
-        }
-        .glossary-status .badge {
-            font-size: 11px;
-        }
     </style>
 </head>
 <body>
-    <div class="container py-5">
+    <div class="container py-6">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <!-- Header -->
-                <div class="text-center mb-4">
-                    <h1 class="text-white mb-2"><i class="fas fa-language"></i> GBA TransPilot</h1>
-                    <p class="text-white-50">粤港澳大湾区智能翻译助手</p>
-                </div>
-
-                <!-- Main Card -->
+            <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-body p-0">
-                        <!-- Tabs -->
-                        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="translate-tab" data-bs-toggle="tab" data-bs-target="#translate" type="button" role="tab">
-                                    <i class="fas fa-exchange-alt"></i> 翻译
+                    <div class="card-header bg-white border-0 py-4">
+                        <h1 class="text-center text-primary">GBA TransPilot</h1>
+                        <p class="text-center text-muted small">中文翻译智能台，跨境政务工具展示版</p>
+
+                        <!-- Tab Navigation -->
+                        <ul class="nav nav-tabs mt-4" id="mainTabs" role="tablist" style="display: flex; justify-content: space-around; width: 100%;">
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link active w-full px-4 py-2" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button" role="tab">
+                                    <i class="fas fa-file-text me-1"></i> 文本翻译
                                 </button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="glossary-tab" data-bs-toggle="tab" data-bs-target="#glossary" type="button" role="tab">
-                                    <i class="fas fa-book"></i> 术语库
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="av-tab" data-bs-toggle="tab" data-bs-target="#av" type="button" role="tab">
+                                    <i class="fas fa-video me-1"></i> 音视频翻译
                                 </button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="av-tab" data-bs-toggle="tab" data-bs-target="#av" type="button" role="tab">
-                                    <i class="fas fa-microphone"></i> 音视频
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="rewrite-tab" data-bs-toggle="tab" data-bs-target="#rewrite" type="button" role="tab">
+                                    <i class="fas fa-edit me-1"></i> AI改写
                                 </button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tools-tab" data-bs-toggle="tab" data-bs-target="#tools" type="button" role="tab">
-                                    <i class="fas fa-tools"></i> 工具
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
-                                    <i class="fas fa-history"></i> 历史
+                            <li class="nav-item flex-1 text-center" role="presentation">
+                                <button class="nav-link w-full px-4 py-2" id="polish-tab" data-bs-toggle="tab" data-bs-target="#polish" type="button" role="tab">
+                                    <i class="fas fa-sparkles me-1"></i> AI润色
                                 </button>
                             </li>
                         </ul>
+                    </div>
 
-                        <!-- Tab Content -->
-                        <div class="tab-content p-4" id="mainTabContent">
-                            <!-- Translation Tab -->
-                            <div class="tab-pane fade show active" id="translate" role="tabpanel">
-                                <!-- Language Selection -->
-                                <div class="row mb-4">
-                                    <div class="col-md-5">
-                                        <select id="sourceLang" class="form-select">
-                                            <option value="auto">自动检测</option>
-                                            <option value="zh" selected>中文</option>
-                                            <option value="en">English</option>
-                                            <option value="zh-HK">粤语</option>
-                                            <option value="ja">日本語</option>
-                                            <option value="ko">한국어</option>
-                                            <option value="fr">Français</option>
-                                            <option value="de">Deutsch</option>
-                                            <option value="es">Español</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2 text-center">
-                                        <button id="swapLang" class="btn btn-outline-secondary">
-                                            <i class="fas fa-exchange-alt"></i>
-                                        </button>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <select id="targetLang" class="form-select">
-                                            <option value="zh">中文</option>
-                                            <option value="en" selected>English</option>
-                                            <option value="zh-HK">粤语</option>
-                                            <option value="ja">日本語</option>
-                                            <option value="ko">한국어</option>
-                                            <option value="fr">Français</option>
-                                            <option value="de">Deutsch</option>
-                                            <option value="es">Español</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Input Area -->
-                                <div class="row mb-4">
-                                    <div class="col-lg-6 mb-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <label class="form-label mb-0">原文</label>
-                                            <div>
-                                                <button id="speakSourceBtn" class="btn btn-sm btn-outline-secondary me-1">
-                                                    <i class="fas fa-volume-up"></i>
-                                                </button>
-                                                <button id="clearSourceBtn" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <textarea id="sourceText" class="form-control" rows="6" placeholder="请输入要翻译的文本..."></textarea>
-                                        <div class="d-flex justify-content-between align-items-center mt-2">
-                                            <small class="text-muted" id="charCount">0/5000</small>
-                                            <div>
-                                                <button id="ocrBtn" class="btn btn-sm btn-outline-primary me-1">
-                                                    <i class="fas fa-image"></i> OCR
-                                                </button>
-                                                <button id="translateBtn" class="btn btn-primary">
-                                                    <i class="fas fa-language"></i> 翻译
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 mb-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <label class="form-label mb-0">译文</label>
-                                            <div>
-                                                <button id="speakTargetBtn" class="btn btn-sm btn-outline-secondary me-1">
-                                                    <i class="fas fa-volume-up"></i>
-                                                </button>
-                                                <button id="copyTargetBtn" class="btn btn-sm btn-outline-secondary copy-btn">
-                                                    <i class="fas fa-copy copy-icon"></i>
-                                                    <i class="fas fa-check check-icon"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <textarea id="targetText" class="form-control" rows="6" placeholder="翻译结果将显示在这里..." readonly></textarea>
-                                        <div class="d-flex justify-content-between align-items-center mt-2">
-                                            <small class="text-muted">点击复制按钮复制译文</small>
-                                            <button id="backTranslateBtn" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-sync"></i> 双向回译
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Back Translation Result -->
-                                <div class="row mb-4" id="backTranslateSection" style="display: none;">
-                                    <div class="col-12">
-                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
-                                            <h5 class="text-gray-700 mb-3">回译验证</h5>
-                                            <p class="text-gray-500 text-sm mb-3">将译文再译回原文语言，验证翻译准确性</p>
-                                            <textarea id="backTranslateResult" class="form-control" rows="4" readonly></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- OCR Modal -->
-                                <div class="modal fade" id="ocrModal" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">图片文字识别 (OCR)</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="file-drop-zone" id="ocrDropZone">
-                                                    <i class="fas fa-cloud-upload-alt mb-3"></i>
-                                                    <p>点击或拖拽上传图片</p>
-                                                    <input type="file" id="ocrFile" accept="image/*" style="display: none;">
-                                                </div>
-                                                <div id="ocrPreview" class="mt-3" style="display: none;">
-                                                    <img id="ocrPreviewImg" class="img-fluid rounded" style="max-height: 200px;">
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                                <button type="button" id="ocrSubmitBtn" class="btn btn-primary">
-                                                    <i class="fas fa-file-image"></i> 识别
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Glossary Tab -->
-                            <div class="tab-pane fade" id="glossary" role="tabpanel">
+                    <div class="card-body p-6">
+                        <div class="tab-content" id="mainTabContent">
+                            <!-- ==================== Text Translation Tab ==================== -->
+                            <div class="tab-pane fade show active" id="text" role="tabpanel">
                                 <div class="row">
+                                    <!-- Left Column -->
                                     <div class="col-lg-8">
-                                        <div class="mb-4">
-                                            <h5>术语查询</h5>
-                                            <p class="text-muted">查询政府术语、法律术语、旅游术语等</p>
-                                            <div class="input-group">
-                                                <input type="text" id="glossaryQuery" class="form-control" placeholder="输入术语，如：立法会、Art Basel...">
-                                                <button id="glossarySearchBtn" class="btn btn-primary">
-                                                    <i class="fas fa-search"></i> 查询
-                                                </button>
+                                        <!-- Translation Workspace -->
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3">翻译工作台</h5>
+                                            <p class="text-gray-500 text-sm mb-4">支持翻译、查输入内容，核心操作保持简洁清爽</p>
+
+                                            <!-- Language Selection -->
+                                            <div class="row mb-4">
+                                                <div class="col-md-5">
+                                                    <select id="sourceLang" class="form-select">
+                                                        <option value="auto">自动检测</option>
+                                                        <option value="zh">中文</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">粤语</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2 text-center">
+                                                    <button id="swapLang" class="btn btn-outline-primary" style="border-radius: 50%; width: 36px; height: 36px;">
+                                                        <i class="fas fa-exchange-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <select id="targetLang" class="form-select">
+                                                        <option value="zh">中文</option>
+                                                        <option value="en">English</option>
+                                                        <option value="zh-HK">粤语</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Input and Output -->
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="sourceText" class="form-control" rows="8" maxlength="5000">香港是一个国际化大都市，拥有繁荣的金融市场和丰富的文化遗产。
+Art Basel是世界著名的艺术博览会。
+大湾区建设正在稳步推进。</textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="charCount">69/5000</div>
+                                                </div>
+
+                                                <div class="col-md-2 text-center d-flex align-items-center justify-content-center">
+                                                    <button id="translateBtn" class="btn btn-primary" style="border-radius: 50%; width: 56px; height: 56px; font-size: 20px;">
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </button>
+                                                </div>
+
+                                                <div class="col-md-5">
+                                                    <label class="text-sm text-gray-600 mb-2">翻译结果</label>
+                                                    <textarea id="targetText" class="form-control" rows="8" readonly></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Toolbar -->
+                                            <div class="row mt-4">
+                                                <div class="col-md-5">
+                                                    <button id="cleanTextBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-align-left"></i> 整理文本</button>
+                                                    <button id="speakSourceBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copySourceBtn" class="btn btn-outline-secondary copy-btn" data-copy-target="sourceText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                </div>
+                                                <div class="col-md-5 offset-md-2">
+                                                    <button id="alignBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-list"></i> 逐句对照</button>
+                                                    <button id="speakTargetBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="copyTargetBtn" class="btn btn-outline-secondary copy-btn" data-copy-target="targetText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div id="glossaryResults">
-                                            <!-- Results will be displayed here -->
+
+                                        <!-- OCR and Back-Translate -->
+                                        <div class="row mb-4">
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">OCR/PDF翻译</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">支持上传图片或PDF进行文字提取和翻译</p>
+                                                    <input type="file" id="ocrFile" class="form-control mb-3" accept=".pdf,.jpg,.jpeg,.png,.bmp">
+                                                    <button id="ocrBtn" class="btn btn-primary w-full"><i class="fas fa-file-image"></i> 上传并识别</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">回译验证</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">将译文再译回原文，验证翻译准确性</p>
+                                                    <button id="backTranslateBtn" class="btn btn-primary w-full mb-3"><i class="fas fa-sync"></i> 双向回译</button>
+                                                    <textarea id="backTranslateResult" class="form-control" rows="4" readonly></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dictionary and Glossary -->
+                                        <div class="row mb-4">
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">OneLook词典</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">查询单词的详细释义和用法</p>
+                                                    <input type="text" id="dictInput" class="form-control mb-3" placeholder="输入要查询的单词（如：metropolis）">
+                                                    <button id="dictBtn" class="btn btn-primary w-full"><i class="fas fa-book"></i> 查询</button>
+                                                    <div id="dictResult" class="mt-3"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="bg-light rounded-12 p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3">术语表查询</h5>
+                                                    <p class="text-gray-500 text-sm mb-3">从政府网站爬取的最新术语库</p>
+                                                    <input type="text" id="glossaryQuery" class="form-control mb-2" placeholder="输入要查询的术语（如：Art Basel）">
+                                                    <select id="glossaryTargetLang" class="form-select mb-3">
+                                                        <option value="zh">&#8594; 中文</option>
+                                                        <option value="en">&#8594; English</option>
+                                                        <option value="zh-HK">&#8594; 粤语</option>
+                                                    </select>
+                                                    <button id="glossaryBtn" class="btn btn-primary w-full"><i class="fas fa-search"></i> 查询</button>
+                                                    <div id="glossaryResult" class="mt-3"></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <!-- Right Column -->
                                     <div class="col-lg-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="mb-0">术语库状态</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div id="glossaryStatus">
-                                                    <p class="mb-2"><span class="badge bg-secondary">加载中...</span></p>
+                                        <!-- Glossary and Sources -->
+                                        <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">词库与历史记录</h5>
+                                                <div>
+                                                    <button id="addTermBtn" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#addTermModal">
+                                                        <i class="fas fa-plus"></i> 添加术语
+                                                    </button>
+                                                    <button id="updateGlossaryBtn" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-sync-alt"></i> 更新词库
+                                                    </button>
                                                 </div>
-                                                <button id="updateGlossaryBtn" class="btn btn-outline-primary btn-sm w-100">
-                                                    <i class="fas fa-sync"></i> 更新术语库
-                                                </button>
-                                                <hr>
-                                                <button id="listGlossaryBtn" class="btn btn-outline-secondary btn-sm w-100">
-                                                    <i class="fas fa-list"></i> 查看所有术语
-                                                </button>
+                                            </div>
+                                            <p class="text-xs text-orange-500 bg-orange-50 px-2 py-1 rounded inline-block mb-3">2026-05-01</p>
+                                            <p class="text-gray-500 text-sm mb-3">从以下官方政府网站实时提取最新术语（支持中英粤三语）</p>
+
+                                            <div class="glossary-item">
+                                                <i class="fas fa-globe me-2 text-danger"></i>
+                                                <a href="https://www.gov.cn/" target="_blank" class="text-decoration-none">gov.cn 中央政府</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-building me-2 text-primary"></i>
+                                                <a href="https://www.state.gov.cn/" target="_blank" class="text-decoration-none">state.gov.cn 国务院</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-gavel me-2 text-info"></i>
+                                                <a href="https://www.court.gov.cn/" target="_blank" class="text-decoration-none">court.gov.cn 最高人民法院</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-users me-2 text-success"></i>
+                                                <a href="https://www.npc.gov.cn/" target="_blank" class="text-decoration-none">npc.gov.cn 全国人大</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-landmark me-2 text-warning"></i>
+                                                <a href="https://www.gov.hk/" target="_blank" class="text-decoration-none">GovHK 香港政府一站通</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-balance-scale me-2 text-secondary"></i>
+                                                <a href="https://www.doj.gov.hk/" target="_blank" class="text-decoration-none">doj.gov.hk 律政司</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-file-alt me-2 text-primary"></i>
+                                                <a href="https://www.elegislation.gov.hk/" target="_blank" class="text-decoration-none">e-legislation 香港电子法律</a>
+                                            </div>
+                                            <div class="glossary-item">
+                                                <i class="fas fa-chart-line me-2 text-info"></i>
+                                                <a href="https://www.hkex.com.hk/" target="_blank" class="text-decoration-none">HKEX 香港交易所</a>
                                             </div>
                                         </div>
-                                        <div class="card mt-3">
-                                            <div class="card-header">
-                                                <h6 class="mb-0">添加术语</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="mb-2">
-                                                    <input type="text" id="newTerm" class="form-control form-control-sm" placeholder="术语">
-                                                </div>
-                                                <div class="mb-2">
-                                                    <input type="text" id="newTranslation" class="form-control form-control-sm" placeholder="翻译">
-                                                </div>
-                                                <button id="addTermBtn" class="btn btn-primary btn-sm w-100">
-                                                    <i class="fas fa-plus"></i> 添加
-                                                </button>
-                                            </div>
+
+                                        <!-- Translation History -->
+                                        <div class="bg-light rounded-12 p-4" style="border-radius: 12px; max-height: 400px; overflow-y: auto;">
+                                            <h5 class="text-gray-700 mb-3">历史记录</h5>
+                                            <button id="clearHistoryBtn" class="btn btn-xs btn-outline-danger float-end">清空</button>
+                                            <p class="text-gray-500 text-sm mb-3">翻译历史一键回溯到翻译工作台</p>
+                                            <div id="historyList"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Audio/Video Tab -->
+                            <!-- ==================== Audio/Video Transcribe Tab ==================== -->
                             <div class="tab-pane fade" id="av" role="tabpanel">
-                                <ul class="nav nav-pills mb-3" id="avSubTabs" role="tablist">
+                                <!-- AV Sub Tabs -->
+                                <ul class="nav nav-tabs sub-tabs mb-4" id="avSubTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="file-transcribe-tab" data-bs-toggle="pill" data-bs-target="#file-transcribe" type="button" role="tab">
-                                            <i class="fas fa-file-audio"></i> 文件转录
+                                        <button class="nav-link active" id="av-transcribe-tab" data-bs-toggle="tab" data-bs-target="#av-transcribe" type="button" role="tab">
+                                            <i class="fas fa-file-audio me-1"></i> 文件转录
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="av-realtime-tab" data-bs-toggle="tab" data-bs-target="#av-realtime" type="button" role="tab">
+                                            <i class="fas fa-microphone me-1"></i> 实时对话
                                         </button>
                                     </li>
                                 </ul>
+
                                 <div class="tab-content" id="avSubTabContent">
-                                    <div class="tab-pane fade show active" id="file-transcribe" role="tabpanel">
+                                    <!-- File Transcribe Sub Tab -->
+                                    <div class="tab-pane fade show active" id="av-transcribe" role="tabpanel">
                                         <div class="row">
                                             <div class="col-lg-8">
-                                                <div class="file-drop-zone" id="avDropZone">
-                                                    <i class="fas fa-cloud-upload-alt mb-3"></i>
-                                                    <p>点击或拖拽上传音频/视频文件</p>
-                                                    <small class="text-muted">支持 MP3, WAV, M4A, MP4, WEBM 等格式</small>
-                                                    <input type="file" id="avFile" accept="audio/*,video/*" style="display: none;">
-                                                </div>
-                                                <div id="avFileInfo" class="mt-3" style="display: none;">
-                                                    <div class="alert alert-info">
-                                                        <i class="fas fa-file"></i> <span id="avFileName"></span>
+                                                <!-- File Upload Area -->
+                                                <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3"><i class="fas fa-upload me-2"></i>上传音视频文件</h5>
+                                                    <div class="file-drop-zone" id="avFileDropZone">
+                                                        <i class="fas fa-cloud-upload-alt mb-3"></i>
+                                                        <p class="text-muted mb-1">点击或拖拽文件到此处上传</p>
+                                                        <p class="text-gray-400 small">支持 MP3, WAV, MP4, AVI, MKV 等格式，最大 500MB</p>
+                                                        <input type="file" id="avFileInput" accept="audio/*,video/*" style="display: none;">
+                                                    </div>
+                                                    <div id="avFileInfo" class="mt-3" style="display: none;">
+                                                        <div class="d-flex align-items-center justify-content-between bg-white p-3 rounded">
+                                                            <div>
+                                                                <i class="fas fa-file-audio text-primary me-2"></i>
+                                                                <span id="avFileName" class="fw-medium"></span>
+                                                                <span id="avFileSize" class="text-muted small ms-2"></span>
+                                                            </div>
+                                                            <button id="avRemoveFile" class="btn btn-sm btn-outline-danger"><i class="fas fa-times"></i></button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="row mt-3">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">源语言</label>
-                                                        <select id="avSourceLang" class="form-select">
-                                                            <option value="auto" selected>自动检测</option>
-                                                            <option value="zh">中文</option>
-                                                            <option value="en">English</option>
-                                                            <option value="zh-HK">粤语</option>
-                                                        </select>
+
+                                                <!-- Language Selection and Transcribe -->
+                                                <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3"><i class="fas fa-language me-2"></i>转录设置</h5>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-sm text-gray-600">音频语言</label>
+                                                            <select id="avSourceLang" class="form-select">
+                                                                <option value="auto">自动检测</option>
+                                                                <option value="zh">中文</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                                <option value="ja">日本語</option>
+                                                                <option value="ko">한국어</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-sm text-gray-600">翻译语言（可选）</label>
+                                                            <select id="avTargetLang" class="form-select">
+                                                                <option value="">不翻译</option>
+                                                                <option value="zh">中文</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">目标语言（可选）</label>
-                                                        <select id="avTargetLang" class="form-select">
-                                                            <option value="">不翻译</option>
-                                                            <option value="zh">中文</option>
-                                                            <option value="en" selected>English</option>
-                                                            <option value="zh-HK">粤语</option>
-                                                        </select>
+                                                    <button id="avTranscribeBtn" class="btn btn-primary w-full" disabled>
+                                                        <i class="fas fa-play-circle me-2"></i>开始转录
+                                                    </button>
+                                                    <div id="avProgressArea" class="mt-3" style="display: none;">
+                                                        <div class="d-flex justify-content-between text-sm text-muted mb-1">
+                                                            <span id="avProgressLabel">转录中...</span>
+                                                            <span id="avProgressPercent">0%</span>
+                                                        </div>
+                                                        <div class="progress-bar-custom">
+                                                            <div class="progress-fill" id="avProgressBar" style="width: 0%;"></div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <button id="avTranscribeBtn" class="btn btn-primary w-100 mt-3">
-                                                    <i class="fas fa-microphone"></i> 开始转录
-                                                </button>
-                                                <div id="avResultSection" class="mt-4" style="display: none;">
-                                                    <h6>转录结果</h6>
-                                                    <textarea id="avResult" class="form-control" rows="6" readonly></textarea>
-                                                    <div id="avTranslationSection" style="display: none;">
-                                                        <h6 class="mt-3">翻译结果</h6>
-                                                        <textarea id="avTranslation" class="form-control" rows="6" readonly></textarea>
+
+                                                <!-- Transcription Result -->
+                                                <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h5 class="text-gray-700 mb-0"><i class="fas fa-file-alt me-2"></i>转录结果</h5>
+                                                        <div>
+                                                            <button id="avCopyTranscript" class="btn btn-sm btn-outline-secondary copy-btn" data-copy-target="avTranscriptResult">
+                                                                <i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i>
+                                                            </button>
+                                                            <button id="avDownloadTranscript" class="btn btn-sm btn-outline-primary ms-2"><i class="fas fa-download me-1"></i>下载</button>
+                                                        </div>
                                                     </div>
+                                                    <textarea id="avTranscriptResult" class="form-control" rows="8" readonly placeholder="转录结果将显示在此处..."></textarea>
+                                                </div>
+
+                                                <!-- Translation of Transcript -->
+                                                <div class="bg-light p-4" style="border-radius: 12px;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h5 class="text-gray-700 mb-0"><i class="fas fa-language me-2"></i>翻译转录内容</h5>
+                                                        <button id="avCopyTranslation" class="btn btn-sm btn-outline-secondary copy-btn" data-copy-target="avTranslationResult">
+                                                            <i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i>
+                                                        </button>
+                                                    </div>
+                                                    <button id="avTranslateTranscriptBtn" class="btn btn-primary w-full mb-3" disabled>
+                                                        <i class="fas fa-arrow-right me-2"></i>翻译转录内容
+                                                    </button>
+                                                    <textarea id="avTranslationResult" class="form-control" rows="6" readonly placeholder="翻译结果将显示在此处..."></textarea>
                                                 </div>
                                             </div>
+
+                                            <!-- AV History Sidebar -->
                                             <div class="col-lg-4">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h6 class="mb-0">使用说明</h6>
+                                                <div class="bg-light p-4" style="border-radius: 12px; max-height: 600px; overflow-y: auto;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h5 class="text-gray-700 mb-0">转录历史</h5>
+                                                        <button id="avClearHistory" class="btn btn-xs btn-outline-danger">清空</button>
                                                     </div>
-                                                    <div class="card-body">
-                                                        <ul class="small text-muted mb-0">
-                                                            <li>支持格式：MP3, WAV, M4A, MP4, WEBM</li>
-                                                            <li>文件大小限制：50MB</li>
-                                                            <li>转录时间取决于文件长度</li>
-                                                            <li>可选择自动翻译为目标语言</li>
-                                                        </ul>
+                                                    <div id="avHistoryList">
+                                                        <p class="text-muted text-center">暂无转录记录</p>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Realtime Conversation Sub Tab -->
+                                    <div class="tab-pane fade" id="av-realtime" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <!-- Language Settings -->
+                                                <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3"><i class="fas fa-cog me-2"></i>对话设置</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-sm text-gray-600">识别语言</label>
+                                                            <select id="rtSourceLang" class="form-select">
+                                                                <option value="zh">中文</option>
+                                                                <option value="en">English</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                                <option value="ja">日本語</option>
+                                                                <option value="ko">한국어</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-sm text-gray-600">翻译语言</label>
+                                                            <select id="rtTargetLang" class="form-select">
+                                                                <option value="en">English</option>
+                                                                <option value="zh">中文</option>
+                                                                <option value="zh-HK">粤语</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Chat Area -->
+                                                <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h5 class="text-gray-700 mb-0"><i class="fas fa-comments me-2"></i>对话记录</h5>
+                                                        <button id="rtClearChat" class="btn btn-xs btn-outline-danger">清空</button>
+                                                    </div>
+                                                    <div class="chat-container" id="rtChatContainer">
+                                                        <div class="text-center text-muted py-4">
+                                                            <i class="fas fa-microphone-alt fa-2x mb-2" style="color: #ccc;"></i>
+                                                            <p>点击下方麦克风按钮开始对话</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Input Area -->
+                                                <div class="bg-light p-4" style="border-radius: 12px;">
+                                                    <div class="row align-items-end">
+                                                        <div class="col-md-8">
+                                                            <label class="form-label text-sm text-gray-600">文字输入</label>
+                                                            <input type="text" id="rtTextInput" class="form-control" placeholder="输入文字发送...">
+                                                        </div>
+                                                        <div class="col-md-4 text-end">
+                                                            <button id="rtSendTextBtn" class="btn btn-primary me-2">
+                                                                <i class="fas fa-paper-plane"></i> 发送
+                                                            </button>
+                                                            <button id="rtMicBtn" class="btn btn-danger" style="border-radius: 50%; width: 48px; height: 48px;">
+                                                                <i class="fas fa-microphone"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div id="rtRecordingStatus" class="mt-2 text-sm text-danger" style="display: none;">
+                                                        <span class="recording-indicator me-2"></span>正在录音中...
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Realtime Tips Sidebar -->
+                                            <div class="col-lg-4">
+                                                <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3"><i class="fas fa-info-circle me-2"></i>使用说明</h5>
+                                                    <ul class="text-sm text-gray-600">
+                                                        <li class="mb-2"><i class="fas fa-microphone text-primary me-2"></i>点击麦克风按钮开始语音识别</li>
+                                                        <li class="mb-2"><i class="fas fa-keyboard text-primary me-2"></i>也可以直接输入文字发送</li>
+                                                        <li class="mb-2"><i class="fas fa-language text-primary me-2"></i>系统将自动翻译为所选语言</li>
+                                                        <li class="mb-2"><i class="fas fa-volume-up text-primary me-2"></i>点击消息旁的喇叭图标可朗读</li>
+                                                        <li><i class="fas fa-download text-primary me-2"></i>可导出完整对话记录</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="bg-light p-4" style="border-radius: 12px;">
+                                                    <h5 class="text-gray-700 mb-3"><i class="fas fa-download me-2"></i>导出记录</h5>
+                                                    <button id="rtExportBtn" class="btn btn-primary w-full"><i class="fas fa-file-export me-2"></i>导出对话记录</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -513,115 +632,243 @@
                                 </div>
                             </div>
 
-                            <!-- Tools Tab -->
-                            <div class="tab-pane fade" id="tools" role="tabpanel">
-                                <ul class="nav nav-pills mb-3" id="toolsSubTabs" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="clean-tab" data-bs-toggle="pill" data-bs-target="#clean" type="button" role="tab">
-                                            <i class="fas fa-broom"></i> 文本清理
-                                        </button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="rewrite-tab" data-bs-toggle="pill" data-bs-target="#rewrite" type="button" role="tab">
-                                            <i class="fas fa-pen-fancy"></i> 改写润色
-                                        </button>
-                                    </li>
-                                </ul>
-                                <div class="tab-content" id="toolsSubTabContent">
-                                    <!-- Clean Text -->
-                                    <div class="tab-pane fade show active" id="clean" role="tabpanel">
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label class="form-label">原文（含多余换行）</label>
-                                                <textarea id="cleanSource" class="form-control" rows="8" placeholder="粘贴含有多余换行的文本..."></textarea>
+                            <!-- ==================== AI Rewrite Tab ==================== -->
+                            <div class="tab-pane fade" id="rewrite" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <!-- Rewrite Mode Selection -->
+                                        <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3"><i class="fas fa-sliders-h me-2"></i>改写设置</h5>
+
+                                            <!-- Mode Selection -->
+                                            <label class="form-label text-sm text-gray-600 mb-2">改写模式</label>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="option-card selected" id="rwModeParaphrase" onclick="selectRewriteMode('paraphrase')">
+                                                        <i class="fas fa-random me-2"></i>意译改写
+                                                        <p class="text-xs text-muted mt-1 mb-0">保持原意，用不同方式表达</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="option-card" id="rwModePreEdit" onclick="selectRewriteMode('preedit')">
+                                                        <i class="fas fa-pencil-alt me-2"></i>预编辑改写
+                                                        <p class="text-xs text-muted mt-1 mb-0">优化文本，为翻译做准备</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-lg-6">
-                                                <label class="form-label">清理结果</label>
-                                                <textarea id="cleanResult" class="form-control" rows="8" readonly></textarea>
+
+                                            <!-- Style Selection -->
+                                            <label class="form-label text-sm text-gray-600 mb-2">改写风格</label>
+                                            <div class="row">
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card selected" id="rwStyleStandard" onclick="selectRewriteStyle('standard')">
+                                                        <i class="fas fa-check-circle me-1"></i>标准
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="rwStyleFormal" onclick="selectRewriteStyle('formal')">
+                                                        <i class="fas fa-user-tie me-1"></i>正式
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="rwStyleCasual" onclick="selectRewriteStyle('casual')">
+                                                        <i class="fas fa-smile me-1"></i>口语化
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="rwStyleAcademic" onclick="selectRewriteStyle('academic')">
+                                                        <i class="fas fa-graduation-cap me-1"></i>学术
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="rwStyleBusiness" onclick="selectRewriteStyle('business')">
+                                                        <i class="fas fa-briefcase me-1"></i>商务
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="text-center mt-3">
-                                            <button id="cleanTextBtn" class="btn btn-primary me-2">
-                                                <i class="fas fa-broom"></i> 智能清理
-                                            </button>
-                                            <button id="removeBreaksBtn" class="btn btn-outline-primary">
-                                                <i class="fas fa-align-justify"></i> 去除所有换行
-                                            </button>
+
+                                        <!-- Rewrite Workspace -->
+                                        <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3"><i class="fas fa-edit me-2"></i>改写工作台</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="rwSourceText" class="form-control" rows="8" maxlength="5000" placeholder="请输入需要改写的文本..."></textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="rwCharCount">0/5000</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">改写结果</label>
+                                                    <textarea id="rwResultText" class="form-control" rows="8" readonly placeholder="改写结果将显示在此处..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-md-6">
+                                                    <button id="rwCleanBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-align-left"></i> 整理文本</button>
+                                                    <button id="rwCopySource" class="btn btn-outline-secondary copy-btn" data-copy-target="rwSourceText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                </div>
+                                                <div class="col-md-6 text-end">
+                                                    <button id="rwCopyResult" class="btn btn-outline-secondary copy-btn me-2" data-copy-target="rwResultText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                    <button id="rwSpeakResult" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="rwExecuteBtn" class="btn btn-primary"><i class="fas fa-magic me-2"></i>开始改写</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <!-- Rewrite -->
-                                    <div class="tab-pane fade" id="rewrite" role="tabpanel">
-                                        <div class="mb-3">
-                                            <label class="form-label">文本改写模式</label>
-                                            <div class="row g-2">
-                                                <div class="col-md-4">
-                                                    <div class="option-card selected" data-mode="paraphrase">
-                                                        <i class="fas fa-sync-alt mb-2 d-block"></i>
-                                                        意译改写
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="option-card" data-mode="pre-edit">
-                                                        <i class="fas fa-edit mb-2 d-block"></i>
-                                                        预编辑
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="option-card" data-mode="polish">
-                                                        <i class="fas fa-magic mb-2 d-block"></i>
-                                                        润色优化
-                                                    </div>
-                                                </div>
+
+                                    <!-- Rewrite History Sidebar -->
+                                    <div class="col-lg-4">
+                                        <div class="bg-light p-4" style="border-radius: 12px; max-height: 600px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">改写历史</h5>
+                                                <button id="rwClearHistory" class="btn btn-xs btn-outline-danger">清空</button>
                                             </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">风格选择</label>
-                                            <select id="rewriteStyle" class="form-select">
-                                                <option value="standard">标准</option>
-                                                <option value="formal">正式</option>
-                                                <option value="casual">随意</option>
-                                                <option value="academic">学术</option>
-                                                <option value="business">商务</option>
-                                            </select>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label class="form-label">原文</label>
-                                                <textarea id="rewriteSource" class="form-control" rows="6" placeholder="输入需要改写的文本..."></textarea>
+                                            <div id="rwHistoryList">
+                                                <p class="text-muted text-center">暂无改写记录</p>
                                             </div>
-                                            <div class="col-lg-6">
-                                                <label class="form-label">改写结果</label>
-                                                <textarea id="rewriteResult" class="form-control" rows="6" readonly></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="text-center mt-3">
-                                            <button id="rewriteBtn" class="btn btn-primary">
-                                                <i class="fas fa-pen-fancy"></i> 开始改写
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- History Tab -->
-                            <div class="tab-pane fade" id="history" role="tabpanel">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="mb-0">翻译历史</h5>
-                                    <button id="clearHistoryBtn" class="btn btn-outline-danger btn-sm">
-                                        <i class="fas fa-trash"></i> 清空历史
-                                    </button>
-                                </div>
-                                <div id="historyList">
-                                    <!-- History items will be displayed here -->
+                            <!-- ==================== AI Polish Tab ==================== -->
+                            <div class="tab-pane fade" id="polish" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <!-- Polish Style Selection -->
+                                        <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3"><i class="fas fa-palette me-2"></i>润色设置</h5>
+                                            <label class="form-label text-sm text-gray-600 mb-2">润色风格</label>
+                                            <div class="row">
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card selected" id="plStyleGeneral" onclick="selectPolishStyle('general')">
+                                                        <i class="fas fa-check-circle me-1"></i>通用润色
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="plStyleAcademic" onclick="selectPolishStyle('academic')">
+                                                        <i class="fas fa-graduation-cap me-1"></i>学术润色
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="plStyleBusiness" onclick="selectPolishStyle('business')">
+                                                        <i class="fas fa-briefcase me-1"></i>商务润色
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="plStyleLiterary" onclick="selectPolishStyle('literary')">
+                                                        <i class="fas fa-feather-alt me-1"></i>文学润色
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 col-6 mb-2">
+                                                    <div class="option-card" id="plStyleConcise" onclick="selectPolishStyle('concise')">
+                                                        <i class="fas fa-compress-alt me-1"></i>精简润色
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Polish Workspace -->
+                                        <div class="bg-light p-4 mb-4" style="border-radius: 12px;">
+                                            <h5 class="text-gray-700 mb-3"><i class="fas fa-sparkles me-2"></i>润色工作台</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">原文输入</label>
+                                                    <textarea id="plSourceText" class="form-control" rows="8" maxlength="5000" placeholder="请输入需要润色的文本..."></textarea>
+                                                    <div class="text-right text-sm text-gray-400 mt-1" id="plCharCount">0/5000</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="text-sm text-gray-600 mb-2">润色结果</label>
+                                                    <textarea id="plResultText" class="form-control" rows="8" readonly placeholder="润色结果将显示在此处..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-md-6">
+                                                    <button id="plCleanBtn" class="btn btn-outline-secondary me-2"><i class="fas fa-align-left"></i> 整理文本</button>
+                                                    <button id="plCopySource" class="btn btn-outline-secondary copy-btn" data-copy-target="plSourceText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                </div>
+                                                <div class="col-md-6 text-end">
+                                                    <button id="plCopyResult" class="btn btn-outline-secondary copy-btn me-2" data-copy-target="plResultText"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i></button>
+                                                    <button id="plSpeakResult" class="btn btn-outline-secondary me-2"><i class="fas fa-volume-up"></i></button>
+                                                    <button id="plExecuteBtn" class="btn btn-primary"><i class="fas fa-sparkles me-2"></i>开始润色</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Polish History Sidebar -->
+                                    <div class="col-lg-4">
+                                        <div class="bg-light p-4" style="border-radius: 12px; max-height: 600px; overflow-y: auto;">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="text-gray-700 mb-0">润色历史</h5>
+                                                <button id="plClearHistory" class="btn btn-xs btn-outline-danger">清空</button>
+                                            </div>
+                                            <div id="plHistoryList">
+                                                <p class="text-muted text-center">暂无润色记录</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Footer -->
-                <div class="text-center mt-4 text-white-50">
-                    <small>GBA TransPilot - 粤港澳大湾区智能翻译助手</small>
+                    <!-- Sentence Alignment Modal -->
+                    <div class="modal fade" id="alignModal" tabindex="-1" aria-labelledby="alignModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="alignModalLabel"><i class="fas fa-list me-2"></i>逐句对照</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                                    <div id="alignContent"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                                    <button type="button" class="btn btn-primary copy-btn-text" onclick="copyAlignResultWithFeedback(this)"><i class="fas fa-copy copy-icon"></i><i class="fas fa-check check-icon"></i> <span class="btn-text">复制结果</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Term Modal -->
+                    <div class="modal fade" id="addTermModal" tabindex="-1" aria-labelledby="addTermModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addTermModalLabel">添加术语</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="termInput" class="form-label">术语</label>
+                                        <input type="text" class="form-control" id="termInput" placeholder="输入术语（如：Art Basel）">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="translationInput" class="form-label">翻译</label>
+                                        <input type="text" class="form-control" id="translationInput" placeholder="输入翻译（如：巴塞尔艺术展）">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sourceInput" class="form-label">来源（可选）</label>
+                                        <input type="text" class="form-control" id="sourceInput" placeholder="如：政府网站">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary" id="saveTermBtn">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 py-3">
+                        <div class="d-flex justify-content-center gap-4">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-lock"></i> 隐私管理</button>
+                            <button class="btn btn-primary btn-sm"><i class="fas fa-comment"></i> 意见反馈</button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-user"></i> 联络作者</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -629,672 +876,1290 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Global variables
-        let currentRewriteMode = 'paraphrase';
-        let alignResultText = '';
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            loadHistory();
-            updateGlossaryStatus();
-
-            // Character count
-            document.getElementById('sourceText').addEventListener('input', function() {
-                document.getElementById('charCount').textContent = this.value.length + '/5000';
-            });
-
-            // Clear source
-            document.getElementById('clearSourceBtn').addEventListener('click', function() {
-                document.getElementById('sourceText').value = '';
-                document.getElementById('charCount').textContent = '0/5000';
-            });
-
-            // Swap languages
-            document.getElementById('swapLang').addEventListener('click', function() {
-                const source = document.getElementById('sourceLang').value;
-                const target = document.getElementById('targetLang').value;
-                document.getElementById('sourceLang').value = target;
-                document.getElementById('targetLang').value = source;
-            });
-
-            // Translate
-            document.getElementById('translateBtn').addEventListener('click', async function() {
-                const text = document.getElementById('sourceText').value;
-                const sourceLang = document.getElementById('sourceLang').value;
-                const targetLang = document.getElementById('targetLang').value;
-
-                if (!text.trim()) {
-                    alert('请输入要翻译的文本');
-                    return;
-                }
-
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 翻译中...';
-
-                try {
-                    const response = await fetch('/api/translate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            text: text,
-                            source_lang: sourceLang,
-                            target_lang: targetLang
-                        })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('targetText').value = data.result;
-                        saveToHistory({
-                            source: text,
-                            target: data.result,
-                            sourceLang: sourceLang,
-                            targetLang: targetLang
-                        });
-                    } else {
-                        alert('翻译失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-language"></i> 翻译';
-                }
-            });
-
-            // FIX: Back translate - 传递正确的 source_lang 和 target_lang
-            document.getElementById('backTranslateBtn').addEventListener('click', async function() {
-                const text = document.getElementById('targetText').value;
-                if (!text.trim()) {
-                    alert('请先翻译内容');
-                    return;
-                }
-
-                const btn = this;
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 回译中...';
-                document.getElementById('backTranslateSection').style.display = 'block';
-                document.getElementById('backTranslateResult').value = '回译中...';
-
-                try {
-                    // FIX: 获取原文语言和译文语言
-                    const sourceLang = document.getElementById('sourceLang').value || 'auto';
-                    const targetLang = document.getElementById('targetLang').value || 'zh';
-                    
-                    const response = await fetch('/api/back-translate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            text: text, 
-                            source_lang: sourceLang,  // 原文语言（回译目标语言）
-                            target_lang: targetLang   // 译文语言（当前文本的语言）
-                        })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('backTranslateResult').value = data.result;
-                    } else {
-                        alert('回译失败: ' + (data.error || '未知错误'));
-                    }
-                } catch (error) {
-                    alert('网络错误: ' + error.message);
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-sync"></i> 双向回译';
-                }
-            });
-
-            // Copy target
-            document.getElementById('copyTargetBtn').addEventListener('click', function() {
-                const text = document.getElementById('targetText').value;
-                if (text) {
-                    navigator.clipboard.writeText(text).then(() => {
-                        this.classList.add('copied');
-                        setTimeout(() => this.classList.remove('copied'), 1500);
-                    });
-                }
-            });
-
-            // Text to speech
-            document.getElementById('speakSourceBtn').addEventListener('click', function() {
-                speakText(document.getElementById('sourceText').value, document.getElementById('sourceLang').value);
-            });
-            document.getElementById('speakTargetBtn').addEventListener('click', function() {
-                speakText(document.getElementById('targetText').value, document.getElementById('targetLang').value);
-            });
-
-            // OCR
-            document.getElementById('ocrBtn').addEventListener('click', function() {
-                new bootstrap.Modal(document.getElementById('ocrModal')).show();
-            });
-
-            const ocrDropZone = document.getElementById('ocrDropZone');
-            const ocrFile = document.getElementById('ocrFile');
-
-            ocrDropZone.addEventListener('click', () => ocrFile.click());
-            ocrDropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                ocrDropZone.classList.add('dragover');
-            });
-            ocrDropZone.addEventListener('dragleave', () => ocrDropZone.classList.remove('dragover'));
-            ocrDropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                ocrDropZone.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    ocrFile.files = e.dataTransfer.files;
-                    showOcrPreview(e.dataTransfer.files[0]);
-                }
-            });
-            ocrFile.addEventListener('change', function() {
-                if (this.files.length) {
-                    showOcrPreview(this.files[0]);
-                }
-            });
-
-            document.getElementById('ocrSubmitBtn').addEventListener('click', async function() {
-                const file = document.getElementById('ocrFile').files[0];
-                if (!file) {
-                    alert('请选择图片文件');
-                    return;
-                }
-
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 识别中...';
-
-                try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-
-                    const response = await fetch('/api/ocr', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('sourceText').value = data.text;
-                        document.getElementById('charCount').textContent = data.text.length + '/5000';
-                        bootstrap.Modal.getInstance(document.getElementById('ocrModal')).hide();
-                    } else {
-                        alert('识别失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-file-image"></i> 识别';
-                }
-            });
-
-            // Glossary search
-            document.getElementById('glossarySearchBtn').addEventListener('click', searchGlossary);
-            document.getElementById('glossaryQuery').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') searchGlossary();
-            });
-
-            // Update glossary
-            document.getElementById('updateGlossaryBtn').addEventListener('click', async function() {
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 更新中...';
-
-                try {
-                    const response = await fetch('/api/update-glossary', {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        alert(data.message);
-                        setTimeout(updateGlossaryStatus, 5000);
-                    } else {
-                        alert('更新失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-sync"></i> 更新术语库';
-                }
-            });
-
-            // List glossary
-            document.getElementById('listGlossaryBtn').addEventListener('click', async function() {
-                try {
-                    const response = await fetch('/api/glossary-list');
-                    const data = await response.json();
-
-                    if (data.success) {
-                        displayGlossaryList(data.terms);
-                    } else {
-                        alert('获取术语列表失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                }
-            });
-
-            // Add term
-            document.getElementById('addTermBtn').addEventListener('click', async function() {
-                const term = document.getElementById('newTerm').value.trim();
-                const translation = document.getElementById('newTranslation').value.trim();
-
-                if (!term || !translation) {
-                    alert('请输入术语和翻译');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/api/add-term', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ term, translation })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        alert('添加成功');
-                        document.getElementById('newTerm').value = '';
-                        document.getElementById('newTranslation').value = '';
-                        updateGlossaryStatus();
-                    } else {
-                        alert('添加失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                }
-            });
-
-            // AV transcription
-            const avDropZone = document.getElementById('avDropZone');
-            const avFile = document.getElementById('avFile');
-
-            avDropZone.addEventListener('click', () => avFile.click());
-            avDropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                avDropZone.classList.add('dragover');
-            });
-            avDropZone.addEventListener('dragleave', () => avDropZone.classList.remove('dragover'));
-            avDropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                avDropZone.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    avFile.files = e.dataTransfer.files;
-                    showAvFileInfo(e.dataTransfer.files[0]);
-                }
-            });
-            avFile.addEventListener('change', function() {
-                if (this.files.length) {
-                    showAvFileInfo(this.files[0]);
-                }
-            });
-
-            document.getElementById('avTranscribeBtn').addEventListener('click', async function() {
-                const file = document.getElementById('avFile').files[0];
-                if (!file) {
-                    alert('请选择音频/视频文件');
-                    return;
-                }
-
-                const sourceLang = document.getElementById('avSourceLang').value;
-                const targetLang = document.getElementById('avTargetLang').value;
-
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 转录中...';
-
-                try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('source_lang', sourceLang);
-                    if (targetLang) {
-                        formData.append('target_lang', targetLang);
-                    }
-
-                    const response = await fetch('/api/transcribe', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('avResultSection').style.display = 'block';
-                        document.getElementById('avResult').value = data.transcript;
-                        if (data.translation) {
-                            document.getElementById('avTranslationSection').style.display = 'block';
-                            document.getElementById('avTranslation').value = data.translation;
-                        }
-                    } else {
-                        alert('转录失败: ' + (data.error || '未知错误'));
-                    }
-                } catch (error) {
-                    alert('网络错误: ' + error.message);
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-microphone"></i> 开始转录';
-                }
-            });
-
-            // Clean text
-            document.getElementById('cleanTextBtn').addEventListener('click', async function() {
-                const text = document.getElementById('cleanSource').value;
-                if (!text.trim()) {
-                    alert('请输入文本');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/api/clean-text', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('cleanResult').value = data.result;
-                    } else {
-                        alert('清理失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                }
-            });
-
-            document.getElementById('removeBreaksBtn').addEventListener('click', async function() {
-                const text = document.getElementById('cleanSource').value;
-                if (!text.trim()) {
-                    alert('请输入文本');
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/api/remove-line-breaks', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('cleanResult').value = data.result;
-                    } else {
-                        alert('处理失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                }
-            });
-
-            // Rewrite mode selection
-            document.querySelectorAll('#rewrite .option-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    document.querySelectorAll('#rewrite .option-card').forEach(c => c.classList.remove('selected'));
-                    this.classList.add('selected');
-                    currentRewriteMode = this.dataset.mode;
-                });
-            });
-
-            // Rewrite
-            document.getElementById('rewriteBtn').addEventListener('click', async function() {
-                const text = document.getElementById('rewriteSource').value;
-                const style = document.getElementById('rewriteStyle').value;
-
-                if (!text.trim()) {
-                    alert('请输入文本');
-                    return;
-                }
-
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
-
-                try {
-                    const response = await fetch('/api/rewrite', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            text: text,
-                            mode: currentRewriteMode,
-                            style: style
-                        })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        document.getElementById('rewriteResult').value = data.result;
-                    } else {
-                        alert('改写失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-pen-fancy"></i> 开始改写';
-                }
-            });
-
-            // Clear history
-            document.getElementById('clearHistoryBtn').addEventListener('click', async function() {
-                if (!confirm('确定要清空所有历史记录吗？')) return;
-
-                try {
-                    const response = await fetch('/api/clear-history', {
-                        method: 'POST'
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        loadHistory();
-                    }
-                } catch (error) {
-                    alert('网络错误');
-                }
-            });
-        });
-
-        // Helper functions
-        function showOcrPreview(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('ocrPreviewImg').src = e.target.result;
-                document.getElementById('ocrPreview').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function showAvFileInfo(file) {
-            document.getElementById('avFileName').textContent = file.name + ' (' + formatFileSize(file.size) + ')';
-            document.getElementById('avFileInfo').style.display = 'block';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function speakText(text, lang) {
-            if (!text || !window.speechSynthesis) {
-                alert('您的浏览器不支持语音合成功能');
-                return;
-            }
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            const langMap = {
-                'zh': 'zh-CN',
-                'en': 'en-US',
-                'zh-HK': 'zh-HK',
-                'ja': 'ja-JP',
-                'ko': 'ko-KR',
-                'fr': 'fr-FR',
-                'de': 'de-DE',
-                'es': 'es-ES'
-            };
-            utterance.lang = langMap[lang] || 'zh-CN';
-            window.speechSynthesis.speak(utterance);
-        }
-
-        async function searchGlossary() {
-            const query = document.getElementById('glossaryQuery').value.trim();
-            if (!query) {
-                alert('请输入查询内容');
-                return;
-            }
-
-            const btn = document.getElementById('glossarySearchBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 查询中...';
-
-            try {
-                const response = await fetch('/api/glossary?query=' + encodeURIComponent(query));
-                const data = await response.json();
-
-                displayGlossaryResults(data.results);
-            } catch (error) {
-                alert('网络错误');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-search"></i> 查询';
-            }
-        }
-
-        function displayGlossaryResults(results) {
-            const container = document.getElementById('glossaryResults');
-            if (!results || results.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">未找到相关术语</div>';
-                return;
-            }
-
-            let html = '<h6 class="mb-3">查询结果</h6>';
-            results.forEach(item => {
-                html += `
-                    <div class="glossary-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">${escapeHtml(item.term)}</h6>
-                                <p class="mb-1 text-muted">${escapeHtml(item.translation)}</p>
-                                <small class="text-muted">来源: ${escapeHtml(item.source)}</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function displayGlossaryList(terms) {
-            const container = document.getElementById('glossaryResults');
-            if (!terms || terms.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">术语库为空</div>';
-                return;
-            }
-
-            let html = `<h6 class="mb-3">术语列表 (${terms.length} 条)</h6>`;
-            html += '<div style="max-height: 400px; overflow-y: auto;">';
-            terms.forEach(item => {
-                if (item.term) {
-                    html += `
-                        <div class="glossary-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="mb-1">${escapeHtml(item.term)}</h6>
-                                    <p class="mb-1 text-muted">${escapeHtml(item.translation || '')}</p>
-                                    <small class="text-muted">来源: ${escapeHtml(item.source || '')}</small>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        async function updateGlossaryStatus() {
-            try {
-                const response = await fetch('/api/glossary-status');
-                const data = await response.json();
-
-                const statusEl = document.getElementById('glossaryStatus');
-                if (data.available) {
-                    let html = `<p class="mb-2"><span class="badge bg-success">可用</span></p>`;
-                    html += `<p class="mb-1 small">词条数: ${data.doc_count}</p>`;
-                    html += `<p class="mb-0 small">更新时间: ${data.last_update || '未知'}</p>`;
-                    statusEl.innerHTML = html;
-                } else {
-                    statusEl.innerHTML = '<p class="mb-2"><span class="badge bg-danger">不可用</span></p><p class="small text-muted">请安装 whoosh 库</p>';
-                }
-            } catch (error) {
-                document.getElementById('glossaryStatus').innerHTML = '<p class="mb-2"><span class="badge bg-warning">状态未知</span></p>';
-            }
-        }
-
-        function saveToHistory(item) {
-            let history = JSON.parse(localStorage.getItem('translationHistory') || '[]');
-            history.unshift({
-                ...item,
-                timestamp: new Date().toLocaleString()
-            });
-            if (history.length > 50) history = history.slice(0, 50);
-            localStorage.setItem('translationHistory', JSON.stringify(history));
-            loadHistory();
-        }
-
+        // ==================== Global State ====================
+        var alignResultText = '';
+        var translationHistory = [];
+        var avTranscriptHistory = [];
+        var rewriteHistory = [];
+        var polishHistory = [];
+        var rewriteMode = 'paraphrase';
+        var rewriteStyle = 'standard';
+        var polishStyle = 'general';
+        var avSelectedFile = null;
+        var rtIsRecording = false;
+        var rtRecognition = null;
+        var rtChatMessages = [];
+
+        // ==================== History Helpers ====================
         function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('translationHistory') || '[]');
-            const container = document.getElementById('historyList');
+            var savedHistory = localStorage.getItem('translationHistory');
+            if (savedHistory) {
+                translationHistory = JSON.parse(savedHistory);
+                renderHistoryList();
+            }
+        }
 
-            if (history.length === 0) {
-                container.innerHTML = '<div class="text-center text-muted py-4">暂无历史记录</div>';
+        function saveHistory() {
+            localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
+        }
+
+        function renderHistoryList() {
+            var historyList = document.getElementById('historyList');
+            if (translationHistory.length === 0) {
+                historyList.innerHTML = '<p class="text-muted text-center">\u6682\u65e0\u5386\u53f2\u8bb0\u5f55</p>';
                 return;
             }
 
-            let html = '';
-            history.forEach((item, index) => {
-                html += `
-                    <div class="history-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="flex-1">
-                                <p class="mb-1 small text-truncate">${escapeHtml(item.source)}</p>
-                                <p class="mb-1 small text-primary text-truncate">${escapeHtml(item.target)}</p>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="lang-tag">${item.sourceLang} → ${item.targetLang}</span>
-                                    <span class="text-muted" style="font-size: 11px;">${item.timestamp}</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="useHistoryItem(${index})">
-                                使用
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
+            var html = '';
+            for (var i = 0; i < translationHistory.length; i++) {
+                var item = translationHistory[i];
+                var source = item.source || '';
+                var target = item.target || '';
+                var sourcePreview = source.length > 50 ? source.substring(0, 50) + '...' : source;
+                var targetPreview = target.length > 50 ? target.substring(0, 50) + '...' : target;
+                html += '<div class="history-item">';
+                html += '<p class="text-sm text-gray-600 mb-1">' + escapeHtml(sourcePreview) + '</p>';
+                html += '<p class="text-sm text-primary mb-1">' + escapeHtml(targetPreview) + '</p>';
+                html += '<span class="lang-tag">' + escapeHtml(item.sourceLang || '') + ' \u2192 ' + escapeHtml(item.targetLang || '') + '</span>';
+                html += '<span class="lang-tag">' + escapeHtml(item.timestamp || '') + '</span>';
+                html += '<button class="btn btn-xs btn-outline-primary float-end" onclick="useHistoryItem(' + i + ')">\u4f7f\u7528</button>';
+                html += '</div>';
+            }
+            historyList.innerHTML = html;
         }
 
         function useHistoryItem(index) {
-            const history = JSON.parse(localStorage.getItem('translationHistory') || '[]');
-            const item = history[index];
-            if (item) {
-                document.getElementById('sourceText').value = item.source;
-                document.getElementById('targetText').value = item.target;
-                document.getElementById('sourceLang').value = item.sourceLang;
-                document.getElementById('targetLang').value = item.targetLang;
-                document.getElementById('charCount').textContent = item.source.length + '/5000';
-
-                // Switch to translate tab
-                const translateTab = document.getElementById('translate-tab');
-                bootstrap.Tab.getOrCreateInstance(translateTab).show();
-            }
+            var item = translationHistory[index];
+            document.getElementById('sourceText').value = item.source;
+            document.getElementById('targetText').value = item.target;
+            document.getElementById('sourceLang').value = item.sourceLang;
+            document.getElementById('targetLang').value = item.targetLang;
         }
 
         function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
             return div.innerHTML;
         }
+
+        // ==================== Text Translation Tab ====================
+        // Character count
+        document.getElementById('sourceText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length + '/5000';
+        });
+
+        // Swap languages
+        document.getElementById('swapLang').addEventListener('click', function() {
+            var source = document.getElementById('sourceLang').value;
+            var target = document.getElementById('targetLang').value;
+            document.getElementById('sourceLang').value = target;
+            document.getElementById('targetLang').value = source;
+        });
+
+        // Translate
+        document.getElementById('translateBtn').addEventListener('click', async function() {
+            var text = document.getElementById('sourceText').value;
+            var sourceLang = document.getElementById('sourceLang').value;
+            var targetLang = document.getElementById('targetLang').value;
+
+            if (!text.trim()) return;
+
+            this.disabled = true;
+            document.getElementById('targetText').value = '\u7ffb\u8bd1\u4e2d...';
+
+            try {
+                var response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        source_lang: sourceLang,
+                        target_lang: targetLang
+                    })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('targetText').value = data.result;
+
+                    translationHistory.unshift({
+                        source: text,
+                        target: data.result,
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        timestamp: new Date().toLocaleString()
+                    });
+
+                    if (translationHistory.length > 20) {
+                        translationHistory = translationHistory.slice(0, 20);
+                    }
+
+                    saveHistory();
+                    renderHistoryList();
+                } else {
+                    alert('\u7ffb\u8bd1\u5931\u8d25: ' + data.error);
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                this.disabled = false;
+            }
+        });
+
+        // Clean text
+        document.getElementById('cleanTextBtn').addEventListener('click', async function() {
+            var text = document.getElementById('sourceText').value;
+            if (!text.trim()) return;
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u6574\u7406\u4e2d...';
+
+            try {
+                var response = await fetch('/api/clean-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                var data = await response.json();
+                if (data.success) {
+                    document.getElementById('sourceText').value = data.result;
+                    document.getElementById('charCount').textContent = data.result.length + '/5000';
+                } else {
+                    alert('\u6574\u7406\u5931\u8d25: ' + data.error);
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-align-left"></i> \u6574\u7406\u6587\u672c';
+            }
+        });
+
+        // Copy buttons with visual feedback
+        document.querySelectorAll('.copy-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-copy-target');
+                copyToClipboardWithFeedback(targetId, this);
+            });
+        });
+
+        // Speak buttons
+        document.getElementById('speakSourceBtn').addEventListener('click', function() {
+            var text = document.getElementById('sourceText').value;
+            var lang = document.getElementById('sourceLang').value;
+            speakText(text, lang);
+        });
+
+        document.getElementById('speakTargetBtn').addEventListener('click', function() {
+            var text = document.getElementById('targetText').value;
+            var lang = document.getElementById('targetLang').value;
+            speakText(text, lang);
+        });
+
+        // Back translate button
+        
+        // OCR button
+        document.getElementById('ocrBtn').addEventListener('click', async function() {
+            var fileInput = document.getElementById('ocrFile');
+            if (!fileInput.files[0]) {
+                alert('请先选择文件');
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 识别中...';
+
+            try {
+                var formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                var response = await fetch('/api/ocr', {
+                    method: 'POST',
+                    body: formData
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('sourceText').value = data.text;
+                    document.getElementById('charCount').textContent = data.text.length + '/5000';
+                } else {
+                    alert('识别失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('网络错误');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-file-image"></i> 上传并识别';
+            }
+        });
+
+        document.getElementById('backTranslateBtn').addEventListener('click', async function() {
+            var text = document.getElementById('targetText').value;
+            if (!text.trim()) {
+                alert('请先翻译内容');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 回译中...';
+            document.getElementById('backTranslateResult').value = '回译中...';
+
+            try {
+                var sourceLang = document.getElementById('sourceLang').value || 'zh';
+                var response = await fetch('/api/back-translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, source_lang: sourceLang })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('backTranslateResult').value = data.result;
+                } else {
+                    alert('回译失败: ' + (data.error || '未知错误'));
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync"></i> 双向回译';
+            }
+        });
+
+        function copyToClipboard(elementId) {
+            var element = document.getElementById(elementId);
+            element.select();
+            try {
+                document.execCommand('copy');
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        function copyToClipboardWithFeedback(elementId, btnElement) {
+            var success = copyToClipboard(elementId);
+            if (success && btnElement) {
+                btnElement.classList.add('copied');
+                setTimeout(function() {
+                    btnElement.classList.remove('copied');
+                }, 1500);
+            }
+        }
+
+        function copyAlignResultWithFeedback(btnElement) {
+            navigator.clipboard.writeText(alignResultText).then(function() {
+                if (btnElement) {
+                    btnElement.classList.add('copied');
+                    setTimeout(function() {
+                        btnElement.classList.remove('copied');
+                    }, 1500);
+                }
+            });
+        }
+
+        // Text-to-speech function
+        function speakText(text, lang) {
+            if (!('speechSynthesis' in window)) {
+                alert('\u60a8\u7684\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u8bed\u97f3\u5408\u6210\u529f\u80fd');
+                return;
+            }
+
+            if (!text.trim()) {
+                alert('\u6ca1\u6709\u53ef\u6717\u8bfb\u7684\u5185\u5bb9');
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+
+            var utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'zh-HK';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Sentence alignment
+        document.getElementById('alignBtn').addEventListener('click', function() {
+            var sourceText = document.getElementById('sourceText').value.trim();
+            var targetText = document.getElementById('targetText').value.trim();
+
+            if (!sourceText || !targetText) {
+                alert('\u8bf7\u5148\u8f93\u5165\u539f\u6587\u548c\u8bd1\u6587');
+                return;
+            }
+
+            var sourceSentences = sourceText.split(/(?<=[\u3002\uff01\uff1f!?])\s*/).filter(function(s) { return s.trim(); });
+            var targetSentences = targetText.split(/(?<=[\u3002\uff01\uff1f!?])\s*/).filter(function(s) { return s.trim(); });
+
+            var html = '<div class="align-container">';
+            alignResultText = '';
+
+            var maxLen = Math.max(sourceSentences.length, targetSentences.length);
+            for (var i = 0; i < maxLen; i++) {
+                var src = sourceSentences[i] || '';
+                var tgt = targetSentences[i] || '';
+
+                if (src || tgt) {
+                    html += '<div class="align-item mb-4 p-3 bg-light rounded">';
+                    html += '<div class="row">';
+                    html += '<div class="col-md-6">';
+                    html += '<span class="badge bg-primary me-2">' + (i + 1) + '</span>';
+                    html += '<span class="text-muted small">\u539f\u6587</span>';
+                    html += '<p class="mt-2 mb-0 fs-6">' + escapeHtml(src) + '</p>';
+                    html += '</div>';
+                    html += '<div class="col-md-6">';
+                    html += '<span class="badge bg-success me-2">' + (i + 1) + '</span>';
+                    html += '<span class="text-muted small">\u8bd1\u6587</span>';
+                    html += '<p class="mt-2 mb-0 fs-6">' + escapeHtml(tgt) + '</p>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+
+                    alignResultText += '[' + (i + 1) + '] \u539f\u6587: ' + src + '\n[' + (i + 1) + '] \u8bd1\u6587: ' + tgt + '\n\n';
+                }
+            }
+
+            html += '</div>';
+            document.getElementById('alignContent').innerHTML = html;
+
+            var modal = new bootstrap.Modal(document.getElementById('alignModal'));
+            modal.show();
+        });
+
+        // Clear history
+        document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+            if (confirm('\u786e\u5b9a\u8981\u6e05\u7a7a\u5386\u53f2\u8bb0\u5f55\u5417\uff1f')) {
+                translationHistory = [];
+                saveHistory();
+                renderHistoryList();
+            }
+        });
+
+        // ==================== Dictionary Query ====================
+        document.getElementById('dictBtn').addEventListener('click', async function() {
+            var word = document.getElementById('dictInput').value.trim();
+            if (!word) {
+                alert('\u8bf7\u8f93\u5165\u8981\u67e5\u8be2\u7684\u5355\u8bcd');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u67e5\u8be2\u4e2d...';
+            document.getElementById('dictResult').innerHTML = '<p class="text-muted">\u67e5\u8be2\u4e2d...</p>';
+
+            try {
+                var response = await fetch('/api/dictionary?word=' + encodeURIComponent(word));
+                var data = await response.json();
+
+                if (data.success) {
+                    var definition = data.definition || '\u6682\u65e0\u5b9a\u4e49';
+                    document.getElementById('dictResult').innerHTML =
+                        '<pre class="bg-white p-3 rounded" style="white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto;">' + escapeHtml(definition) + '</pre>';
+                } else {
+                    alert('\u67e5\u8be2\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-book"></i> \u67e5\u8be2';
+            }
+        });
+
+        // ==================== Glossary Search ====================
+        document.getElementById('glossaryBtn').addEventListener('click', async function() {
+            var query = document.getElementById('glossaryQuery').value.trim();
+            var lang = document.getElementById('glossaryTargetLang').value;
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u67e5\u8be2\u4e2d...';
+
+            try {
+                var response = await fetch('/api/glossary?query=' + encodeURIComponent(query) + '&lang=' + encodeURIComponent(lang));
+                var data = await response.json();
+
+                if (data.success) {
+                    var html = '';
+                    if (!data.results || data.results.length === 0) {
+                        html = '<p class="text-muted">\u672a\u627e\u5230\u76f8\u5173\u672f\u8bed</p>';
+                    } else {
+                        for (var i = 0; i < data.results.length; i++) {
+                            var item = data.results[i];
+                            html += '<div class="glossary-item"><strong>' + escapeHtml(item.term) + '</strong><br><span class="text-muted text-sm">' + escapeHtml(item.source || '') + '</span><br>' + escapeHtml(item.translation) + '</div>';
+                        }
+                    }
+                    document.getElementById('glossaryResult').innerHTML = html;
+                } else {
+                    alert('\u67e5\u8be2\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> \u67e5\u8be2';
+            }
+        });
+
+        // ==================== Update Glossary ====================
+        document.getElementById('updateGlossaryBtn').addEventListener('click', async function() {
+            if (!confirm('\u786e\u5b9a\u8981\u66f4\u65b0\u8bcd\u5e93\u5417\uff1f\u8fd9\u53ef\u80fd\u9700\u8981\u4e00\u4e9b\u65f6\u95f4')) {
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u66f4\u65b0\u4e2d...';
+
+            try {
+                var response = await fetch('/api/update-glossary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    alert('\u8bcd\u5e93\u66f4\u65b0\u6210\u529f\uff01');
+                } else {
+                    alert('\u66f4\u65b0\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> \u66f4\u65b0\u8bcd\u5e93';
+            }
+        });
+
+        // ==================== Save Term ====================
+        document.getElementById('saveTermBtn').addEventListener('click', async function() {
+            var term = document.getElementById('termInput').value.trim();
+            var translation = document.getElementById('translationInput').value.trim();
+            var source = document.getElementById('sourceInput').value.trim() || 'Manual Entry';
+
+            if (!term || !translation) {
+                alert('\u8bf7\u8f93\u5165\u672f\u8bed\u548c\u7ffb\u8bd1');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u4fdd\u5b58\u4e2d...';
+
+            try {
+                var response = await fetch('/api/add-term', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ term: term, translation: translation, source: source })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    alert('\u672f\u8bed\u5df2\u6dfb\u52a0\uff01');
+                    bootstrap.Modal.getInstance(document.getElementById('addTermModal')).hide();
+                    document.getElementById('termInput').value = '';
+                    document.getElementById('translationInput').value = '';
+                    document.getElementById('sourceInput').value = '';
+                } else {
+                    alert('\u6dfb\u52a0\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '\u4fdd\u5b58';
+            }
+        });
+
+
+        // ==================== Audio/Video Transcribe Tab ====================
+
+        // --- File Transcribe Sub Tab ---
+
+        // File drop zone click
+        document.getElementById('avFileDropZone').addEventListener('click', function() {
+            document.getElementById('avFileInput').click();
+        });
+
+        // File drop zone drag events
+        var dropZone = document.getElementById('avFileDropZone');
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleAvFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        // File input change
+        document.getElementById('avFileInput').addEventListener('change', function() {
+            if (this.files.length > 0) {
+                handleAvFileSelect(this.files[0]);
+            }
+        });
+
+        // Handle file selection
+        function handleAvFileSelect(file) {
+            var validTypes = ['audio/', 'video/'];
+            var isValid = false;
+            for (var i = 0; i < validTypes.length; i++) {
+                if (file.type.indexOf(validTypes[i]) === 0) {
+                    isValid = true;
+                    break;
+                }
+            }
+            if (!isValid) {
+                alert('\u8bf7\u4e0a\u4f20\u97f3\u9891\u6216\u89c6\u9891\u6587\u4ef6');
+                return;
+            }
+            if (file.size > 500 * 1024 * 1024) {
+                alert('\u6587\u4ef6\u5927\u5c0f\u4e0d\u80fd\u8d85\u8fc7500MB');
+                return;
+            }
+
+            avSelectedFile = file;
+            document.getElementById('avFileName').textContent = file.name;
+            document.getElementById('avFileSize').textContent = formatFileSize(file.size);
+            document.getElementById('avFileInfo').style.display = 'block';
+            document.getElementById('avFileDropZone').style.display = 'none';
+            document.getElementById('avTranscribeBtn').disabled = false;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        }
+
+        // Remove file
+        document.getElementById('avRemoveFile').addEventListener('click', function() {
+            avSelectedFile = null;
+            document.getElementById('avFileInput').value = '';
+            document.getElementById('avFileInfo').style.display = 'none';
+            document.getElementById('avFileDropZone').style.display = 'block';
+            document.getElementById('avTranscribeBtn').disabled = true;
+            document.getElementById('avTranscriptResult').value = '';
+            document.getElementById('avTranslationResult').value = '';
+            document.getElementById('avTranslateTranscriptBtn').disabled = true;
+        });
+
+        // Transcribe button
+        document.getElementById('avTranscribeBtn').addEventListener('click', async function() {
+            if (!avSelectedFile) return;
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>\u8f6c\u5f55\u4e2d...';
+            document.getElementById('avProgressArea').style.display = 'block';
+            document.getElementById('avTranscriptResult').value = '';
+            document.getElementById('avTranslationResult').value = '';
+            document.getElementById('avTranslateTranscriptBtn').disabled = true;
+
+            var formData = new FormData();
+            formData.append('file', avSelectedFile);
+            formData.append('source_lang', document.getElementById('avSourceLang').value);
+            formData.append('target_lang', document.getElementById('avTargetLang').value);
+
+            try {
+                var response = await fetch('/api/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('avTranscriptResult').value = data.transcript || '';
+                    if (data.translation) {
+                        document.getElementById('avTranslationResult').value = data.translation;
+                    }
+                    if (data.transcript) {
+                        document.getElementById('avTranslateTranscriptBtn').disabled = false;
+                    }
+
+                    // Save to history
+                    avTranscriptHistory.unshift({
+                        fileName: avSelectedFile.name,
+                        transcript: data.transcript || '',
+                        translation: data.translation || '',
+                        sourceLang: document.getElementById('avSourceLang').value,
+                        targetLang: document.getElementById('avTargetLang').value,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    if (avTranscriptHistory.length > 20) {
+                        avTranscriptHistory = avTranscriptHistory.slice(0, 20);
+                    }
+                    localStorage.setItem('avTranscriptHistory', JSON.stringify(avTranscriptHistory));
+                    renderAvHistory();
+                } else {
+                    alert('\u8f6c\u5f55\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play-circle me-2"></i>\u5f00\u59cb\u8f6c\u5f55';
+                document.getElementById('avProgressArea').style.display = 'none';
+                document.getElementById('avProgressBar').style.width = '0%';
+            }
+        });
+
+        // Simulate progress (since we can't get real progress from API)
+        function simulateProgress() {
+            var bar = document.getElementById('avProgressBar');
+            var percent = document.getElementById('avProgressPercent');
+            var width = 0;
+            var interval = setInterval(function() {
+                if (width >= 90) {
+                    clearInterval(interval);
+                    return;
+                }
+                width += Math.random() * 15;
+                if (width > 90) width = 90;
+                bar.style.width = width + '%';
+                percent.textContent = Math.round(width) + '%';
+            }, 500);
+            return interval;
+        }
+
+        // Translate transcript
+        document.getElementById('avTranslateTranscriptBtn').addEventListener('click', async function() {
+            var transcript = document.getElementById('avTranscriptResult').value;
+            var targetLang = document.getElementById('avTargetLang').value;
+
+            if (!transcript.trim() || !targetLang) {
+                alert('\u8bf7\u5148\u5b8c\u6210\u8f6c\u5f55\u5e76\u9009\u62e9\u7ffb\u8bd1\u8bed\u8a00');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>\u7ffb\u8bd1\u4e2d...';
+            document.getElementById('avTranslationResult').value = '\u7ffb\u8bd1\u4e2d...';
+
+            try {
+                var response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: transcript,
+                        source_lang: document.getElementById('avSourceLang').value,
+                        target_lang: targetLang
+                    })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('avTranslationResult').value = data.result;
+                } else {
+                    alert('\u7ffb\u8bd1\u5931\u8d25: ' + data.error);
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>\u7ffb\u8bd1\u8f6c\u5f55\u5185\u5bb9';
+            }
+        });
+
+        // Download transcript
+        document.getElementById('avDownloadTranscript').addEventListener('click', function() {
+            var transcript = document.getElementById('avTranscriptResult').value;
+            var translation = document.getElementById('avTranslationResult').value;
+
+            if (!transcript.trim()) {
+                alert('\u6ca1\u6709\u53ef\u4e0b\u8f7d\u7684\u8f6c\u5f55\u5185\u5bb9');
+                return;
+            }
+
+            var content = '\u3010\u8f6c\u5f55\u5185\u5bb9\u3011\n\n' + transcript;
+            if (translation.trim()) {
+                content += '\n\n\u3010\u7ffb\u8bd1\u5185\u5bb9\u3011\n\n' + translation;
+            }
+
+            var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = '\u8f6c\u5f55\u7ed3\u679c_' + new Date().toISOString().slice(0, 10) + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // AV History
+        function loadAvHistory() {
+            var saved = localStorage.getItem('avTranscriptHistory');
+            if (saved) {
+                avTranscriptHistory = JSON.parse(saved);
+                renderAvHistory();
+            }
+        }
+
+        function renderAvHistory() {
+            var list = document.getElementById('avHistoryList');
+            if (avTranscriptHistory.length === 0) {
+                list.innerHTML = '<p class="text-muted text-center">\u6682\u65e0\u8f6c\u5f55\u8bb0\u5f55</p>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < avTranscriptHistory.length; i++) {
+                var item = avTranscriptHistory[i];
+                html += '<div class="history-item">';
+                html += '<p class="text-sm text-gray-600 mb-1"><i class="fas fa-file-audio me-1"></i>' + escapeHtml(item.fileName) + '</p>';
+                html += '<p class="text-sm text-primary mb-1">' + escapeHtml((item.transcript || '').substring(0, 60)) + '...</p>';
+                html += '<span class="lang-tag">' + escapeHtml(item.timestamp || '') + '</span>';
+                html += '<button class="btn btn-xs btn-outline-primary float-end" onclick="useAvHistoryItem(' + i + ')">\u67e5\u770b</button>';
+                html += '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function useAvHistoryItem(index) {
+            var item = avTranscriptHistory[index];
+            document.getElementById('avTranscriptResult').value = item.transcript || '';
+            document.getElementById('avTranslationResult').value = item.translation || '';
+            if (item.transcript) {
+                document.getElementById('avTranslateTranscriptBtn').disabled = false;
+            }
+        }
+
+        document.getElementById('avClearHistory').addEventListener('click', function() {
+            if (confirm('\u786e\u5b9a\u8981\u6e05\u7a7a\u8f6c\u5f55\u5386\u53f2\u5417\uff1f')) {
+                avTranscriptHistory = [];
+                localStorage.setItem('avTranscriptHistory', JSON.stringify(avTranscriptHistory));
+                renderAvHistory();
+            }
+        });
+
+        // --- Realtime Conversation Sub Tab ---
+
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                document.getElementById('rtMicBtn').disabled = true;
+                document.getElementById('rtMicBtn').title = '\u60a8\u7684\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u8bed\u97f3\u8bc6\u522b';
+                return null;
+            }
+            var recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'zh-CN';
+
+            recognition.onresult = function(event) {
+                var finalTranscript = '';
+                var interimTranscript = '';
+                for (var i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    addChatMessage(finalTranscript, 'sent');
+                    translateAndReply(finalTranscript);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                if (event.error === 'not-allowed') {
+                    alert('\u8bf7\u5141\u8bb8\u9ea6\u514b\u98ce\u6743\u9650\u4ee5\u4f7f\u7528\u8bed\u97f3\u8bc6\u522b');
+                }
+                stopRecording();
+            };
+
+            recognition.onend = function() {
+                if (rtIsRecording) {
+                    // Auto restart if still recording
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        stopRecording();
+                    }
+                }
+            };
+
+            return recognition;
+        }
+
+        // Start/stop recording
+        document.getElementById('rtMicBtn').addEventListener('click', function() {
+            if (rtIsRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+
+        function startRecording() {
+            if (!rtRecognition) {
+                rtRecognition = initSpeechRecognition();
+            }
+            if (!rtRecognition) {
+                alert('\u60a8\u7684\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u8bed\u97f3\u8bc6\u522b\u529f\u80fd');
+                return;
+            }
+
+            var lang = document.getElementById('rtSourceLang').value;
+            rtRecognition.lang = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : lang === 'zh-HK' ? 'zh-HK' : lang;
+
+            try {
+                rtRecognition.start();
+                rtIsRecording = true;
+                document.getElementById('rtMicBtn').classList.remove('btn-danger');
+                document.getElementById('rtMicBtn').classList.add('btn-warning');
+                document.getElementById('rtMicBtn').innerHTML = '<i class="fas fa-stop"></i>';
+                document.getElementById('rtRecordingStatus').style.display = 'block';
+            } catch (e) {
+                alert('\u65e0\u6cd5\u542f\u52a8\u8bed\u97f3\u8bc6\u522b');
+            }
+        }
+
+        function stopRecording() {
+            if (rtRecognition) {
+                try {
+                    rtRecognition.stop();
+                } catch (e) {
+                    // ignore
+                }
+            }
+            rtIsRecording = false;
+            document.getElementById('rtMicBtn').classList.remove('btn-warning');
+            document.getElementById('rtMicBtn').classList.add('btn-danger');
+            document.getElementById('rtMicBtn').innerHTML = '<i class="fas fa-microphone"></i>';
+            document.getElementById('rtRecordingStatus').style.display = 'none';
+        }
+
+        // Translate and reply
+        async function translateAndReply(text) {
+            var targetLang = document.getElementById('rtTargetLang').value;
+            try {
+                var response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        source_lang: document.getElementById('rtSourceLang').value,
+                        target_lang: targetLang
+                    })
+                });
+                var data = await response.json();
+                if (data.success) {
+                    addChatMessage(data.result, 'received');
+                }
+            } catch (error) {
+                addChatMessage('\u7ffb\u8bd1\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5', 'received');
+            }
+        }
+
+        // Add chat message
+        function addChatMessage(text, type) {
+            var container = document.getElementById('rtChatContainer');
+            // Clear placeholder if first message
+            if (rtChatMessages.length === 0) {
+                container.innerHTML = '';
+            }
+
+            rtChatMessages.push({ text: text, type: type, time: new Date().toLocaleTimeString() });
+
+            var bubble = document.createElement('div');
+            bubble.className = 'chat-bubble ' + type;
+            bubble.innerHTML = '<div class="small text-muted mb-1">' + (type === 'sent' ? '\u4f60' : '\u8bd1\u6587') + ' ' + new Date().toLocaleTimeString() + '</div>' +
+                '<div>' + escapeHtml(text) + '</div>' +
+                '<button class="btn btn-sm btn-link p-0 mt-1" onclick="speakText(\'' + escapeHtml(text).replace(/'/g, "\\'") + '\', \'' + (type === 'sent' ? document.getElementById('rtSourceLang').value : document.getElementById('rtTargetLang').value) + '\')"><i class="fas fa-volume-up"></i></button>';
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Send text
+        document.getElementById('rtSendTextBtn').addEventListener('click', function() {
+            var input = document.getElementById('rtTextInput');
+            var text = input.value.trim();
+            if (!text) return;
+            addChatMessage(text, 'sent');
+            input.value = '';
+            translateAndReply(text);
+        });
+
+        document.getElementById('rtTextInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('rtSendTextBtn').click();
+            }
+        });
+
+        // Clear chat
+        document.getElementById('rtClearChat').addEventListener('click', function() {
+            rtChatMessages = [];
+            document.getElementById('rtChatContainer').innerHTML =
+                '<div class="text-center text-muted py-4">' +
+                '<i class="fas fa-microphone-alt fa-2x mb-2" style="color: #ccc;"></i>' +
+                '<p>\u70b9\u51fb\u4e0b\u65b9\u9ea6\u514b\u98ce\u6309\u94ae\u5f00\u59cb\u5bf9\u8bdd</p>' +
+                '</div>';
+        });
+
+        // Export chat
+        document.getElementById('rtExportBtn').addEventListener('click', function() {
+            if (rtChatMessages.length === 0) {
+                alert('\u6ca1\u6709\u53ef\u5bfc\u51fa\u7684\u5bf9\u8bdd\u8bb0\u5f55');
+                return;
+            }
+            var content = '\u3010\u5b9e\u65f6\u5bf9\u8bdd\u8bb0\u5f55\u3011\n\u5bfc\u51fa\u65f6\u95f4: ' + new Date().toLocaleString() + '\n\n';
+            for (var i = 0; i < rtChatMessages.length; i++) {
+                var msg = rtChatMessages[i];
+                var role = msg.type === 'sent' ? '\u4f60' : '\u8bd1\u6587';
+                content += '[' + msg.time + '] ' + role + ': ' + msg.text + '\n\n';
+            }
+            var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = '\u5bf9\u8bdd\u8bb0\u5f55_' + new Date().toISOString().slice(0, 10) + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // ==================== AI Rewrite Tab ====================
+
+        // Rewrite mode selection
+        function selectRewriteMode(mode) {
+            rewriteMode = mode;
+            document.getElementById('rwModeParaphrase').classList.remove('selected');
+            document.getElementById('rwModePreEdit').classList.remove('selected');
+            if (mode === 'paraphrase') {
+                document.getElementById('rwModeParaphrase').classList.add('selected');
+            } else {
+                document.getElementById('rwModePreEdit').classList.add('selected');
+            }
+        }
+
+        // Rewrite style selection
+        function selectRewriteStyle(style) {
+            rewriteStyle = style;
+            var styles = ['Standard', 'Formal', 'Casual', 'Academic', 'Business'];
+            for (var i = 0; i < styles.length; i++) {
+                document.getElementById('rwStyle' + styles[i]).classList.remove('selected');
+            }
+            var id = 'rwStyle' + style.charAt(0).toUpperCase() + style.slice(1);
+            document.getElementById(id).classList.add('selected');
+        }
+
+        // Rewrite character count
+        document.getElementById('rwSourceText').addEventListener('input', function() {
+            document.getElementById('rwCharCount').textContent = this.value.length + '/5000';
+        });
+
+        // Execute rewrite
+        document.getElementById('rwExecuteBtn').addEventListener('click', async function() {
+            var text = document.getElementById('rwSourceText').value.trim();
+            if (!text) {
+                alert('\u8bf7\u8f93\u5165\u9700\u8981\u6539\u5199\u7684\u6587\u672c');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>\u6539\u5199\u4e2d...';
+            document.getElementById('rwResultText').value = '\u6539\u5199\u4e2d...';
+
+            try {
+                var response = await fetch('/api/rewrite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        mode: rewriteMode,
+                        style: rewriteStyle
+                    })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('rwResultText').value = data.result;
+
+                    // Save to history
+                    rewriteHistory.unshift({
+                        source: text,
+                        result: data.result,
+                        mode: rewriteMode,
+                        style: rewriteStyle,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    if (rewriteHistory.length > 20) {
+                        rewriteHistory = rewriteHistory.slice(0, 20);
+                    }
+                    localStorage.setItem('rewriteHistory', JSON.stringify(rewriteHistory));
+                    renderRewriteHistory();
+                } else {
+                    alert('\u6539\u5199\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic me-2"></i>\u5f00\u59cb\u6539\u5199';
+            }
+        });
+
+        // Rewrite clean text
+        document.getElementById('rwCleanBtn').addEventListener('click', async function() {
+            var text = document.getElementById('rwSourceText').value;
+            if (!text.trim()) return;
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u6574\u7406\u4e2d...';
+
+            try {
+                var response = await fetch('/api/clean-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                var data = await response.json();
+                if (data.success) {
+                    document.getElementById('rwSourceText').value = data.result;
+                    document.getElementById('rwCharCount').textContent = data.result.length + '/5000';
+                } else {
+                    alert('\u6574\u7406\u5931\u8d25: ' + data.error);
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-align-left"></i> \u6574\u7406\u6587\u672c';
+            }
+        });
+
+        // Rewrite speak result
+        document.getElementById('rwSpeakResult').addEventListener('click', function() {
+            var text = document.getElementById('rwResultText').value;
+            speakText(text, 'zh');
+        });
+
+        // Rewrite history
+        function loadRewriteHistory() {
+            var saved = localStorage.getItem('rewriteHistory');
+            if (saved) {
+                rewriteHistory = JSON.parse(saved);
+                renderRewriteHistory();
+            }
+        }
+
+        function renderRewriteHistory() {
+            var list = document.getElementById('rwHistoryList');
+            if (rewriteHistory.length === 0) {
+                list.innerHTML = '<p class="text-muted text-center">\u6682\u65e0\u6539\u5199\u8bb0\u5f55</p>';
+                return;
+            }
+            var modeLabels = { paraphrase: '\u610f\u8bd1', preedit: '\u9884\u7f16\u8f91' };
+            var styleLabels = { standard: '\u6807\u51c6', formal: '\u6b63\u5f0f', casual: '\u53e3\u8bed\u5316', academic: '\u5b66\u672f', business: '\u5546\u52a1' };
+
+            var html = '';
+            for (var i = 0; i < rewriteHistory.length; i++) {
+                var item = rewriteHistory[i];
+                html += '<div class="history-item">';
+                html += '<p class="text-sm text-gray-600 mb-1">' + escapeHtml((item.source || '').substring(0, 50)) + '...</p>';
+                html += '<p class="text-sm text-primary mb-1">' + escapeHtml((item.result || '').substring(0, 50)) + '...</p>';
+                html += '<span class="lang-tag">' + (modeLabels[item.mode] || item.mode) + ' / ' + (styleLabels[item.style] || item.style) + '</span>';
+                html += '<span class="lang-tag">' + escapeHtml(item.timestamp || '') + '</span>';
+                html += '<button class="btn btn-xs btn-outline-primary float-end" onclick="useRewriteHistoryItem(' + i + ')">\u4f7f\u7528</button>';
+                html += '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function useRewriteHistoryItem(index) {
+            var item = rewriteHistory[index];
+            document.getElementById('rwSourceText').value = item.source || '';
+            document.getElementById('rwResultText').value = item.result || '';
+            document.getElementById('rwCharCount').textContent = (item.source || '').length + '/5000';
+            selectRewriteMode(item.mode || 'paraphrase');
+            selectRewriteStyle(item.style || 'standard');
+        }
+
+        document.getElementById('rwClearHistory').addEventListener('click', function() {
+            if (confirm('\u786e\u5b9a\u8981\u6e05\u7a7a\u6539\u5199\u5386\u53f2\u5417\uff1f')) {
+                rewriteHistory = [];
+                localStorage.setItem('rewriteHistory', JSON.stringify(rewriteHistory));
+                renderRewriteHistory();
+            }
+        });
+
+        // ==================== AI Polish Tab ====================
+
+        // Polish style selection
+        function selectPolishStyle(style) {
+            polishStyle = style;
+            var styles = ['General', 'Academic', 'Business', 'Literary', 'Concise'];
+            for (var i = 0; i < styles.length; i++) {
+                document.getElementById('plStyle' + styles[i]).classList.remove('selected');
+            }
+            var id = 'plStyle' + style.charAt(0).toUpperCase() + style.slice(1);
+            document.getElementById(id).classList.add('selected');
+        }
+
+        // Polish character count
+        document.getElementById('plSourceText').addEventListener('input', function() {
+            document.getElementById('plCharCount').textContent = this.value.length + '/5000';
+        });
+
+        // Execute polish
+        document.getElementById('plExecuteBtn').addEventListener('click', async function() {
+            var text = document.getElementById('plSourceText').value.trim();
+            if (!text) {
+                alert('\u8bf7\u8f93\u5165\u9700\u8981\u6da6\u8272\u7684\u6587\u672c');
+                return;
+            }
+
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>\u6da6\u8272\u4e2d...';
+            document.getElementById('plResultText').value = '\u6da6\u8272\u4e2d...';
+
+            try {
+                var response = await fetch('/api/polish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        style: polishStyle
+                    })
+                });
+                var data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('plResultText').value = data.result;
+
+                    // Save to history
+                    polishHistory.unshift({
+                        source: text,
+                        result: data.result,
+                        style: polishStyle,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    if (polishHistory.length > 20) {
+                        polishHistory = polishHistory.slice(0, 20);
+                    }
+                    localStorage.setItem('polishHistory', JSON.stringify(polishHistory));
+                    renderPolishHistory();
+                } else {
+                    alert('\u6da6\u8272\u5931\u8d25: ' + (data.error || '\u672a\u77e5\u9519\u8bef'));
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sparkles me-2"></i>\u5f00\u59cb\u6da6\u8272';
+            }
+        });
+
+        // Polish clean text
+        document.getElementById('plCleanBtn').addEventListener('click', async function() {
+            var text = document.getElementById('plSourceText').value;
+            if (!text.trim()) return;
+
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> \u6574\u7406\u4e2d...';
+
+            try {
+                var response = await fetch('/api/clean-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                var data = await response.json();
+                if (data.success) {
+                    document.getElementById('plSourceText').value = data.result;
+                    document.getElementById('plCharCount').textContent = data.result.length + '/5000';
+                } else {
+                    alert('\u6574\u7406\u5931\u8d25: ' + data.error);
+                }
+            } catch (error) {
+                alert('\u7f51\u7edc\u9519\u8bef');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-align-left"></i> \u6574\u7406\u6587\u672c';
+            }
+        });
+
+        // Polish speak result
+        document.getElementById('plSpeakResult').addEventListener('click', function() {
+            var text = document.getElementById('plResultText').value;
+            speakText(text, 'zh');
+        });
+
+        // Polish history
+        function loadPolishHistory() {
+            var saved = localStorage.getItem('polishHistory');
+            if (saved) {
+                polishHistory = JSON.parse(saved);
+                renderPolishHistory();
+            }
+        }
+
+        function renderPolishHistory() {
+            var list = document.getElementById('plHistoryList');
+            if (polishHistory.length === 0) {
+                list.innerHTML = '<p class="text-muted text-center">\u6682\u65e0\u6da6\u8272\u8bb0\u5f55</p>';
+                return;
+            }
+            var styleLabels = { general: '\u901a\u7528', academic: '\u5b66\u672f', business: '\u5546\u52a1', literary: '\u6587\u5b66', concise: '\u7cbe\u7b80' };
+
+            var html = '';
+            for (var i = 0; i < polishHistory.length; i++) {
+                var item = polishHistory[i];
+                html += '<div class="history-item">';
+                html += '<p class="text-sm text-gray-600 mb-1">' + escapeHtml((item.source || '').substring(0, 50)) + '...</p>';
+                html += '<p class="text-sm text-primary mb-1">' + escapeHtml((item.result || '').substring(0, 50)) + '...</p>';
+                html += '<span class="lang-tag">' + (styleLabels[item.style] || item.style) + '</span>';
+                html += '<span class="lang-tag">' + escapeHtml(item.timestamp || '') + '</span>';
+                html += '<button class="btn btn-xs btn-outline-primary float-end" onclick="usePolishHistoryItem(' + i + ')">\u4f7f\u7528</button>';
+                html += '</div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function usePolishHistoryItem(index) {
+            var item = polishHistory[index];
+            document.getElementById('plSourceText').value = item.source || '';
+            document.getElementById('plResultText').value = item.result || '';
+            document.getElementById('plCharCount').textContent = (item.source || '').length + '/5000';
+            selectPolishStyle(item.style || 'general');
+        }
+
+        document.getElementById('plClearHistory').addEventListener('click', function() {
+            if (confirm('\u786e\u5b9a\u8981\u6e05\u7a7a\u6da6\u8272\u5386\u53f2\u5417\uff1f')) {
+                polishHistory = [];
+                localStorage.setItem('polishHistory', JSON.stringify(polishHistory));
+                renderPolishHistory();
+            }
+        });
+
+        // ==================== Initialize All ====================
+        loadHistory();
+        loadAvHistory();
+        loadRewriteHistory();
+        loadPolishHistory();
+        rtRecognition = initSpeechRecognition();
     </script>
 </body>
 </html>
