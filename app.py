@@ -1358,7 +1358,7 @@ def remove_line_breaks_api():
 
 
 # Load manual glossary on startup
-def # load_manual_glossary() - called on first request instead:
+def load_manual_glossary():
     global glossary_last_update
     if not WHOOSH_AVAILABLE or ix is None:
         return
