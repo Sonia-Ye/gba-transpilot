@@ -454,6 +454,107 @@ def scrape_government_sites():
         print(f"Extracted entries from news.gov.hk")
     except Exception as e:
         print(f"Error scraping news.gov.hk: {e}")
+    # Scrape Policy Address 2025
+    try:
+        print("Scraping Policy Address 2025...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.policyaddress.gov.hk/2025/sc/index.html", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3', 'h4', 'li']):
+            text = elem.get_text(strip=True)
+            if text and 3 <= len(text) <= 25 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "policyaddress.gov.hk",
+                    "type": "policy"
+                })
+        print(f"Extracted entries from Policy Address")
+    except Exception as e:
+        print(f"Error scraping Policy Address: {e}")
+
+    # Scrape ITIB (Innovation, Technology and Industry Bureau)
+    try:
+        print("Scraping ITIB...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.itib.gov.hk/zh-cn/index.html", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3', 'li']):
+            text = elem.get_text(strip=True)
+            if text and 3 <= len(text) <= 25 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "itib.gov.hk",
+                    "type": "technology"
+                })
+        print(f"Extracted entries from ITIB")
+    except Exception as e:
+        print(f"Error scraping ITIB: {e}")
+
+    # Scrape Digital Policy Office
+    try:
+        print("Scraping Digital Policy Office...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.digitalpolicy.gov.hk/sc/", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3', 'li']):
+            text = elem.get_text(strip=True)
+            if text and 3 <= len(text) <= 25 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "digitalpolicy.gov.hk",
+                    "type": "digital"
+                })
+        print(f"Extracted entries from Digital Policy Office")
+    except Exception as e:
+        print(f"Error scraping Digital Policy Office: {e}")
+
+    # Scrape HYAB (Home and Youth Affairs Bureau)
+    try:
+        print("Scraping HYAB...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.hyab.gov.hk/chs/home/index.htm", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3', 'li']):
+            text = elem.get_text(strip=True)
+            if text and 3 <= len(text) <= 25 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "hyab.gov.hk",
+                    "type": "youth"
+                })
+        print(f"Extracted entries from HYAB")
+    except Exception as e:
+        print(f"Error scraping HYAB: {e}")
+
+    # Scrape FSO (Financial Secretary's Office)
+    try:
+        print("Scraping FSO...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.fso.gov.hk/sim/index.htm", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3', 'li']):
+            text = elem.get_text(strip=True)
+            if text and 3 <= len(text) <= 25 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "fso.gov.hk",
+                    "type": "finance"
+                })
+        print(f"Extracted entries from FSO")
+    except Exception as e:
+        print(f"Error scraping FSO: {e}")
+
+
 
 
     """Scrape Hong Kong government bilingual pages to extract Chinese-English term pairs."""
@@ -590,7 +691,7 @@ def scrape_government_sites():
                 source=entry['source']
             )
         writer.commit()
-        glossary_last_update = datetime.datetime.now().isoformat()
+        glossary_last_update = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         print(f"Updated glossary with {len(unique_entries)} unique entries")
     except Exception as e:
         print(f"Error updating glossary index: {e}")
@@ -1356,6 +1457,33 @@ def update_glossary():
             "error": str(e)
         }), 500
 
+
+
+
+@app.route('/api/cron/update-glossary', methods=['GET'])
+def cron_update_glossary():
+    """API endpoint for external cron job services (e.g. cron-job.org).
+    Protected by GLOSSARY_CRON_SECRET environment variable."""
+    import os
+    secret = os.environ.get('GLOSSARY_CRON_SECRET', 'gba-transpilot-2026')
+    
+    # Verify secret key
+    request_secret = request.args.get('secret', '')
+    if request_secret != secret:
+        return jsonify({"error": "Unauthorized", "success": False}), 401
+    
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "Glossary not available", "success": False}), 503
+    
+    try:
+        scrape_government_sites()
+        return jsonify({
+            "success": True,
+            "message": "Glossary auto-update completed",
+            "timestamp": datetime.datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
 
 @app.after_request
 def after_request(response):
