@@ -350,7 +350,12 @@ Art Basel是世界著名的艺术博览会。
                                                         <option value="en">&#8594; English</option>
                                                         <option value="zh-HK">&#8594; 粤语</option>
                                                     </select>
-                                                    <button id="glossaryBtn" class="btn btn-primary w-full"><i class="fas fa-search"></i> 查询</button>
+                                                    <button id="glossaryBtn" class="btn btn-primary w-full mb-2"><i class="fas fa-search"></i> 查询</button>
+                                                    <div class="d-flex gap-2">
+                                                        <button id="downloadGlossaryBtn" class="btn btn-outline-secondary flex-fill"><i class="fas fa-download"></i> 下载术语库</button>
+                                                        <button id="uploadGlossaryBtn" class="btn btn-outline-secondary flex-fill"><i class="fas fa-upload"></i> 上传术语</button>
+                                                    </div>
+                                                    <input type="file" id="glossaryUploadFile" accept=".json" style="display:none;">
                                                     <div id="glossaryResult" class="mt-3"></div>
                                                 </div>
                                             </div>
@@ -1272,7 +1277,67 @@ Art Basel是世界著名的艺术博览会。
         });
 
         // ==================== Glossary Search ====================
-        document.getElementById('glossaryBtn').addEventListener('click', async function() {
+        // Download glossary
+        document.getElementById('downloadGlossaryBtn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/glossary/download');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Create download link
+                        const blob = new Blob([JSON.stringify(data.terms, null, 2)], { type: 'application/json' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'glossary_export.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        alert(`已下载 ${data.count} 条术语`);
+                    }
+                } else {
+                    alert('下载失败');
+                }
+            } catch (error) {
+                alert('下载错误: ' + error.message);
+            }
+        });
+
+        // Upload glossary button click
+        document.getElementById('uploadGlossaryBtn').addEventListener('click', function() {
+            document.getElementById('glossaryUploadFile').click();
+        });
+
+        // Upload glossary file selected
+        document.getElementById('glossaryUploadFile').addEventListener('change', async function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/glossary/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert(data.message);
+                    // Refresh glossary status
+                    loadGlossaryStatus();
+                } else {
+                    alert('上传失败: ' + (data.error || '未知错误'));
+                }
+            } catch (error) {
+                alert('上传错误: ' + error.message);
+            }
+            // Clear file input
+            this.value = '';
+        });
+
+        // Glossary query button        document.getElementById('glossaryBtn').addEventListener('click', async function() {
             var query = document.getElementById('glossaryQuery').value.trim();
             var lang = document.getElementById('glossaryTargetLang').value;
 

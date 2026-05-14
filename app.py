@@ -1374,6 +1374,94 @@ def load_manual_glossary():
 
 load_manual_glossary()  # Load manual glossary on startup
 
+
+@app.route('/api/glossary/download', methods=['GET'])
+def download_glossary():
+    """Download all glossary terms as JSON file."""
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "术语库功能不可用", "success": False}), 503
+    
+    try:
+        terms = []
+        with ix.searcher() as searcher:
+            # Get all documents
+            for doc in searcher.all_stored_fields():
+                terms.append({
+                    "term": doc.get('term', ''),
+                    "translation": doc.get('translation', ''),
+                    "source": doc.get('source', '')
+                })
+        
+        # Create JSON response with download header
+        response = jsonify({
+            "terms": terms,
+            "count": len(terms),
+            "success": True
+        })
+        response.headers['Content-Disposition'] = 'attachment; filename=glossary_export.json'
+        return response
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
+
+
+@app.route('/api/glossary/upload', methods=['POST'])
+def upload_glossary():
+    """Upload custom glossary terms from JSON file."""
+    if not WHOOSH_AVAILABLE or ix is None:
+        return jsonify({"error": "术语库功能不可用（whoosh 未安装）", "success": False}), 503
+    
+    if 'file' not in request.files:
+        return jsonify({"error": "没有上传文件", "success": False}), 400
+    
+    file = request.files['file']
+    if not file.filename:
+        return jsonify({"error": "文件名为空", "success": False}), 400
+    
+    try:
+        # Read JSON file
+        file_content = file.read().decode('utf-8')
+        data = json.loads(file_content)
+        
+        # Support both { "terms": [...] } and direct array format
+        if isinstance(data, dict) and 'terms' in data:
+            terms = data['terms']
+        elif isinstance(data, list):
+            terms = data
+        else:
+            return jsonify({"error": "无效的JSON格式，应为数组或{terms: [...]}", "success": False}), 400
+        
+        # Add terms to index
+        count = 0
+        writer = ix.writer()
+        for term_data in terms:
+            if isinstance(term_data, dict):
+                term = term_data.get('term', '')
+                translation = term_data.get('translation', '')
+                source = term_data.get('source', 'User Upload')
+            else:
+                continue
+            
+            if term and translation:
+                writer.update_document(term=term, translation=translation, source=source)
+                count += 1
+        
+        writer.commit()
+        
+        # Update last update time
+        global glossary_last_update
+        glossary_last_update = datetime.datetime.now().strftime('%Y-%m-%d')
+        
+        return jsonify({
+            "success": True,
+            "message": f"成功导入 {count} 条术语",
+            "count": count
+        })
+    except json.JSONDecodeError as e:
+        return jsonify({"error": f"JSON解析错误: {str(e)}", "success": False}), 400
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
+
+
 @app.route('/api/glossary-status', methods=['GET'])
 def glossary_status():
     global glossary_last_update
