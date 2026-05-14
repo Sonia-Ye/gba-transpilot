@@ -348,6 +348,114 @@ def extract_proper_nouns(text):
     return chinese_terms, english_terms
 
 def scrape_government_sites():
+
+    # Scrape GovHK main site
+    try:
+        print("Scraping GovHK main site...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.gov.hk/sc/residents/", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract all links and their text
+        links = soup.find_all('a', href=True)
+        for link in links:
+            text = link.get_text(strip=True)
+            if text and len(text) >= 2 and len(text) <= 50:
+                # Check if contains Chinese
+                if re.search(r'[\u4e00-\u9fff]', text):
+                    glossary_entries.append({
+                        "term": text,
+                        "translation": "",
+                        "source": "gov.hk/residents",
+                        "type": "service"
+                    })
+        print(f"Extracted {len(glossary_entries)} entries from GovHK main")
+    except Exception as e:
+        print(f"Error scraping GovHK main: {e}")
+
+    # Scrape HKEX
+    try:
+        print("Scraping HKEX...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.hkex.com.hk/?sc_lang=zh-HK", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract menu items and section titles
+        for elem in soup.find_all(['a', 'h2', 'h3', 'span']):
+            text = elem.get_text(strip=True)
+            if text and 2 <= len(text) <= 30 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "hkex.com.hk",
+                    "type": "financial"
+                })
+        print(f"Extracted entries from HKEX")
+    except Exception as e:
+        print(f"Error scraping HKEX: {e}")
+
+    # Scrape DOJ
+    try:
+        print("Scraping DOJ...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.doj.gov.hk/sc/index.html", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3']):
+            text = elem.get_text(strip=True)
+            if text and 2 <= len(text) <= 30 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "doj.gov.hk",
+                    "type": "legal"
+                })
+        print(f"Extracted entries from DOJ")
+    except Exception as e:
+        print(f"Error scraping DOJ: {e}")
+
+    # Scrape ImmD
+    try:
+        print("Scraping ImmD...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.immd.gov.hk/hks/services/chinese.html", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for elem in soup.find_all(['a', 'h2', 'h3']):
+            text = elem.get_text(strip=True)
+            if text and 2 <= len(text) <= 30 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "immd.gov.hk",
+                    "type": "immigration"
+                })
+        print(f"Extracted entries from ImmD")
+    except Exception as e:
+        print(f"Error scraping ImmD: {e}")
+
+    # Scrape news.gov.hk
+    try:
+        print("Scraping news.gov.hk...")
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get("https://www.news.gov.hk/sc/categories/government/html", timeout=30, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract news titles
+        for elem in soup.find_all(['h3', 'a', 'span']):
+            text = elem.get_text(strip=True)
+            if text and 5 <= len(text) <= 50 and re.search(r'[\u4e00-\u9fff]', text):
+                glossary_entries.append({
+                    "term": text,
+                    "translation": "",
+                    "source": "news.gov.hk",
+                    "type": "news"
+                })
+        print(f"Extracted entries from news.gov.hk")
+    except Exception as e:
+        print(f"Error scraping news.gov.hk: {e}")
+
+
     """Scrape Hong Kong government bilingual pages to extract Chinese-English term pairs."""
     import re
     global glossary_last_update
@@ -785,14 +893,19 @@ def back_translate():
             'zh-HK': '繁體中文（粤語）', 'yue': '繁體中文（粤語）',
         }
         target_lang_name = lang_names.get(source_lang, source_lang)
-        prompt = f"""请将以下文本翻译为英文，然后再将英文翻译回{target_lang_name}。
-只输出最终回译结果（必须是{target_lang_name}），不要输出任何中间步骤、解释或英文翻译。
+        prompt = f"""Task: Back-translation
+Step 1: Translate the following text to English
+Step 2: Translate the English back to {target_lang_name}
+Step 3: Output ONLY the final result in {target_lang_name}, nothing else
 
-输入文本：
+Input text:
 {text}
 
-回译结果（{target_lang_name}）："""
+Final result in {target_lang_name}:"""
+        print(f"[DEBUG] Back-translate prompt: source_lang={source_lang}, target_lang_name={target_lang_name}")
+        print(f"[DEBUG] Input text: {text[:100]}...")
         result = call_qwen(prompt)
+        print(f"[DEBUG] Result: {result[:100]}...")
         return jsonify({"result": result, "success": True})
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
