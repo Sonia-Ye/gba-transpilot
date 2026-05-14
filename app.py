@@ -1015,11 +1015,11 @@ def polish_text():
                 'academic': '学术风格',
                 'business': '商务风格'
             }
-            style_text = style_descriptions.get(style, style_descriptions['general'])
+            style_desc = style_descriptions.get(style, style_descriptions['general'])
             if detected_lang == 'yue':
-                prompt = f"請用粵語以{style_text}潤色以下文本，提升其質量、流暢性和專業性，保持原意不變。只輸出潤色後的文本，不要任何說明或格式提示。\n\n" + text
+                prompt = f"請用粵語以{style_desc}潤色以下文本，提升其質量、流暢性和專業性，保持原意不變。只輸出潤色後的文本，不要輸出風格說明、格式提示或任何其他內容。\n\n" + text
             else:
-                prompt = f"请用中文以{style_text}润色以下文本，提升其质量、流畅性和专业性，保持原意不变。只输出润色后的文本，不要任何说明或格式提示。\n\n" + text
+                prompt = f"请用中文以{style_desc}润色以下文本，提升其质量、流畅性和专业性，保持原意不变。只输出润色后的文本，不要输出风格说明、格式提示或任何其他内容。\n\n" + text
         else:
             style_map_en = {
                 'general': 'natural and standard style',
@@ -1029,8 +1029,8 @@ def polish_text():
                 'academic': 'academic style',
                 'business': 'business style'
             }
-            style_text = "Please use a " + style_map_en.get(style, style_map_en['general']) + "."
-            prompt = "Please polish the following text in English to improve its quality, fluency, and professionalism, while preserving its original meaning.\n" + style_text + "\n\nInput text:\n" + text
+            style_desc = style_map_en.get(style, style_map_en['general'])
+            prompt = f"Polish and improve the following text using a {style_desc}. Enhance quality, fluency, and professionalism while preserving the original meaning. Output only the polished text without any style descriptions, formatting notes, or additional commentary.\n\n" + text
 
         result = call_qwen(prompt)
         return jsonify({
