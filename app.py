@@ -303,7 +303,7 @@ if WHOOSH_AVAILABLE:
         ix = index.open_dir(GLOSSARY_DIR)
 
 # Global variable to track glossary last update time
-glossary_last_update = None
+glossary_last_update = datetime.datetime.now().strftime('%Y-%m-%d')
 
 # History storage
 HISTORY_FILE = "translation_history.json"
@@ -709,16 +709,10 @@ def ocr_image():
     filename = file.filename.lower()
 
     try:
-        if PYTESSERACT_AVAILABLE:
-            # Use pytesseract if available
-            if filename.endswith('.pdf'):
-                with pdfplumber.open(file) as pdf:
-                    text = ""
-                    for page in pdf.pages:
-                        text += page.extract_text() + "\n"
-            else:
-                image = Image.open(file)
-                text = pytesseract.image_to_string(image, lang='chi_sim+eng')
+        # Always use qwen-vl-max for OCR (tesseract not available on Render)
+        if False and PYTESSERACT_AVAILABLE:
+            # Skip tesseract - use qwen-vl-max instead
+            pass
         else:
             # Fallback: use qwen-vl-max multimodal model for OCR
             file.seek(0)
@@ -792,12 +786,12 @@ def back_translate():
         }
         target_lang_name = lang_names.get(source_lang, source_lang)
         prompt = f"""请将以下文本翻译为英文，然后再将英文翻译回{target_lang_name}。
-只输出最终回译结果（{target_lang_name}），不要输出任何中间步骤、解释或英文翻译。
+只输出最终回译结果（必须是{target_lang_name}），不要输出任何中间步骤、解释或英文翻译。
 
 输入文本：
 {text}
 
-回译结果："""
+回译结果（{target_lang_name}）："""
         result = call_qwen(prompt)
         return jsonify({"result": result, "success": True})
     except Exception as e:
@@ -1021,11 +1015,11 @@ def polish_text():
                 'academic': '学术风格',
                 'business': '商务风格'
             }
-            style_text = "请使用" + style_descriptions.get(style, style_descriptions['general']) + "。"
+            style_text = style_descriptions.get(style, style_descriptions['general'])
             if detected_lang == 'yue':
-                prompt = "請用粵語潤色以下文本，提升其質量、流暢性和專業性，保持原意不變。\n" + style_text + "\n\n" + text
+                prompt = f"請用粵語以{style_text}潤色以下文本，提升其質量、流暢性和專業性，保持原意不變。只輸出潤色後的文本，不要任何說明或格式提示。\n\n" + text
             else:
-                prompt = "请用中文润色以下文本，提升其质量、流畅性和专业性，保持原意不变。\n" + style_text + "\n\n" + text
+                prompt = f"请用中文以{style_text}润色以下文本，提升其质量、流畅性和专业性，保持原意不变。只输出润色后的文本，不要任何说明或格式提示。\n\n" + text
         else:
             style_map_en = {
                 'general': 'natural and standard style',
@@ -1151,6 +1145,9 @@ def _transcribe_with_qwen(file_path, language='auto'):
                 return None
         else:
             print(f"Paraformer API error: {response.status_code} - {response.text}")
+            print(f"Request URL: {url}")
+            print(f"File exists: {os.path.exists(file_path)}")
+            print(f"File size: {os.path.getsize(file_path) if os.path.exists(file_path) else 0}")
             return None
     except Exception as e:
         print(f"Paraformer audio transcription error: {e}")
@@ -1375,7 +1372,7 @@ def load_manual_glossary():
     except Exception as e:
         print(f"Error loading manual glossary: {e}")
 
-# load_manual_glossary() called on first request
+load_manual_glossary()  # Load manual glossary on startup
 
 @app.route('/api/glossary-status', methods=['GET'])
 def glossary_status():
