@@ -1247,15 +1247,6 @@ def update_glossary():
         }), 500
 
 
-@app.route('/api/glossary-status', methods=['GET'])
-def glossary_status():
-    """Return the last glossary update time and availability status."""
-    return jsonify({
-        "available": WHOOSH_AVAILABLE and ix is not None,
-        "last_update": glossary_last_update,
-        "success": True
-    })
-
 @app.after_request
 def after_request(response):
     """Add CORS headers to all responses"""
