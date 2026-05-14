@@ -1017,9 +1017,9 @@ def polish_text():
             }
             style_desc = style_descriptions.get(style, style_descriptions['general'])
             if detected_lang == 'yue':
-                prompt = f"請用粵語以{style_desc}潤色以下文本，提升其質量、流暢性和專業性，保持原意不變。只輸出潤色後的文本，不要輸出風格說明、格式提示或任何其他內容。\n\n" + text
+                prompt = f"潤色以下文本，使用{style_desc}。直接輸出潤色後的結果，禁止輸出風格名稱、格式說明、提示語或任何其他內容。\n\n原文：{text}\n\n潤色結果："
             else:
-                prompt = f"请用中文以{style_desc}润色以下文本，提升其质量、流畅性和专业性，保持原意不变。只输出润色后的文本，不要输出风格说明、格式提示或任何其他内容。\n\n" + text
+                prompt = f"润色以下文本，使用{style_desc}。直接输出润色后的结果，禁止输出风格名称、格式说明、提示语或任何其他内容。\n\n原文：{text}\n\n润色结果："
         else:
             style_map_en = {
                 'general': 'natural and standard style',

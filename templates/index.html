@@ -1025,7 +1025,12 @@
                 });
                 var data = await response.json();
                 if (data.success) {
-                    document.getElementById('sourceText').value = data.result;
+                    // Handle both {text: "..."} and direct string formats
+                    var ocrText = data.text || data.result || '';
+                    if (typeof ocrText === 'object') {
+                        ocrText = JSON.stringify(ocrText);
+                    }
+                    document.getElementById('sourceText').value = ocrText;
                     document.getElementById('charCount').textContent = data.result.length + '/5000';
                 } else {
                     alert('\u6574\u7406\u5931\u8d25: ' + data.error);
