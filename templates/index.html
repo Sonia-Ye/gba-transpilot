@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -246,7 +246,7 @@
                                         <!-- Translation Workspace -->
                                         <div class="bg-light rounded-12 p-4 mb-4" style="border-radius: 12px;">
                                             <h5 class="text-gray-700 mb-3">翻译工作台</h5>
-                                            <p class="text-gray-500 text-sm mb-4">支持翻译、查输入内容，核心操作保持简洁清爽</p>
+                                            
 
                                             <!-- Language Selection -->
                                             <div class="row mb-4">
@@ -1088,8 +1088,13 @@
                 var data = await response.json();
 
                 if (data.success) {
-                    document.getElementById('sourceText').value = data.text;
-                    document.getElementById('charCount').textContent = data.text.length + '/5000';
+                    // Handle OCR result - extract text from dict if needed
+                    var ocrResult = data.text || data.result || '';
+                    if (typeof ocrResult === 'object') {
+                        ocrResult = ocrResult.text || JSON.stringify(ocrResult);
+                    }
+                    document.getElementById('sourceText').value = ocrResult;
+                    document.getElementById('charCount').textContent = ocrResult.length + '/5000';
                 } else {
                     alert('识别失败: ' + data.error);
                 }
@@ -2232,3 +2237,5 @@
     </script>
 </body>
 </html>
+
+
