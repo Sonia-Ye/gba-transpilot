@@ -1984,6 +1984,221 @@
                 }
             });
 
+            // Swap language
+            document.getElementById('swapLang').addEventListener('click', function() {
+                var src = document.getElementById('sourceLang');
+                var tgt = document.getElementById('targetLang');
+                var tmp = src.value;
+                src.value = tgt.value;
+                tgt.value = tmp;
+            });
+
+            // Speak source
+            document.getElementById('speakSourceBtn').addEventListener('click', function() {
+                var text = document.getElementById('sourceText').value;
+                if (text) {
+                    var utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = document.getElementById('sourceLang').value === 'zh' ? 'zh-CN' : document.getElementById('sourceLang').value === 'zh-HK' ? 'zh-HK' : 'en-US';
+                    speechSynthesis.speak(utterance);
+                }
+            });
+
+            // Speak target
+            document.getElementById('speakTargetBtn').addEventListener('click', function() {
+                var text = document.getElementById('targetText').value;
+                if (text) {
+                    var utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = document.getElementById('targetLang').value === 'zh' ? 'zh-CN' : document.getElementById('targetLang').value === 'zh-HK' ? 'zh-HK' : 'en-US';
+                    speechSynthesis.speak(utterance);
+                }
+            });
+
+            // Align (sentence-by-sentence comparison)
+            document.getElementById('alignBtn').addEventListener('click', function() {
+                var source = document.getElementById('sourceText').value;
+                var target = document.getElementById('targetText').value;
+                if (!source || !target) { alert('请先进行翻译'); return; }
+                var srcLines = source.split(/[。！？.!?\n]+/).filter(function(l) { return l.trim(); });
+                var tgtLines = target.split(/[。！？.!?\n]+/).filter(function(l) { return l.trim(); });
+                var html = '<div class="row"><div class="col-6">';
+                srcLines.forEach(function(line, i) {
+                    html += '<p style="margin-bottom:8px;padding:4px;background:#f0f0f0;border-radius:4px;">' + (i+1) + '. ' + line.trim() + '</p>';
+                });
+                html += '</div><div class="col-6">';
+                tgtLines.forEach(function(line, i) {
+                    html += '<p style="margin-bottom:8px;padding:4px;background:#e8f0fe;border-radius:4px;">' + (i+1) + '. ' + line.trim() + '</p>';
+                });
+                html += '</div></div>';
+                alignResultText = html;
+                alert('逐句对照已生成，共 ' + srcLines.length + ' 句');
+            });
+
+            // Copy source/target (already handled by .copy-btn class above)
+
+            // AV Transcribe
+            document.getElementById('avTranscribeBtn').addEventListener('click', async function() {
+                var fileInput = document.getElementById('avFileInput');
+                if (!fileInput.files || fileInput.files.length === 0) { alert('请选择音视频文件'); return; }
+                var formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 转录中...';
+                try {
+                    var response = await fetch('/api/transcribe', { method: 'POST', body: formData });
+                    var data = await response.json();
+                    if (data.error) { alert('转录错误: ' + data.error); }
+                    else { document.getElementById('avTranscript').value = data.text || ''; }
+                } catch (error) { alert('转录请求失败: ' + error.message); }
+                finally { this.disabled = false; this.innerHTML = '<i class="fas fa-microphone"></i> 开始转录'; }
+            });
+
+            // Live chat
+            var isLiveListening = false;
+            document.getElementById('liveChatBtn').addEventListener('click', function() {
+                if (!isLiveListening) {
+                    isLiveListening = true;
+                    this.innerHTML = '<i class="fas fa-stop"></i> 停止';
+                    this.classList.add('btn-danger');
+                    this.classList.remove('btn-primary');
+                } else {
+                    isLiveListening = false;
+                    this.innerHTML = '<i class="fas fa-microphone"></i> 开始对话';
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-primary');
+                }
+            });
+
+            document.getElementById('liveSendBtn').addEventListener('click', async function() {
+                var input = document.getElementById('liveInput');
+                var text = input.value.trim();
+                if (!text) return;
+                input.value = '';
+                var chatBox = document.getElementById('rtChatMessages');
+                chatBox.innerHTML += '<div class="mb-2"><span class="badge bg-primary">你</span> ' + text + '</div>';
+                try {
+                    var response = await fetch('/api/translate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ text: text, source_lang: 'auto', target_lang: document.getElementById('targetLang').value })
+                    });
+                    var data = await response.json();
+                    if (data.translation) {
+                        chatBox.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + data.translation + '</div>';
+                    }
+                } catch (error) {
+                    chatBox.innerHTML += '<div class="mb-2 text-danger">请求失败: ' + error.message + '</div>';
+                }
+            });
+
+            // AI Rewrite
+            document.getElementById('rewriteBtn').addEventListener('click', async function() {
+                var text = document.getElementById('rwSourceText').value;
+                if (!text.trim()) { alert('请输入要改写的文本'); return; }
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 改写中...';
+                try {
+                    var response = await fetch('/api/rewrite', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ text: text, mode: rewriteMode, style: rewriteStyle })
+                    });
+                    var data = await response.json();
+                    if (data.error) { alert('改写错误: ' + data.error); }
+                    else { document.getElementById('rwResultText').value = data.rewritten_text || data.result || ''; }
+                } catch (error) { alert('改写请求失败: ' + error.message); }
+                finally { this.disabled = false; this.innerHTML = '<i class="fas fa-magic"></i> 开始改写'; }
+            });
+
+            // AI Polish
+            document.getElementById('polishBtn').addEventListener('click', async function() {
+                var text = document.getElementById('plSourceText').value;
+                if (!text.trim()) { alert('请输入要润色的文本'); return; }
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 润色中...';
+                try {
+                    var response = await fetch('/api/polish', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ text: text, style: polishStyle })
+                    });
+                    var data = await response.json();
+                    if (data.error) { alert('润色错误: ' + data.error); }
+                    else { document.getElementById('plResultText').value = data.polished_text || data.result || ''; }
+                } catch (error) { alert('润色请求失败: ' + error.message); }
+                finally { this.disabled = false; this.innerHTML = '<i class="fas fa-sparkles"></i> 开始润色'; }
+            });
+
+            // Rewrite clean
+            document.getElementById('rwCleanBtn').addEventListener('click', function() {
+                document.getElementById('rwSourceText').value = '';
+                document.getElementById('rwResultText').value = '';
+            });
+
+            // Polish clean
+            document.getElementById('plCleanBtn').addEventListener('click', function() {
+                document.getElementById('plSourceText').value = '';
+                document.getElementById('plResultText').value = '';
+            });
+
+            // Copy rewrite result
+            document.getElementById('copyRewriteBtn').addEventListener('click', function() {
+                var text = document.getElementById('rwResultText').value;
+                if (text) { navigator.clipboard.writeText(text); alert('已复制'); }
+            });
+
+            // Copy polish result
+            document.getElementById('copyPolishBtn').addEventListener('click', function() {
+                var text = document.getElementById('plResultText').value;
+                if (text) { navigator.clipboard.writeText(text); alert('已复制'); }
+            });
+
+            // Clear history
+            document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+                if (confirm('确定要清空翻译历史吗？')) {
+                    translationHistory = [];
+                    localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
+                }
+            });
+
+            // Save term
+            document.getElementById('saveTermBtn').addEventListener('click', async function() {
+                var term = document.getElementById('newTerm').value.trim();
+                var translation = document.getElementById('newTranslation').value.trim();
+                if (!term || !translation) { alert('请输入术语和翻译'); return; }
+                try {
+                    var response = await fetch('/api/add-term', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ term: term, translation: translation })
+                    });
+                    var data = await response.json();
+                    if (data.success) { alert('术语已添加'); }
+                    else { alert('添加失败: ' + (data.error || '')); }
+                } catch (error) { alert('请求失败: ' + error.message); }
+            });
+
+            // Download glossary
+            document.getElementById('downloadGlossaryBtn').addEventListener('click', function() {
+                window.location.href = '/api/glossary/download';
+            });
+
+            // Upload glossary
+            document.getElementById('uploadGlossaryBtn').addEventListener('click', function() {
+                document.getElementById('glossaryUploadFile').click();
+            });
+
+            document.getElementById('glossaryUploadFile').addEventListener('change', async function() {
+                if (!this.files || this.files.length === 0) return;
+                var formData = new FormData();
+                formData.append('file', this.files[0]);
+                try {
+                    var response = await fetch('/api/glossary/upload', { method: 'POST', body: formData });
+                    var data = await response.json();
+                    if (data.success) { alert('术语库上传成功'); }
+                    else { alert('上传失败: ' + (data.error || '')); }
+                } catch (error) { alert('上传失败: ' + error.message); }
+            });
+
             // Initialize
             console.log('GBA TransPilot loaded');
         });
