@@ -1,0 +1,32 @@
+﻿name: Daily Glossary Update
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-glossary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 whoosh
+
+      - name: Run glossary scraper
+        run: |
+          python scrape_glossary_local.py
+
+      - name: Trigger Render update
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" "https://gba-transpilot-1.onrender.com/api/cron/update-glossary?secret=gba-transpilot-2026" --max-time 120 || echo "Render wakeup call sent"
