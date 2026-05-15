@@ -1638,7 +1638,7 @@ def load_manual_glossary():
             term = term_data.get('term', '')
             translation = term_data.get('translation', '')
             source = term_data.get('source', 'Manual Glossary')
-            if term and translation:
+            if term:  # Load all terms, even without translation
                 writer.update_document(term=term, translation=translation, source=source)
                 count += 1
         writer.commit()
@@ -1648,6 +1648,54 @@ def load_manual_glossary():
         print(f"Error loading manual glossary: {e}")
 
 load_manual_glossary()  # Load manual glossary on startup
+
+# Rebuild glossary index from JSON (call this after updating glossary_manual.json)
+def rebuild_glossary_index():
+    """Rebuild Whoosh index from glossary_manual.json"""
+    global ix, glossary_last_update
+    if not WHOOSH_AVAILABLE:
+        print("Whoosh not available, cannot rebuild index")
+        return False
+    
+    glossary_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'glossary_manual.json')
+    if not os.path.exists(glossary_file):
+        print("No glossary_manual.json found")
+        return False
+    
+    try:
+        # Clear existing index
+        import shutil
+        if os.path.exists(GLOSSARY_DIR):
+            shutil.rmtree(GLOSSARY_DIR)
+        os.mkdir(GLOSSARY_DIR)
+        
+        # Create new index
+        schema = Schema(term=TEXT(stored=True), translation=TEXT(stored=True), source=TEXT(stored=True))
+        ix = index.create_in(GLOSSARY_DIR, schema)
+        
+        # Load terms
+        with open(glossary_file, 'r', encoding='utf-8') as f:
+            terms = json.load(f)
+        
+        writer = ix.writer()
+        count = 0
+        for term_data in terms:
+            term = term_data.get('term', '')
+            translation = term_data.get('translation', '')
+            source = term_data.get('source', 'Manual Glossary')
+            if term:
+                writer.add_document(term=term, translation=translation, source=source)
+                count += 1
+        writer.commit()
+        
+        glossary_last_update = datetime.datetime.now().strftime('%Y-%m-%d')
+        print(f"Rebuilt glossary index with {count} terms")
+        return True
+    except Exception as e:
+        print(f"Error rebuilding glossary index: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 
 @app.route('/api/glossary/download', methods=['GET'])
@@ -1716,7 +1764,7 @@ def upload_glossary():
             else:
                 continue
             
-            if term and translation:
+            if term:  # Load all terms, even without translation
                 writer.update_document(term=term, translation=translation, source=source)
                 count += 1
         
