@@ -781,13 +781,13 @@
   },
   {
     "term": "税务易",
-    "translation": "",
-    "source": "gov.hk/residents"
+    "translation": "eTAX",
+    "source": "budget.gov.hk"
   },
   {
     "term": "居屋",
-    "translation": "",
-    "source": "gov.hk/residents"
+    "translation": "Home Ownership Scheme",
+    "source": "budget.gov.hk"
   },
   {
     "term": "繁體中文",
@@ -1471,13 +1471,13 @@
   },
   {
     "term": "利得税",
-    "translation": "",
-    "source": "gov.hk/residents"
+    "translation": "Profits Tax",
+    "source": "budget.gov.hk"
   },
   {
     "term": "物业税",
-    "translation": "",
-    "source": "gov.hk/residents"
+    "translation": "Property Tax",
+    "source": "budget.gov.hk"
   },
   {
     "term": "提交报税表、查询及缴税",
@@ -1486,8 +1486,8 @@
   },
   {
     "term": "印花税",
-    "translation": "",
-    "source": "gov.hk/residents"
+    "translation": "Stamp Duty",
+    "source": "budget.gov.hk"
   },
   {
     "term": "应课税品",
@@ -5406,8 +5406,8 @@
   },
   {
     "term": "大湾区医疗合作",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "Greater Bay Area Healthcare Cooperation",
+    "source": "budget.gov.hk"
   },
   {
     "term": "大湾区发展",
@@ -5436,8 +5436,8 @@
   },
   {
     "term": "巴塞尔艺术展",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "Art Basel Hong Kong",
+    "source": "budget.gov.hk"
   },
   {
     "term": "市区重建局",
@@ -5541,8 +5541,8 @@
   },
   {
     "term": "教资会",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "UGC",
+    "source": "budget.gov.hk"
   },
   {
     "term": "数据通",
@@ -5591,8 +5591,8 @@
   },
   {
     "term": "智慧交通",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "Smart Transport",
+    "source": "budget.gov.hk"
   },
   {
     "term": "智慧交通基金",
@@ -5786,8 +5786,8 @@
   },
   {
     "term": "综援",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "Comprehensive Social Security Assistance",
+    "source": "budget.gov.hk"
   },
   {
     "term": "绿在区区",
@@ -5796,8 +5796,8 @@
   },
   {
     "term": "绿置居",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "Green Form Subsidised Home Ownership Scheme",
+    "source": "budget.gov.hk"
   },
   {
     "term": "网络安全",
@@ -5931,8 +5931,8 @@
   },
   {
     "term": "非本地毕业生留港",
-    "translation": "",
-    "source": "government_comprehensive"
+    "translation": "Non-local Graduate Employment",
+    "source": "budget.gov.hk"
   },
   {
     "term": "首置盘",
@@ -7148,5 +7148,290 @@
     "term": "标准工时委员会",
     "translation": "Standard Working Hours Committee",
     "source": "gov.hk"
+  },
+  {
+    "term": "创科驱动",
+    "translation": "Innovation and Technology",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "金融赋能",
+    "translation": "Financial Empowerment",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "十五五规划",
+    "translation": "National 15th Five-Year Plan",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "AI+与产业发展策略委员会",
+    "translation": "Committee on AI+ and Industry Development Strategy",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "人工智能研发院",
+    "translation": "AI Research and Development Institute",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "沙岭数据园区",
+    "translation": "Sandy Ridge Data Facility Cluster",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "技能提升局",
+    "translation": "Upskill Hong Kong",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "国际临床试验学院",
+    "translation": "International Clinical Trial Academy",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "中医药发展基金",
+    "translation": "Chinese Medicine Development Fund",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "引进办",
+    "translation": "Office of Attracting Strategic Enterprises",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "香港RISC-V联盟",
+    "translation": "Hong Kong RISC-V Alliance",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "新型工业菁英企业培育计划",
+    "translation": "New Industrialisation Elite Enterprises Nurturing Scheme",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "国家制造业创新中心",
+    "translation": "National Manufacturing Innovation Centre",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "北都国际创科新城",
+    "translation": "Northern Metropolis International Innovation and Technology Hub",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "河套香港园区",
+    "translation": "Hetao Co-operation Zone Hong Kong Park",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "洪水桥产业园有限公司",
+    "translation": "Hung Shui Kiu Industrial Park Company Limited",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "创科产业引导基金",
+    "translation": "I&T Industry-Oriented Fund",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "港投公司",
+    "translation": "Hong Kong Investment Corporation",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "耐心资本",
+    "translation": "Patient Capital",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "离岸人民币市场",
+    "translation": "Offshore RMB Market",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "国债期货",
+    "translation": "Chinese Government Bond Futures",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "房托基金",
+    "translation": "Real Estate Investment Trusts (REITs)",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "人民币交易柜台",
+    "translation": "RMB Trading Counter",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "同股不同权",
+    "translation": "Weighted Voting Right",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "第二上市",
+    "translation": "Secondary Listing",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "T+1结算",
+    "translation": "T+1 Settlement",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "资产托管平台",
+    "translation": "Custodian Platform",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "资产及财富管理",
+    "translation": "Asset and Wealth Management",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "企业财资中心",
+    "translation": "Corporate Treasury Centres",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "数字资产",
+    "translation": "Digital Assets",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "数字债券",
+    "translation": "Digital Bonds",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "迅清结算",
+    "translation": "CMU OmniClear",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "黄金交易",
+    "translation": "Gold Trading",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "普惠金融",
+    "translation": "Financial Inclusion",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "全自由行",
+    "translation": "Full Portability",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "气候预算",
+    "translation": "Climate Budget",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "绿色债券",
+    "translation": "Green Bonds",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "银色债券",
+    "translation": "Silver Bonds",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "通胀挂钩债券",
+    "translation": "iBond",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "iBond",
+    "translation": "Inflation-linked Retail Bond",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "银色债",
+    "translation": "Silver Bond",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "绿色和可持续金融",
+    "translation": "Green and Sustainable Finance",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "科技园",
+    "translation": "Science Park",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "5G",
+    "translation": "5G",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "数码转型",
+    "translation": "Digital Transformation",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "政府云端平台",
+    "translation": "Government Cloud Platform",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "私人参建居屋",
+    "translation": "Private Sector Participation Scheme",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "三跑道系统",
+    "translation": "Three-Runway System",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "基层医疗",
+    "translation": "Primary Healthcare",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "职训局",
+    "translation": "Vocational Training Council",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "证监会",
+    "translation": "Securities and Futures Commission",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "积金局",
+    "translation": "Mandatory Provident Fund Schemes Authority",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "大湾区",
+    "translation": "Greater Bay Area",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "北部都会区发展策略",
+    "translation": "Northern Metropolis Development Strategy",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "薪俸税",
+    "translation": "Salaries Tax",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "差饷",
+    "translation": "Rates",
+    "source": "budget.gov.hk"
+  },
+  {
+    "term": "入息税",
+    "translation": "Income Tax",
+    "source": "budget.gov.hk"
   }
 ]
