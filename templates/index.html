@@ -1717,11 +1717,11 @@
 
                         <div class="d-flex justify-content-center gap-4">
 
-                            <button id="privacyBtn" class="btn btn-outline-secondary btn-sm" onclick="alert('隐私管理功能开发中')"><i class="fas fa-lock"></i> 隐私管理</button>
+                            <button id="privacyBtn" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#privacyModal"><i class="fas fa-lock"></i> 隐私管理</button>
 
-                            <button id="feedbackBtn" class="btn btn-primary btn-sm" onclick="alert('请发送反馈至：feedback@example.com')"><i class="fas fa-comment"></i> 意见反馈</button>
+                            <button id="feedbackBtn" class="btn btn-primary btn-sm" onclick="window.location.href='mailto:feedback@gbatranspilot.com'"><i class="fas fa-comment"></i> 意见反馈</button>
 
-                            <button id="contactBtn" class="btn btn-outline-secondary btn-sm" onclick="alert('联系邮箱：contact@example.com')"><i class="fas fa-user"></i> 联络作者</button>
+                            <button id="contactBtn" class="btn btn-outline-secondary btn-sm" onclick="window.location.href='mailto:contact@gbatranspilot.com'"><i class="fas fa-user"></i> 联络作者</button>
 
                         </div>
 
@@ -2205,6 +2205,46 @@
             console.log('GBA TransPilot loaded');
         });
     </script>
+
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="privacyModalLabel"><i class="fas fa-shield-alt me-2"></i>隐私政策</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="line-height: 1.8;">
+                    <h6>一、信息收集</h6>
+                    <p>GBA TransPilot（以下简称"本平台"）不会主动收集、存储或记录用户的任何个人信息。用户在使用翻译、改写、润色等功能时输入的文本内容，仅在处理请求期间临时使用，处理完成后立即丢弃，不会被保存到服务器或任何持久化存储中。</p>
+
+                    <h6>二、信息使用</h6>
+                    <p>本平台不会将用户输入的内容用于任何商业目的、模型训练或数据分析。所有文本处理均通过加密通道（HTTPS）传输至第三方 AI 服务接口进行实时处理，处理结果直接返回给用户。</p>
+
+                    <h6>三、Cookie 使用</h6>
+                    <p>本平台不使用任何追踪型 Cookie。仅使用浏览器本地存储（localStorage）保存用户的翻译历史记录，该数据仅存储在用户本地设备上，不会上传至服务器。</p>
+
+                    <h6>四、第三方服务</h6>
+                    <p>本平台的 AI 翻译、改写、润色功能依赖第三方 AI 服务提供商（阿里云通义千问）。用户输入的文本会发送至该第三方服务进行处理。请参阅该第三方服务的隐私政策了解更多信息。</p>
+
+                    <h6>五、数据安全</h6>
+                    <p>本平台采用 HTTPS 加密传输，确保用户数据在传输过程中的安全性。我们不会将用户数据分享、出售或以任何方式提供给第三方（AI 服务提供商除外）。</p>
+
+                    <h6>六、用户权利</h6>
+                    <p>用户可随时清除浏览器本地存储中的翻译历史记录。如对本隐私政策有任何疑问，请通过 contact@gbatranspilot.com 联系我们。</p>
+
+                    <h6>七、政策更新</h6>
+                    <p>本平台保留随时更新本隐私政策的权利。更新后的政策将在本页面发布，建议用户定期查阅。</p>
+
+                    <p class="text-muted mt-4 mb-0" style="font-size: 12px;">最后更新日期：2025年5月</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">我已知晓</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 
