@@ -1386,6 +1386,7 @@ def query_glossary():
 
     results = []
     try:
+        # Method 1: Try exact match first
         with ix.searcher(weighting=scoring.BM25F()) as searcher:
             qp = QueryParser("term", ix.schema)
             q = qp.parse(query)
@@ -1398,7 +1399,22 @@ def query_glossary():
                     "source": hit['source']
                 })
 
-        # If no results from index, try exact match on translation field
+        # Method 2: Try wildcard search for partial matches
+        if not results:
+            with ix.searcher(weighting=scoring.BM25F()) as searcher:
+                # Use wildcard query for fuzzy matching
+                from whoosh.query import Wildcard
+                q = Wildcard("term", "*" + query + "*")
+                hits = searcher.search(q, limit=10)
+
+                for hit in hits:
+                    results.append({
+                        "term": hit['term'],
+                        "translation": hit['translation'],
+                        "source": hit['source']
+                    })
+
+        # Method 3: Try translation field
         if not results:
             with ix.searcher(weighting=scoring.BM25F()) as searcher:
                 qp = QueryParser("translation", ix.schema)
@@ -1412,8 +1428,26 @@ def query_glossary():
                         "source": hit['source']
                     })
 
+        # Method 4: Scan all documents for substring match (fallback)
+        if not results:
+            with ix.searcher() as searcher:
+                all_docs = list(searcher.all_stored_fields())
+                for doc in all_docs:
+                    term = doc.get('term', '')
+                    translation = doc.get('translation', '')
+                    if query in term or query in translation:
+                        results.append({
+                            "term": term,
+                            "translation": translation,
+                            "source": doc.get('source', '')
+                        })
+                        if len(results) >= 10:
+                            break
+
     except Exception as e:
         print(f"Glossary search error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": "术语库查询出错", "success": False}), 500
 
     return jsonify({
