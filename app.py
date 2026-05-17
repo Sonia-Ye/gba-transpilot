@@ -681,7 +681,7 @@ def translate_text():
                 from whoosh.qparser import QueryParser
                 import re
                 with ix.searcher() as searcher:
-                    phrases = re.findall(r'[A-Za-z][A-Za-z\s\-\+]{1,50}', text)
+                    phrases = re.findall(r'[A-Za-z][A-Za-z0-9\s\-\+\'\.]{2,80}', text)
                     print(f"[DEBUG] Extracted phrases: {phrases}")
                     for phrase in phrases:
                         phrase = phrase.strip()

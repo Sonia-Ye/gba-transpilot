@@ -1842,19 +1842,19 @@
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-upload"></i> 上传并识别'; }
             });
 
-            // Back translate
+            // Back translate - use dedicated back-translate API
             on('backTranslateBtn', 'click', async function() {
                 var t = $('targetText').value;
                 if (!t.trim()) { alert('请先进行翻译'); return; }
                 this.disabled = true;
                 try {
-                    var r = await fetch('/api/translate', {
+                    var r = await fetch('/api/back-translate', {
                         method: 'POST', headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({text: t, source_lang: $('targetLang').value, target_lang: $('sourceLang').value})
+                        body: JSON.stringify({text: t, source_lang: $('sourceLang').value})
                     });
                     var d = await r.json();
                     if (d.error) alert('回译错误: ' + d.error);
-                    else $('backTranslateResult').value = d.result || d.translation || '';
+                    else $('backTranslateResult').value = d.result || '';
                 } catch(e) { alert('回译请求失败: ' + e.message); }
                 finally { this.disabled = false; }
             });
