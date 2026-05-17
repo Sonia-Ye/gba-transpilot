@@ -1812,7 +1812,7 @@
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 try {
-                    var response = await fetch('/translate', {
+                    var response = await fetch('/api/translate', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
@@ -1893,7 +1893,7 @@
                 }
                 this.disabled = true;
                 try {
-                    var response = await fetch('/translate', {
+                    var response = await fetch('/api/translate', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
