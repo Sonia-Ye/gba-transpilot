@@ -1932,13 +1932,29 @@
                 if (t) { var u = new SpeechSynthesisUtterance(t); u.lang = $('targetLang').value === 'zh' ? 'zh-CN' : $('targetLang').value === 'zh-HK' ? 'zh-HK' : 'en-US'; speechSynthesis.speak(u); }
             });
 
-            // Align
+            // Align - show interleaved sentences inline
             on('alignBtn', 'click', function() {
                 var s = $('sourceText').value, t = $('targetText').value;
                 if (!s || !t) { alert('请先进行翻译'); return; }
-                var sl = s.split(/[。！？.!?\\n]+/).filter(function(l) { return l.trim(); });
-                var tl = t.split(/[。！？.!?\\n]+/).filter(function(l) { return l.trim(); });
-                alert('逐句对照已生成，共 ' + sl.length + ' 句');
+                var sl = s.split(/(?<=[。！？.!?])\s*/).filter(function(l) { return l.trim(); });
+                var tl = t.split(/(?<=[。！？.!?])\s*/).filter(function(l) { return l.trim(); });
+                var maxLen = Math.max(sl.length, tl.length);
+                var html = '';
+                for (var i = 0; i < maxLen; i++) {
+                    if (sl[i]) html += '<div style="color:#2563eb;padding:4px 0;border-bottom:1px solid #e5e7eb;">' + (i+1) + '. ' + sl[i].trim() + '</div>';
+                    if (tl[i]) html += '<div style="color:#16a34a;padding:4px 0;margin-bottom:8px;">' + (i+1) + '. ' + tl[i].trim() + '</div>';
+                }
+                var area = $('alignResult');
+                if (area) {
+                    area.innerHTML = html;
+                    area.style.display = 'block';
+                } else {
+                    var div = document.createElement('div');
+                    div.id = 'alignResult';
+                    div.style.cssText = 'background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-top:8px;max-height:400px;overflow-y:auto;font-size:14px;line-height:1.8;';
+                    div.innerHTML = html;
+                    $('targetText').parentNode.parentNode.appendChild(div);
+                }
             });
 
             // AV Transcribe
