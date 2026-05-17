@@ -1792,15 +1792,17 @@
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-arrow-right"></i>'; }
             });
 
-            // Clean text
+            // Clean text - merge broken lines and remove extra whitespace
             on('cleanTextBtn', 'click', function() {
                 var t = $('sourceText').value;
-                if (!t.trim()) { alert('文本框为空'); return; }
-                var original = t;
-                t = t.replace(/\n\s*\n/g, '\n').trim();
+                if (!t.trim()) return;
+                // Merge lines broken mid-sentence (no punctuation at end of line)
+                t = t.replace(/([^。！？.!?,;；：\n])\n(?!\n)/g, '$1');
+                // Remove extra blank lines (keep single newline)
+                t = t.replace(/\n{3,}/g, '\n\n');
+                // Remove spaces at start/end of lines
+                t = t.split('\n').map(function(l) { return l.trim(); }).join('\n').trim();
                 $('sourceText').value = t;
-                var removed = original.length - t.length;
-                alert('整理完成！删除了 ' + removed + ' 个多余字符');
             });
 
             // Copy buttons with checkmark animation
