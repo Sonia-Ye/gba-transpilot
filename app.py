@@ -816,8 +816,8 @@ def ocr_image():
 @app.route('/api/back-translate', methods=['POST'])
 def back_translate():
     data = request.json
-    text = data.get('text', '')
-    source_lang = data.get('source_lang', 'zh')
+    text = data.get('text', '')  # This is the translated text (target language)
+    source_lang = data.get('source_lang', 'zh')  # This is the original language we want to translate back to
 
     if not text:
         return jsonify({"error": "No text provided"}), 400
@@ -828,16 +828,17 @@ def back_translate():
             'zh-HK': '繁體中文（粤語）', 'yue': '繁體中文（粤語）',
         }
         target_lang_name = lang_names.get(source_lang, source_lang)
-        prompt = f"""Task: Back-translation
-Step 1: Translate the following text to English
-Step 2: Translate the English back to {target_lang_name}
-Step 3: Output ONLY the final result in {target_lang_name}, nothing else
+        
+        # Directly translate the translated text back to the original language
+        prompt = f"""Task: Translate the following text to {target_lang_name}
+Output ONLY the translation in {target_lang_name}, nothing else
 
 Input text:
 {text}
 
-Final result in {target_lang_name}:"""
-        print(f"[DEBUG] Back-translate prompt: source_lang={source_lang}, target_lang_name={target_lang_name}")
+Translation in {target_lang_name}:"""
+        
+        print(f"[DEBUG] Back-translate: translating to {target_lang_name}")
         print(f"[DEBUG] Input text: {text[:100]}...")
         result = call_qwen(prompt)
         print(f"[DEBUG] Result: {result[:100]}...")
