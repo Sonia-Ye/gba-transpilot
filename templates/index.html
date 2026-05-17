@@ -1787,7 +1787,7 @@
                     });
                     var d = await r.json();
                     if (d.error) alert('翻译错误: ' + d.error);
-                    else $('targetText').value = d.translation || '';
+                    else $('targetText').value = d.result || d.translation || '';
                 } catch(e) { alert('翻译请求失败: ' + e.message); }
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-arrow-right"></i>'; }
             });
@@ -1835,7 +1835,7 @@
                     });
                     var d = await r.json();
                     if (d.error) alert('回译错误: ' + d.error);
-                    else $('backTranslateResult').value = d.translation || '';
+                    else $('backTranslateResult').value = d.result || d.translation || '';
                 } catch(e) { alert('回译请求失败: ' + e.message); }
                 finally { this.disabled = false; }
             });
@@ -1955,7 +1955,7 @@
                         body: JSON.stringify({text: text, source_lang: 'auto', target_lang: $('targetLang').value})
                     });
                     var d = await r.json();
-                    if (d.translation && box) box.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + d.translation + '</div>';
+                    if ((d.result || d.translation) && box) box.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + (d.result || d.translation) + '</div>'; += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + d.translation + '</div>';
                 } catch(e) { if (box) box.innerHTML += '<div class="mb-2 text-danger">请求失败</div>'; }
             });
 
