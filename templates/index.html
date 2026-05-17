@@ -1802,7 +1802,7 @@
         // DOM Ready - all event bindings
         document.addEventListener('DOMContentLoaded', function() {
             // Text translation
-            document.getElementById('translateBtn').addEventListener('click', async function() {
+            var translateBtn_el = document.getElementById('translateBtn'); if (translateBtn_el) { translateBtn_el.addEventListener('click', async function() {
                 var sourceText = document.getElementById('sourceText').value;
                 var targetLang = document.getElementById('targetLang').value;
                 if (!sourceText.trim()) {
@@ -1836,7 +1836,7 @@
             });
 
             // Clean text button
-            document.getElementById('cleanTextBtn').addEventListener('click', function() {
+            var cleanTextBtn_el = document.getElementById('cleanTextBtn'); if (cleanTextBtn_el) { cleanTextBtn_el.addEventListener('click', function() {
                 var text = document.getElementById('sourceText').value;
                 text = text.replace(/\n\s*\n/g, '\n').trim();
                 document.getElementById('sourceText').value = text;
@@ -1854,7 +1854,7 @@
             });
 
             // OCR button
-            document.getElementById('ocrBtn').addEventListener('click', async function() {
+            var ocrBtn_el = document.getElementById('ocrBtn'); if (ocrBtn_el) { ocrBtn_el.addEventListener('click', async function() {
                 var fileInput = document.getElementById('ocrFile');
                 if (!fileInput.files || fileInput.files.length === 0) {
                     alert('请选择要识别的文件');
@@ -1885,7 +1885,7 @@
             });
 
             // Back translate button
-            document.getElementById('backTranslateBtn').addEventListener('click', async function() {
+            var backTranslateBtn_el = document.getElementById('backTranslateBtn'); if (backTranslateBtn_el) { backTranslateBtn_el.addEventListener('click', async function() {
                 var targetText = document.getElementById('targetText').value;
                 if (!targetText.trim()) {
                     alert('请先进行翻译');
@@ -1916,7 +1916,7 @@
             });
 
             // Dictionary button
-            document.getElementById('dictBtn').addEventListener('click', async function() {
+            var dictBtn_el = document.getElementById('dictBtn'); if (dictBtn_el) { dictBtn_el.addEventListener('click', async function() {
                 var word = document.getElementById('dictInput').value.trim();
                 if (!word) {
                     alert('请输入要查询的单词');
@@ -1938,7 +1938,7 @@
             });
 
             // Glossary button
-            document.getElementById('glossaryBtn').addEventListener('click', async function() {
+            var glossaryBtn_el = document.getElementById('glossaryBtn'); if (glossaryBtn_el) { glossaryBtn_el.addEventListener('click', async function() {
                 var query = document.getElementById('glossaryQuery').value.trim();
                 if (!query) {
                     alert('请输入要查询的术语');
@@ -1967,7 +1967,7 @@
             });
 
             // Update glossary button
-            document.getElementById('updateGlossaryBtn').addEventListener('click', async function() {
+            var updateGlossaryBtn_el = document.getElementById('updateGlossaryBtn'); if (updateGlossaryBtn_el) { updateGlossaryBtn_el.addEventListener('click', async function() {
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 更新中...';
                 try {
@@ -1987,7 +1987,7 @@
             });
 
             // Swap language
-            document.getElementById('swapLang').addEventListener('click', function() {
+            var swapLang_el = document.getElementById('swapLang'); if (swapLang_el) { swapLang_el.addEventListener('click', function() {
                 var src = document.getElementById('sourceLang');
                 var tgt = document.getElementById('targetLang');
                 var tmp = src.value;
@@ -1996,7 +1996,7 @@
             });
 
             // Speak source
-            document.getElementById('speakSourceBtn').addEventListener('click', function() {
+            var speakSourceBtn_el = document.getElementById('speakSourceBtn'); if (speakSourceBtn_el) { speakSourceBtn_el.addEventListener('click', function() {
                 var text = document.getElementById('sourceText').value;
                 if (text) {
                     var utterance = new SpeechSynthesisUtterance(text);
@@ -2006,7 +2006,7 @@
             });
 
             // Speak target
-            document.getElementById('speakTargetBtn').addEventListener('click', function() {
+            var speakTargetBtn_el = document.getElementById('speakTargetBtn'); if (speakTargetBtn_el) { speakTargetBtn_el.addEventListener('click', function() {
                 var text = document.getElementById('targetText').value;
                 if (text) {
                     var utterance = new SpeechSynthesisUtterance(text);
@@ -2016,7 +2016,7 @@
             });
 
             // Align (sentence-by-sentence comparison)
-            document.getElementById('alignBtn').addEventListener('click', function() {
+            var alignBtn_el = document.getElementById('alignBtn'); if (alignBtn_el) { alignBtn_el.addEventListener('click', function() {
                 var source = document.getElementById('sourceText').value;
                 var target = document.getElementById('targetText').value;
                 if (!source || !target) { alert('请先进行翻译'); return; }
@@ -2038,7 +2038,7 @@
             // Copy source/target (already handled by .copy-btn class above)
 
             // AV Transcribe
-            document.getElementById('avTranscribeBtn').addEventListener('click', async function() {
+            var avTranscribeBtn_el = document.getElementById('avTranscribeBtn'); if (avTranscribeBtn_el) { avTranscribeBtn_el.addEventListener('click', async function() {
                 var fileInput = document.getElementById('avFileInput');
                 if (!fileInput.files || fileInput.files.length === 0) { alert('请选择音视频文件'); return; }
                 var formData = new FormData();
@@ -2056,7 +2056,7 @@
 
             // Live chat
             var isLiveListening = false;
-            document.getElementById('liveChatBtn').addEventListener('click', function() {
+            var liveChatBtn_el = document.getElementById('liveChatBtn'); if (liveChatBtn_el) { liveChatBtn_el.addEventListener('click', function() {
                 if (!isLiveListening) {
                     isLiveListening = true;
                     this.innerHTML = '<i class="fas fa-stop"></i> 停止';
@@ -2070,7 +2070,7 @@
                 }
             });
 
-            document.getElementById('liveSendBtn').addEventListener('click', async function() {
+            var liveSendBtn_el = document.getElementById('liveSendBtn'); if (liveSendBtn_el) { liveSendBtn_el.addEventListener('click', async function() {
                 var input = document.getElementById('liveInput');
                 var text = input.value.trim();
                 if (!text) return;
@@ -2093,7 +2093,7 @@
             });
 
             // AI Rewrite
-            document.getElementById('rewriteBtn').addEventListener('click', async function() {
+            var rewriteBtn_el = document.getElementById('rewriteBtn'); if (rewriteBtn_el) { rewriteBtn_el.addEventListener('click', async function() {
                 var text = document.getElementById('rwSourceText').value;
                 if (!text.trim()) { alert('请输入要改写的文本'); return; }
                 this.disabled = true;
@@ -2112,7 +2112,7 @@
             });
 
             // AI Polish
-            document.getElementById('polishBtn').addEventListener('click', async function() {
+            var polishBtn_el = document.getElementById('polishBtn'); if (polishBtn_el) { polishBtn_el.addEventListener('click', async function() {
                 var text = document.getElementById('plSourceText').value;
                 if (!text.trim()) { alert('请输入要润色的文本'); return; }
                 this.disabled = true;
@@ -2131,31 +2131,31 @@
             });
 
             // Rewrite clean
-            document.getElementById('rwCleanBtn').addEventListener('click', function() {
+            var rwCleanBtn_el = document.getElementById('rwCleanBtn'); if (rwCleanBtn_el) { rwCleanBtn_el.addEventListener('click', function() {
                 document.getElementById('rwSourceText').value = '';
                 document.getElementById('rwResultText').value = '';
             });
 
             // Polish clean
-            document.getElementById('plCleanBtn').addEventListener('click', function() {
+            var plCleanBtn_el = document.getElementById('plCleanBtn'); if (plCleanBtn_el) { plCleanBtn_el.addEventListener('click', function() {
                 document.getElementById('plSourceText').value = '';
                 document.getElementById('plResultText').value = '';
             });
 
             // Copy rewrite result
-            document.getElementById('copyRewriteBtn').addEventListener('click', function() {
+            var copyRewriteBtn_el = document.getElementById('copyRewriteBtn'); if (copyRewriteBtn_el) { copyRewriteBtn_el.addEventListener('click', function() {
                 var text = document.getElementById('rwResultText').value;
                 if (text) { navigator.clipboard.writeText(text); alert('已复制'); }
             });
 
             // Copy polish result
-            document.getElementById('copyPolishBtn').addEventListener('click', function() {
+            var copyPolishBtn_el = document.getElementById('copyPolishBtn'); if (copyPolishBtn_el) { copyPolishBtn_el.addEventListener('click', function() {
                 var text = document.getElementById('plResultText').value;
                 if (text) { navigator.clipboard.writeText(text); alert('已复制'); }
             });
 
             // Clear history
-            document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+            var clearHistoryBtn_el = document.getElementById('clearHistoryBtn'); if (clearHistoryBtn_el) { clearHistoryBtn_el.addEventListener('click', function() {
                 if (confirm('确定要清空翻译历史吗？')) {
                     translationHistory = [];
                     localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
@@ -2163,7 +2163,7 @@
             });
 
             // Save term
-            document.getElementById('saveTermBtn').addEventListener('click', async function() {
+            var saveTermBtn_el = document.getElementById('saveTermBtn'); if (saveTermBtn_el) { saveTermBtn_el.addEventListener('click', async function() {
                 var term = document.getElementById('newTerm').value.trim();
                 var translation = document.getElementById('newTranslation').value.trim();
                 if (!term || !translation) { alert('请输入术语和翻译'); return; }
@@ -2180,16 +2180,16 @@
             });
 
             // Download glossary
-            document.getElementById('downloadGlossaryBtn').addEventListener('click', function() {
+            var downloadGlossaryBtn_el = document.getElementById('downloadGlossaryBtn'); if (downloadGlossaryBtn_el) { downloadGlossaryBtn_el.addEventListener('click', function() {
                 window.location.href = '/api/glossary/download';
             });
 
             // Upload glossary
-            document.getElementById('uploadGlossaryBtn').addEventListener('click', function() {
+            var uploadGlossaryBtn_el = document.getElementById('uploadGlossaryBtn'); if (uploadGlossaryBtn_el) { uploadGlossaryBtn_el.addEventListener('click', function() {
                 document.getElementById('glossaryUploadFile').click();
             });
 
-            document.getElementById('glossaryUploadFile').addEventListener('change', async function() {
+            var glossaryUploadFile_el = document.getElementById('glossaryUploadFile'); if (glossaryUploadFile_el) { glossaryUploadFile_el.addEventListener('change', async function() {
                 if (!this.files || this.files.length === 0) return;
                 var formData = new FormData();
                 formData.append('file', this.files[0]);
