@@ -1795,8 +1795,12 @@
             // Clean text
             on('cleanTextBtn', 'click', function() {
                 var t = $('sourceText').value;
+                if (!t.trim()) { alert('文本框为空'); return; }
+                var original = t;
                 t = t.replace(/\n\s*\n/g, '\n').trim();
                 $('sourceText').value = t;
+                var removed = original.length - t.length;
+                alert('整理完成！删除了 ' + removed + ' 个多余字符');
             });
 
             // Copy buttons with checkmark animation
@@ -1895,7 +1899,15 @@
                     var r = await fetch('/api/update-glossary', {method: 'POST'});
                     var d = await r.json();
                     if (d.error) alert('更新失败: ' + d.error);
-                    else alert('词库更新成功！共 ' + d.count + ' 条术语');
+                    else {
+                        alert(d.message || '词库更新成功！');
+                        // Update the date display
+                        var dateEl = document.querySelector('p.text-xs.text-orange-500');
+                        if (dateEl) {
+                            var today = new Date().toISOString().slice(0, 10);
+                            dateEl.textContent = today;
+                        }
+                    }
                 } catch(e) { alert('更新请求失败: ' + e.message); }
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-sync-alt"></i> 更新词库'; }
             });
