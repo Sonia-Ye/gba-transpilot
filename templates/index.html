@@ -1799,12 +1799,18 @@
                 $('sourceText').value = t;
             });
 
-            // Copy buttons
+            // Copy buttons with checkmark animation
             document.querySelectorAll('.copy-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var tid = this.getAttribute('data-copy-target');
                     var t = $(tid) ? $(tid).value : '';
-                    if (t) navigator.clipboard.writeText(t).then(function() { alert('已复制到剪贴板'); });
+                    if (!t) return;
+                    var icon = this.querySelector('i');
+                    var origClass = icon ? icon.className : '';
+                    navigator.clipboard.writeText(t).then(function() {
+                        if (icon) { icon.className = 'fas fa-check'; }
+                        setTimeout(function() { if (icon) icon.className = origClass; }, 1500);
+                    });
                 });
             });
 
@@ -1818,7 +1824,14 @@
                     var r = await fetch('/api/ocr', {method: 'POST', body: fd});
                     var d = await r.json();
                     if (d.error) alert('OCR错误: ' + d.error);
-                    else { $('sourceText').value = d.text || ''; alert('识别完成！'); }
+                    else {
+                        var txt = d.text || '';
+                        // Handle Python dict string format
+                        if (txt.startsWith('{') && txt.includes('text')) {
+                            try { var parsed = JSON.parse(txt.replace(/'/g, '"')); txt = parsed.text || txt; } catch(e) {}
+                        }
+                        $('sourceText').value = txt;
+                    }
                 } catch(e) { alert('OCR请求失败: ' + e.message); }
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-upload"></i> 上传并识别'; }
             });
@@ -1849,7 +1862,10 @@
                     var r = await fetch('/api/dictionary?word=' + encodeURIComponent(w));
                     var d = await r.json();
                     if (d.error) $('dictResult').innerHTML = '<p class="text-danger">' + d.error + '</p>';
-                    else $('dictResult').innerHTML = '<p>' + (d.definition || '未找到释义') + '</p>';
+                    else {
+                        var def = (d.definition || '未找到释义').replace(/\n/g, '<br>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                        $('dictResult').innerHTML = '<div style="line-height:1.8;white-space:pre-wrap;">' + def + '</div>';
+                    }
                 } catch(e) { $('dictResult').innerHTML = '<p class="text-danger">查询失败</p>'; }
             });
 
