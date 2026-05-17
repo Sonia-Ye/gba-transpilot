@@ -673,12 +673,54 @@ def translate_text():
         return jsonify({"error": "No text provided"}), 400
     
     try:
+        # Search glossary for terms in the text
+        glossary_matches = {}
+        print(f"[DEBUG] WHOOSH_AVAILABLE={WHOOSH_AVAILABLE}, ix={ix is not None}")
+        if WHOOSH_AVAILABLE and ix is not None:
+            try:
+                from whoosh.qparser import QueryParser
+                import re
+                with ix.searcher() as searcher:
+                    phrases = re.findall(r'[A-Za-z][A-Za-z\s\-\+]{1,50}', text)
+                    print(f"[DEBUG] Extracted phrases: {phrases}")
+                    for phrase in phrases:
+                        phrase = phrase.strip()
+                        if len(phrase) < 3:
+                            continue
+                        try:
+                            query = QueryParser("translation", ix.schema).parse(phrase.lower())
+                            results = searcher.search(query, limit=1)
+                            if results:
+                                zh_term = results[0].get('term', '')
+                                en_term = results[0].get('translation', '')
+                                print(f"[DEBUG] Found: {en_term} -> {zh_term}")
+                                if en_term and zh_term:
+                                    glossary_matches[en_term.lower()] = zh_term
+                        except Exception as ex:
+                            print(f"[DEBUG] Search error: {ex}")
+            except Exception as e:
+                print(f"[DEBUG] Glossary error: {e}")
+        print(f"[DEBUG] Glossary matches: {glossary_matches}")
+        
+        # Build glossary context for the prompt
+        glossary_context = ""
+        if glossary_matches and target_lang == 'zh':
+            glossary_context = "\n\nIMPORTANT: Use these official translations:\n"
+            for en_term, zh_term in glossary_matches.items():
+                glossary_context += f"- '{en_term}' should be translated as '{zh_term}'\n"
+        
         # DEMO MODE: Use mock translation
         if DEMO_MODE:
             translation = mock_translate(text, source_lang, target_lang)
+            # Apply glossary substitutions for demo mode
+            import re
+            for en_term, zh_term in glossary_matches.items():
+                if target_lang == 'zh':
+                    pattern = re.compile(re.escape(en_term), re.IGNORECASE)
+                    translation = pattern.sub(zh_term, translation)
         else:
             prompt = f"""Translate the following text from {source_lang} to {target_lang}.
-            Keep the meaning accurate and natural:
+            Keep the meaning accurate and natural.{glossary_context}
 
             {text}"""
 
@@ -699,6 +741,7 @@ def translate_text():
         })
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
+
 
 @app.route('/api/ocr', methods=['POST'])
 def ocr_image():
