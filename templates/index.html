@@ -1740,422 +1740,269 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Helper: safely get element and add listener
+        function $(id) { return document.getElementById(id); }
+        function on(id, evt, fn) { var el = $(id); if (el) el.addEventListener(evt, fn); }
+
         // Global State
-        var alignResultText = '';
         var translationHistory = [];
-        var avTranscriptHistory = [];
-        var rewriteHistory = [];
-        var polishHistory = [];
         var rewriteMode = 'paraphrase';
         var rewriteStyle = 'standard';
         var polishStyle = 'general';
-        var rtRecognition = null;
-        var rtChatMessages = [];
 
-        // Helper functions
+        // Helper functions (global, used by onclick in HTML)
         function selectRewriteMode(mode) {
             rewriteMode = mode;
-            document.querySelectorAll('#rewrite .option-card').forEach(function(card) {
-                card.classList.remove('selected');
-            });
-            if (mode === 'paraphrase') {
-                document.getElementById('rwModeParaphrase').classList.add('selected');
-            } else {
-                document.getElementById('rwModePreEdit').classList.add('selected');
-            }
+            document.querySelectorAll('#rewrite .option-card').forEach(function(c) { c.classList.remove('selected'); });
+            var el = mode === 'paraphrase' ? $('rwModeParaphrase') : $('rwModePreEdit');
+            if (el) el.classList.add('selected');
         }
-
         function selectRewriteStyle(style) {
             rewriteStyle = style;
-            var styleMap = {
-                'standard': 'rwStyleStandard',
-                'formal': 'rwStyleFormal',
-                'casual': 'rwStyleCasual',
-                'academic': 'rwStyleAcademic',
-                'business': 'rwStyleBusiness'
-            };
-            if (styleMap[style]) {
-                document.querySelectorAll('#rewrite .option-card').forEach(function(card) {
-                    card.classList.remove('selected');
-                });
-                document.getElementById(styleMap[style]).classList.add('selected');
-            }
+            document.querySelectorAll('#rewrite .option-card').forEach(function(c) { c.classList.remove('selected'); });
+            var map = {standard:'rwStyleStandard',formal:'rwStyleFormal',casual:'rwStyleCasual',academic:'rwStyleAcademic',business:'rwStyleBusiness'};
+            if (map[style]) { var el = $(map[style]); if (el) el.classList.add('selected'); }
         }
-
         function selectPolishStyle(style) {
             polishStyle = style;
-            var styleMap = {
-                'general': 'plStyleGeneral',
-                'formal': 'plStyleFormal',
-                'concise': 'plStyleConcise',
-                'academic': 'plStyleAcademic',
-                'business': 'plStyleBusiness'
-            };
-            if (styleMap[style]) {
-                document.querySelectorAll('#polish .option-card').forEach(function(card) {
-                    card.classList.remove('selected');
-                });
-                document.getElementById(styleMap[style]).classList.add('selected');
-            }
+            document.querySelectorAll('#polish .option-card').forEach(function(c) { c.classList.remove('selected'); });
+            var map = {general:'plStyleGeneral',formal:'plStyleFormal',concise:'plStyleConcise',academic:'plStyleAcademic',business:'plStyleBusiness'};
+            if (map[style]) { var el = $(map[style]); if (el) el.classList.add('selected'); }
         }
 
-        // DOM Ready - all event bindings
+        // All event bindings
         document.addEventListener('DOMContentLoaded', function() {
-            // Text translation
-            var translateBtn_el = document.getElementById('translateBtn'); if (translateBtn_el) { translateBtn_el.addEventListener('click', async function() {
-                var sourceText = document.getElementById('sourceText').value;
-                var targetLang = document.getElementById('targetLang').value;
-                if (!sourceText.trim()) {
-                    alert('请输入要翻译的文本');
-                    return;
-                }
+
+            // Translate
+            on('translateBtn', 'click', async function() {
+                var text = $('sourceText').value;
+                if (!text.trim()) { alert('请输入要翻译的文本'); return; }
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 try {
-                    var response = await fetch('/api/translate', {
+                    var r = await fetch('/api/translate', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            text: sourceText,
-                            source_lang: document.getElementById('sourceLang').value,
-                            target_lang: targetLang
-                        })
+                        body: JSON.stringify({text: text, source_lang: $('sourceLang').value, target_lang: $('targetLang').value})
                     });
-                    var data = await response.json();
-                    if (data.error) {
-                        alert('翻译错误: ' + data.error);
-                    } else {
-                        document.getElementById('targetText').value = data.translation;
-                    }
-                } catch (error) {
-                    alert('翻译请求失败: ' + error.message);
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-arrow-right"></i>';
-                }
+                    var d = await r.json();
+                    if (d.error) alert('翻译错误: ' + d.error);
+                    else $('targetText').value = d.translation || '';
+                } catch(e) { alert('翻译请求失败: ' + e.message); }
+                finally { this.disabled = false; this.innerHTML = '<i class="fas fa-arrow-right"></i>'; }
             });
 
-            // Clean text button
-            var cleanTextBtn_el = document.getElementById('cleanTextBtn'); if (cleanTextBtn_el) { cleanTextBtn_el.addEventListener('click', function() {
-                var text = document.getElementById('sourceText').value;
-                text = text.replace(/\n\s*\n/g, '\n').trim();
-                document.getElementById('sourceText').value = text;
+            // Clean text
+            on('cleanTextBtn', 'click', function() {
+                var t = $('sourceText').value;
+                t = t.replace(/\n\s*\n/g, '\n').trim();
+                $('sourceText').value = t;
             });
 
             // Copy buttons
             document.querySelectorAll('.copy-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    var targetId = this.getAttribute('data-copy-target');
-                    var text = document.getElementById(targetId).value;
-                    navigator.clipboard.writeText(text).then(function() {
-                        alert('已复制到剪贴板');
-                    });
+                    var tid = this.getAttribute('data-copy-target');
+                    var t = $(tid) ? $(tid).value : '';
+                    if (t) navigator.clipboard.writeText(t).then(function() { alert('已复制到剪贴板'); });
                 });
             });
 
-            // OCR button
-            var ocrBtn_el = document.getElementById('ocrBtn'); if (ocrBtn_el) { ocrBtn_el.addEventListener('click', async function() {
-                var fileInput = document.getElementById('ocrFile');
-                if (!fileInput.files || fileInput.files.length === 0) {
-                    alert('请选择要识别的文件');
-                    return;
-                }
-                var formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 识别中...';
+            // OCR
+            on('ocrBtn', 'click', async function() {
+                var fi = $('ocrFile');
+                if (!fi || !fi.files || fi.files.length === 0) { alert('请选择要识别的文件'); return; }
+                var fd = new FormData(); fd.append('file', fi.files[0]);
+                this.disabled = true; this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 识别中...';
                 try {
-                    var response = await fetch('/ocr', {
-                        method: 'POST',
-                        body: formData
+                    var r = await fetch('/api/ocr', {method: 'POST', body: fd});
+                    var d = await r.json();
+                    if (d.error) alert('OCR错误: ' + d.error);
+                    else { $('sourceText').value = d.text || ''; alert('识别完成！'); }
+                } catch(e) { alert('OCR请求失败: ' + e.message); }
+                finally { this.disabled = false; this.innerHTML = '<i class="fas fa-upload"></i> 上传并识别'; }
+            });
+
+            // Back translate
+            on('backTranslateBtn', 'click', async function() {
+                var t = $('targetText').value;
+                if (!t.trim()) { alert('请先进行翻译'); return; }
+                this.disabled = true;
+                try {
+                    var r = await fetch('/api/translate', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: t, source_lang: $('targetLang').value, target_lang: $('sourceLang').value})
                     });
-                    var data = await response.json();
-                    if (data.error) {
-                        alert('OCR错误: ' + data.error);
-                    } else {
-                        document.getElementById('sourceText').value = data.text || '';
-                        alert('识别完成！');
-                    }
-                } catch (error) {
-                    alert('OCR请求失败: ' + error.message);
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-upload"></i> 上传并识别';
-                }
+                    var d = await r.json();
+                    if (d.error) alert('回译错误: ' + d.error);
+                    else $('backTranslateResult').value = d.translation || '';
+                } catch(e) { alert('回译请求失败: ' + e.message); }
+                finally { this.disabled = false; }
             });
 
-            // Back translate button
-            var backTranslateBtn_el = document.getElementById('backTranslateBtn'); if (backTranslateBtn_el) { backTranslateBtn_el.addEventListener('click', async function() {
-                var targetText = document.getElementById('targetText').value;
-                if (!targetText.trim()) {
-                    alert('请先进行翻译');
-                    return;
-                }
-                this.disabled = true;
+            // Dictionary
+            on('dictBtn', 'click', async function() {
+                var w = $('dictInput').value.trim();
+                if (!w) { alert('请输入要查询的单词'); return; }
+                $('dictResult').innerHTML = '<p class="text-muted">查询中...</p>';
                 try {
-                    var response = await fetch('/api/translate', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            text: targetText,
-                            source_lang: document.getElementById('targetLang').value,
-                            target_lang: document.getElementById('sourceLang').value
-                        })
-                    });
-                    var data = await response.json();
-                    if (data.error) {
-                        alert('回译错误: ' + data.error);
-                    } else {
-                        document.getElementById('backTranslateResult').value = data.translation;
-                    }
-                } catch (error) {
-                    alert('回译请求失败: ' + error.message);
-                } finally {
-                    this.disabled = false;
-                }
+                    var r = await fetch('/api/dictionary?word=' + encodeURIComponent(w));
+                    var d = await r.json();
+                    if (d.error) $('dictResult').innerHTML = '<p class="text-danger">' + d.error + '</p>';
+                    else $('dictResult').innerHTML = '<p>' + (d.definition || '未找到释义') + '</p>';
+                } catch(e) { $('dictResult').innerHTML = '<p class="text-danger">查询失败</p>'; }
             });
 
-            // Dictionary button
-            var dictBtn_el = document.getElementById('dictBtn'); if (dictBtn_el) { dictBtn_el.addEventListener('click', async function() {
-                var word = document.getElementById('dictInput').value.trim();
-                if (!word) {
-                    alert('请输入要查询的单词');
-                    return;
-                }
-                var resultDiv = document.getElementById('dictResult');
-                resultDiv.innerHTML = '<p class="text-muted">查询中...</p>';
+            // Glossary search
+            on('glossaryBtn', 'click', async function() {
+                var q = $('glossaryQuery').value.trim();
+                if (!q) { alert('请输入要查询的术语'); return; }
+                $('glossaryResult').innerHTML = '<p class="text-muted">查询中...</p>';
                 try {
-                    var response = await fetch('/dictionary?word=' + encodeURIComponent(word));
-                    var data = await response.json();
-                    if (data.error) {
-                        resultDiv.innerHTML = '<p class="text-danger">' + data.error + '</p>';
-                    } else {
-                        resultDiv.innerHTML = '<p>' + (data.definition || '未找到释义') + '</p>';
-                    }
-                } catch (error) {
-                    resultDiv.innerHTML = '<p class="text-danger">查询失败</p>';
-                }
+                    var lang = $('glossaryTargetLang') ? $('glossaryTargetLang').value : 'zh';
+                    var r = await fetch('/api/glossary?query=' + encodeURIComponent(q) + '&lang=' + lang);
+                    var d = await r.json();
+                    if (d.error) $('glossaryResult').innerHTML = '<p class="text-danger">' + d.error + '</p>';
+                    else if (d.results && d.results.length > 0) {
+                        var h = '<ul class="list-group">';
+                        d.results.forEach(function(item) { h += '<li class="list-group-item"><strong>' + item.term + '</strong>: ' + (item.translation || '无翻译') + '</li>'; });
+                        h += '</ul>';
+                        $('glossaryResult').innerHTML = h;
+                    } else $('glossaryResult').innerHTML = '<p class="text-muted">未找到相关术语</p>';
+                } catch(e) { $('glossaryResult').innerHTML = '<p class="text-danger">查询失败</p>'; }
             });
 
-            // Glossary button
-            var glossaryBtn_el = document.getElementById('glossaryBtn'); if (glossaryBtn_el) { glossaryBtn_el.addEventListener('click', async function() {
-                var query = document.getElementById('glossaryQuery').value.trim();
-                if (!query) {
-                    alert('请输入要查询的术语');
-                    return;
-                }
-                var resultDiv = document.getElementById('glossaryResult');
-                resultDiv.innerHTML = '<p class="text-muted">查询中...</p>';
+            // Update glossary
+            on('updateGlossaryBtn', 'click', async function() {
+                this.disabled = true; this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 更新中...';
                 try {
-                    var response = await fetch('/glossary?query=' + encodeURIComponent(query));
-                    var data = await response.json();
-                    if (data.error) {
-                        resultDiv.innerHTML = '<p class="text-danger">' + data.error + '</p>';
-                    } else if (data.results && data.results.length > 0) {
-                        var html = '<ul class="list-group">';
-                        data.results.forEach(function(item) {
-                            html += '<li class="list-group-item"><strong>' + item.term + '</strong>: ' + (item.translation || '无翻译') + '</li>';
-                        });
-                        html += '</ul>';
-                        resultDiv.innerHTML = html;
-                    } else {
-                        resultDiv.innerHTML = '<p class="text-muted">未找到相关术语</p>';
-                    }
-                } catch (error) {
-                    resultDiv.innerHTML = '<p class="text-danger">查询失败</p>';
-                }
-            });
-
-            // Update glossary button
-            var updateGlossaryBtn_el = document.getElementById('updateGlossaryBtn'); if (updateGlossaryBtn_el) { updateGlossaryBtn_el.addEventListener('click', async function() {
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 更新中...';
-                try {
-                    var response = await fetch('/update_glossary', {method: 'POST'});
-                    var data = await response.json();
-                    if (data.error) {
-                        alert('更新失败: ' + data.error);
-                    } else {
-                        alert('词库更新成功！共 ' + data.count + ' 条术语');
-                    }
-                } catch (error) {
-                    alert('更新请求失败: ' + error.message);
-                } finally {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-sync-alt"></i> 更新词库';
-                }
+                    var r = await fetch('/api/update-glossary', {method: 'POST'});
+                    var d = await r.json();
+                    if (d.error) alert('更新失败: ' + d.error);
+                    else alert('词库更新成功！共 ' + d.count + ' 条术语');
+                } catch(e) { alert('更新请求失败: ' + e.message); }
+                finally { this.disabled = false; this.innerHTML = '<i class="fas fa-sync-alt"></i> 更新词库'; }
             });
 
             // Swap language
-            var swapLang_el = document.getElementById('swapLang'); if (swapLang_el) { swapLang_el.addEventListener('click', function() {
-                var src = document.getElementById('sourceLang');
-                var tgt = document.getElementById('targetLang');
-                var tmp = src.value;
-                src.value = tgt.value;
-                tgt.value = tmp;
+            on('swapLang', 'click', function() {
+                var s = $('sourceLang'), t = $('targetLang'), tmp = s.value;
+                s.value = t.value; t.value = tmp;
             });
 
             // Speak source
-            var speakSourceBtn_el = document.getElementById('speakSourceBtn'); if (speakSourceBtn_el) { speakSourceBtn_el.addEventListener('click', function() {
-                var text = document.getElementById('sourceText').value;
-                if (text) {
-                    var utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = document.getElementById('sourceLang').value === 'zh' ? 'zh-CN' : document.getElementById('sourceLang').value === 'zh-HK' ? 'zh-HK' : 'en-US';
-                    speechSynthesis.speak(utterance);
-                }
+            on('speakSourceBtn', 'click', function() {
+                var t = $('sourceText').value;
+                if (t) { var u = new SpeechSynthesisUtterance(t); u.lang = $('sourceLang').value === 'zh' ? 'zh-CN' : $('sourceLang').value === 'zh-HK' ? 'zh-HK' : 'en-US'; speechSynthesis.speak(u); }
             });
 
             // Speak target
-            var speakTargetBtn_el = document.getElementById('speakTargetBtn'); if (speakTargetBtn_el) { speakTargetBtn_el.addEventListener('click', function() {
-                var text = document.getElementById('targetText').value;
-                if (text) {
-                    var utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = document.getElementById('targetLang').value === 'zh' ? 'zh-CN' : document.getElementById('targetLang').value === 'zh-HK' ? 'zh-HK' : 'en-US';
-                    speechSynthesis.speak(utterance);
-                }
+            on('speakTargetBtn', 'click', function() {
+                var t = $('targetText').value;
+                if (t) { var u = new SpeechSynthesisUtterance(t); u.lang = $('targetLang').value === 'zh' ? 'zh-CN' : $('targetLang').value === 'zh-HK' ? 'zh-HK' : 'en-US'; speechSynthesis.speak(u); }
             });
 
-            // Align (sentence-by-sentence comparison)
-            var alignBtn_el = document.getElementById('alignBtn'); if (alignBtn_el) { alignBtn_el.addEventListener('click', function() {
-                var source = document.getElementById('sourceText').value;
-                var target = document.getElementById('targetText').value;
-                if (!source || !target) { alert('请先进行翻译'); return; }
-                var srcLines = source.split(/[。！？.!?\n]+/).filter(function(l) { return l.trim(); });
-                var tgtLines = target.split(/[。！？.!?\n]+/).filter(function(l) { return l.trim(); });
-                var html = '<div class="row"><div class="col-6">';
-                srcLines.forEach(function(line, i) {
-                    html += '<p style="margin-bottom:8px;padding:4px;background:#f0f0f0;border-radius:4px;">' + (i+1) + '. ' + line.trim() + '</p>';
-                });
-                html += '</div><div class="col-6">';
-                tgtLines.forEach(function(line, i) {
-                    html += '<p style="margin-bottom:8px;padding:4px;background:#e8f0fe;border-radius:4px;">' + (i+1) + '. ' + line.trim() + '</p>';
-                });
-                html += '</div></div>';
-                alignResultText = html;
-                alert('逐句对照已生成，共 ' + srcLines.length + ' 句');
+            // Align
+            on('alignBtn', 'click', function() {
+                var s = $('sourceText').value, t = $('targetText').value;
+                if (!s || !t) { alert('请先进行翻译'); return; }
+                var sl = s.split(/[。！？.!?\\n]+/).filter(function(l) { return l.trim(); });
+                var tl = t.split(/[。！？.!?\\n]+/).filter(function(l) { return l.trim(); });
+                alert('逐句对照已生成，共 ' + sl.length + ' 句');
             });
-
-            // Copy source/target (already handled by .copy-btn class above)
 
             // AV Transcribe
-            var avTranscribeBtn_el = document.getElementById('avTranscribeBtn'); if (avTranscribeBtn_el) { avTranscribeBtn_el.addEventListener('click', async function() {
-                var fileInput = document.getElementById('avFileInput');
-                if (!fileInput.files || fileInput.files.length === 0) { alert('请选择音视频文件'); return; }
-                var formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 转录中...';
+            on('avTranscribeBtn', 'click', async function() {
+                var fi = $('avFileInput');
+                if (!fi || !fi.files || fi.files.length === 0) { alert('请选择音视频文件'); return; }
+                var fd = new FormData(); fd.append('file', fi.files[0]);
+                this.disabled = true; this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 转录中...';
                 try {
-                    var response = await fetch('/api/transcribe', { method: 'POST', body: formData });
-                    var data = await response.json();
-                    if (data.error) { alert('转录错误: ' + data.error); }
-                    else { document.getElementById('avTranscript').value = data.text || ''; }
-                } catch (error) { alert('转录请求失败: ' + error.message); }
+                    var r = await fetch('/api/transcribe', {method: 'POST', body: fd});
+                    var d = await r.json();
+                    if (d.error) alert('转录错误: ' + d.error);
+                    else { var el = $('avTranscript'); if (el) el.value = d.text || ''; }
+                } catch(e) { alert('转录请求失败: ' + e.message); }
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-microphone"></i> 开始转录'; }
             });
 
             // Live chat
-            var isLiveListening = false;
-            var liveChatBtn_el = document.getElementById('liveChatBtn'); if (liveChatBtn_el) { liveChatBtn_el.addEventListener('click', function() {
-                if (!isLiveListening) {
-                    isLiveListening = true;
-                    this.innerHTML = '<i class="fas fa-stop"></i> 停止';
-                    this.classList.add('btn-danger');
-                    this.classList.remove('btn-primary');
+            on('liveChatBtn', 'click', function() {
+                var el = $('liveChatBtn');
+                if (!el) return;
+                if (el.dataset.listening !== 'true') {
+                    el.dataset.listening = 'true';
+                    el.innerHTML = '<i class="fas fa-stop"></i> 停止';
+                    el.classList.add('btn-danger'); el.classList.remove('btn-primary');
                 } else {
-                    isLiveListening = false;
-                    this.innerHTML = '<i class="fas fa-microphone"></i> 开始对话';
-                    this.classList.remove('btn-danger');
-                    this.classList.add('btn-primary');
+                    el.dataset.listening = 'false';
+                    el.innerHTML = '<i class="fas fa-microphone"></i> 开始对话';
+                    el.classList.remove('btn-danger'); el.classList.add('btn-primary');
                 }
             });
 
-            var liveSendBtn_el = document.getElementById('liveSendBtn'); if (liveSendBtn_el) { liveSendBtn_el.addEventListener('click', async function() {
-                var input = document.getElementById('liveInput');
-                var text = input.value.trim();
-                if (!text) return;
-                input.value = '';
-                var chatBox = document.getElementById('rtChatMessages');
-                chatBox.innerHTML += '<div class="mb-2"><span class="badge bg-primary">你</span> ' + text + '</div>';
+            // Live send
+            on('liveSendBtn', 'click', async function() {
+                var inp = $('liveInput');
+                if (!inp) return;
+                var text = inp.value.trim(); if (!text) return;
+                inp.value = '';
+                var box = $('rtChatMessages');
+                if (box) box.innerHTML += '<div class="mb-2"><span class="badge bg-primary">你</span> ' + text + '</div>';
                 try {
-                    var response = await fetch('/api/translate', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ text: text, source_lang: 'auto', target_lang: document.getElementById('targetLang').value })
+                    var r = await fetch('/api/translate', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: text, source_lang: 'auto', target_lang: $('targetLang').value})
                     });
-                    var data = await response.json();
-                    if (data.translation) {
-                        chatBox.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + data.translation + '</div>';
-                    }
-                } catch (error) {
-                    chatBox.innerHTML += '<div class="mb-2 text-danger">请求失败: ' + error.message + '</div>';
-                }
+                    var d = await r.json();
+                    if (d.translation && box) box.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + d.translation + '</div>';
+                } catch(e) { if (box) box.innerHTML += '<div class="mb-2 text-danger">请求失败</div>'; }
             });
 
             // AI Rewrite
-            var rewriteBtn_el = document.getElementById('rewriteBtn'); if (rewriteBtn_el) { rewriteBtn_el.addEventListener('click', async function() {
-                var text = document.getElementById('rwSourceText').value;
-                if (!text.trim()) { alert('请输入要改写的文本'); return; }
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 改写中...';
+            on('rewriteBtn', 'click', async function() {
+                var t = $('rwSourceText');
+                if (!t || !t.value.trim()) { alert('请输入要改写的文本'); return; }
+                this.disabled = true; this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 改写中...';
                 try {
-                    var response = await fetch('/api/rewrite', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ text: text, mode: rewriteMode, style: rewriteStyle })
+                    var r = await fetch('/api/rewrite', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: t.value, mode: rewriteMode, style: rewriteStyle})
                     });
-                    var data = await response.json();
-                    if (data.error) { alert('改写错误: ' + data.error); }
-                    else { document.getElementById('rwResultText').value = data.rewritten_text || data.result || ''; }
-                } catch (error) { alert('改写请求失败: ' + error.message); }
+                    var d = await r.json();
+                    if (d.error) alert('改写错误: ' + d.error);
+                    else { var el = $('rwResultText'); if (el) el.value = d.rewritten_text || d.result || ''; }
+                } catch(e) { alert('改写请求失败: ' + e.message); }
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-magic"></i> 开始改写'; }
             });
 
             // AI Polish
-            var polishBtn_el = document.getElementById('polishBtn'); if (polishBtn_el) { polishBtn_el.addEventListener('click', async function() {
-                var text = document.getElementById('plSourceText').value;
-                if (!text.trim()) { alert('请输入要润色的文本'); return; }
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 润色中...';
+            on('polishBtn', 'click', async function() {
+                var t = $('plSourceText');
+                if (!t || !t.value.trim()) { alert('请输入要润色的文本'); return; }
+                this.disabled = true; this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 润色中...';
                 try {
-                    var response = await fetch('/api/polish', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ text: text, style: polishStyle })
+                    var r = await fetch('/api/polish', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: t.value, style: polishStyle})
                     });
-                    var data = await response.json();
-                    if (data.error) { alert('润色错误: ' + data.error); }
-                    else { document.getElementById('plResultText').value = data.polished_text || data.result || ''; }
-                } catch (error) { alert('润色请求失败: ' + error.message); }
+                    var d = await r.json();
+                    if (d.error) alert('润色错误: ' + d.error);
+                    else { var el = $('plResultText'); if (el) el.value = d.polished_text || d.result || ''; }
+                } catch(e) { alert('润色请求失败: ' + e.message); }
                 finally { this.disabled = false; this.innerHTML = '<i class="fas fa-sparkles"></i> 开始润色'; }
             });
 
-            // Rewrite clean
-            var rwCleanBtn_el = document.getElementById('rwCleanBtn'); if (rwCleanBtn_el) { rwCleanBtn_el.addEventListener('click', function() {
-                document.getElementById('rwSourceText').value = '';
-                document.getElementById('rwResultText').value = '';
-            });
+            // Clean buttons
+            on('rwCleanBtn', 'click', function() { var a = $('rwSourceText'); var b = $('rwResultText'); if (a) a.value = ''; if (b) b.value = ''; });
+            on('plCleanBtn', 'click', function() { var a = $('plSourceText'); var b = $('plResultText'); if (a) a.value = ''; if (b) b.value = ''; });
 
-            // Polish clean
-            var plCleanBtn_el = document.getElementById('plCleanBtn'); if (plCleanBtn_el) { plCleanBtn_el.addEventListener('click', function() {
-                document.getElementById('plSourceText').value = '';
-                document.getElementById('plResultText').value = '';
-            });
-
-            // Copy rewrite result
-            var copyRewriteBtn_el = document.getElementById('copyRewriteBtn'); if (copyRewriteBtn_el) { copyRewriteBtn_el.addEventListener('click', function() {
-                var text = document.getElementById('rwResultText').value;
-                if (text) { navigator.clipboard.writeText(text); alert('已复制'); }
-            });
-
-            // Copy polish result
-            var copyPolishBtn_el = document.getElementById('copyPolishBtn'); if (copyPolishBtn_el) { copyPolishBtn_el.addEventListener('click', function() {
-                var text = document.getElementById('plResultText').value;
-                if (text) { navigator.clipboard.writeText(text); alert('已复制'); }
-            });
+            // Copy results
+            on('copyRewriteBtn', 'click', function() { var t = $('rwResultText'); if (t && t.value) { navigator.clipboard.writeText(t.value); alert('已复制'); } });
+            on('copyPolishBtn', 'click', function() { var t = $('plResultText'); if (t && t.value) { navigator.clipboard.writeText(t.value); alert('已复制'); } });
 
             // Clear history
-            var clearHistoryBtn_el = document.getElementById('clearHistoryBtn'); if (clearHistoryBtn_el) { clearHistoryBtn_el.addEventListener('click', function() {
+            on('clearHistoryBtn', 'click', function() {
                 if (confirm('确定要清空翻译历史吗？')) {
                     translationHistory = [];
                     localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
@@ -2163,46 +2010,35 @@
             });
 
             // Save term
-            var saveTermBtn_el = document.getElementById('saveTermBtn'); if (saveTermBtn_el) { saveTermBtn_el.addEventListener('click', async function() {
-                var term = document.getElementById('newTerm').value.trim();
-                var translation = document.getElementById('newTranslation').value.trim();
-                if (!term || !translation) { alert('请输入术语和翻译'); return; }
+            on('saveTermBtn', 'click', async function() {
+                var term = $('newTerm'), trans = $('newTranslation');
+                if (!term || !trans || !term.value.trim() || !trans.value.trim()) { alert('请输入术语和翻译'); return; }
                 try {
-                    var response = await fetch('/api/add-term', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ term: term, translation: translation })
+                    var r = await fetch('/api/add-term', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({term: term.value.trim(), translation: trans.value.trim()})
                     });
-                    var data = await response.json();
-                    if (data.success) { alert('术语已添加'); }
-                    else { alert('添加失败: ' + (data.error || '')); }
-                } catch (error) { alert('请求失败: ' + error.message); }
+                    var d = await r.json();
+                    if (d.success) alert('术语已添加'); else alert('添加失败');
+                } catch(e) { alert('请求失败: ' + e.message); }
             });
 
             // Download glossary
-            var downloadGlossaryBtn_el = document.getElementById('downloadGlossaryBtn'); if (downloadGlossaryBtn_el) { downloadGlossaryBtn_el.addEventListener('click', function() {
-                window.location.href = '/api/glossary/download';
-            });
+            on('downloadGlossaryBtn', 'click', function() { window.location.href = '/api/glossary/download'; });
 
             // Upload glossary
-            var uploadGlossaryBtn_el = document.getElementById('uploadGlossaryBtn'); if (uploadGlossaryBtn_el) { uploadGlossaryBtn_el.addEventListener('click', function() {
-                document.getElementById('glossaryUploadFile').click();
-            });
-
-            var glossaryUploadFile_el = document.getElementById('glossaryUploadFile'); if (glossaryUploadFile_el) { glossaryUploadFile_el.addEventListener('change', async function() {
+            on('uploadGlossaryBtn', 'click', function() { var el = $('glossaryUploadFile'); if (el) el.click(); });
+            on('glossaryUploadFile', 'change', async function() {
                 if (!this.files || this.files.length === 0) return;
-                var formData = new FormData();
-                formData.append('file', this.files[0]);
+                var fd = new FormData(); fd.append('file', this.files[0]);
                 try {
-                    var response = await fetch('/api/glossary/upload', { method: 'POST', body: formData });
-                    var data = await response.json();
-                    if (data.success) { alert('术语库上传成功'); }
-                    else { alert('上传失败: ' + (data.error || '')); }
-                } catch (error) { alert('上传失败: ' + error.message); }
+                    var r = await fetch('/api/glossary/upload', {method: 'POST', body: fd});
+                    var d = await r.json();
+                    if (d.success) alert('术语库上传成功'); else alert('上传失败');
+                } catch(e) { alert('上传失败: ' + e.message); }
             });
 
-            // Initialize
-            console.log('GBA TransPilot loaded');
+            console.log('GBA TransPilot loaded successfully');
         });
     </script>
 
