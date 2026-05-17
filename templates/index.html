@@ -1955,7 +1955,7 @@
                         body: JSON.stringify({text: text, source_lang: 'auto', target_lang: $('targetLang').value})
                     });
                     var d = await r.json();
-                    if ((d.result || d.translation) && box) box.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + (d.result || d.translation) + '</div>'; += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + d.translation + '</div>';
+                    if ((d.result || d.translation) && box) box.innerHTML += '<div class="mb-2"><span class="badge bg-success">AI</span> ' + (d.result || d.translation) + '</div>';
                 } catch(e) { if (box) box.innerHTML += '<div class="mb-2 text-danger">请求失败</div>'; }
             });
 
